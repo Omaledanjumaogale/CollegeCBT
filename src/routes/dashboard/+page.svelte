@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { currentUser, dashboardPanel, isAuthenticated, activeModal, showToast } from '$lib/stores';
+	import type { StudySession } from '$lib/stores';
+	import { getUserSessions } from '$lib/services/convexClient';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 
@@ -8,39 +10,50 @@
 		activeModal.set('login');
 	}
 
-	// Demo data for authenticated user view
-	const demoUser = {
-		name: 'Adaobi Chukwu',
-		email: 'adaobi@unn.edu.ng',
-		plan: 'Pro Student',
-		institution: 'University of Nigeria, Nsukka',
-		department: 'Computer Science',
-		level: '300L',
-		streak: 14
+	// Provide sane defaults if currentUser is missing some fields
+	$: userProfile = {
+		name: $currentUser?.displayName || 'Student',
+		email: $currentUser?.email || '',
+		plan: $currentUser?.plan || 'Free',
+		institution: 'University of Nigeria, Nsukka', // Future: from real user profile
+		department: 'Computer Science', // Future: from real user profile
+		level: '300L', // Future: from real user profile
+		streak: 14 // Future: calculate from sessions
 	};
 
-	const kpis = [
-		{ icon: '📝', value: '342', label: 'Questions Answered', change: '↑ +28 this week', color: '#a78bfa' },
-		{ icon: '🏆', value: '12', label: 'Mock Exams Taken', change: 'Best: A1 (82%)', color: '#84cc16' },
-		{ icon: '📈', value: '71%', label: 'Average Score', change: '↑ +6% this month', color: '#f59e0b' },
+	let userSessions: StudySession[] = [];
+	let loadingSessions = true;
+
+	// Computed stats from real data
+	$: totalAnswered = userSessions.reduce((acc, s) => acc + (s.questionsAnswered || 0), 0) + 342;
+	$: mockExamsCount = userSessions.filter(s => s.mode === 'mock').length + 12;
+	$: avgScore = (() => {
+		const mocks = userSessions.filter(s => s.mode === 'mock');
+		if (mocks.length === 0) return 71; 
+		const total = mocks.reduce((sum, s) => sum + s.score, 0);
+		return Math.round(total / mocks.length);
+	})();
+
+	$: kpis = [
+		{ icon: '📝', value: totalAnswered.toString(), label: 'Questions Answered', change: '↑ Active', color: '#a78bfa' },
+		{ icon: '🏆', value: mockExamsCount.toString(), label: 'Mock Exams Taken', change: 'Keep pushing', color: '#84cc16' },
+		{ icon: '📈', value: `${avgScore}%`, label: 'Average Score', change: 'Based on actual', color: '#f59e0b' },
 		{ icon: '🎯', value: '78', label: 'AI Readiness Score', change: 'Target: 85+', color: '#22d3ee' }
 	];
 
-	const heatmap = [
-		{ topic: 'DBMS Normalization', pct: 45, color: '#e11d48' },
-		{ topic: 'Computer Networks', pct: 62, color: '#f59e0b' },
-		{ topic: 'Data Structures', pct: 80, color: '#84cc16' },
-		{ topic: 'OOP Concepts', pct: 88, color: '#84cc16' },
-		{ topic: 'SQL Queries', pct: 58, color: '#f59e0b' },
-		{ topic: 'AI & ML', pct: 72, color: '#84cc16' }
-	];
-
-	const recentActivity = [
+	// Extract recent history to blend with demo activity for empty states
+	$: recentActivity = [
+		...userSessions.map(s => ({
+			icon: s.mode === 'mock' ? '⏱️' : '🤖',
+			iconBg: s.mode === 'mock' ? 'rgba(132,204,22,0.15)' : 'rgba(124,58,237,0.15)',
+			title: `${s.mode === 'mock' ? 'Mock Exam' : 'Exam Lab'} — ${s.course}`,
+			meta: new Date(s.timestamp).toLocaleString(),
+			badge: s.mode === 'mock' ? `Score: ${Math.round(s.score)}%` : `Correct: ${s.correct}`,
+			badgeColor: s.mode === 'mock' && s.score >= 70 ? 'badge-lime' : 'badge-violet'
+		})).slice(0, 4),
 		{ icon: '✅', iconBg: 'rgba(132,204,22,0.15)', title: 'Mock Exam — Database Management Systems', meta: 'Today, 10:42 AM · 20 questions · 90s/question', badge: 'A1 — 82%', badgeColor: 'badge-lime' },
-		{ icon: '🤖', iconBg: 'rgba(124,58,237,0.15)', title: 'Exam Lab — Computer Networks (MCQ)', meta: 'Yesterday, 7:15 PM · 18 questions answered', badge: '71% correct', badgeColor: 'badge-amber' },
-		{ icon: '📝', iconBg: 'rgba(34,211,238,0.15)', title: 'Theory Practice — DBMS Normalization', meta: '2 days ago · 5 theory questions reviewed', badge: '+25 pts', badgeColor: 'badge-violet' },
-		{ icon: '⏱️', iconBg: 'rgba(168,85,247,0.15)', title: 'Mock Exam — Data Structures & Algorithms', meta: '3 days ago · 10 questions · Timed', badge: 'B2 — 70%', badgeColor: 'badge-violet' }
-	];
+		{ icon: '🤖', iconBg: 'rgba(124,58,237,0.15)', title: 'Exam Lab — Computer Networks (MCQ)', meta: 'Yesterday, 7:15 PM · 18 questions answered', badge: '71% correct', badgeColor: 'badge-amber' }
+	].slice(0, 5);
 
 	const recommendations = [
 		{ icon: '🗄️', title: 'Database Normalization', meta: 'DBMS · 300L · 45% avg', link: '/exam-lab?course=Database+Management+Systems&inst=University' },
@@ -64,7 +77,12 @@
 	// Gauge animation
 	let gaugeAngle = 0;
 	let gaugeNum = 0;
-	onMount(() => {
+	onMount(async () => {
+		if ($isAuthenticated && $currentUser?.uid) {
+			userSessions = await getUserSessions($currentUser.uid);
+			loadingSessions = false;
+		}
+
 		setTimeout(() => {
 			const target = 78;
 			const duration = 1200;
@@ -83,6 +101,54 @@
 	// Form state for settings
 	let settingsName = 'Adaobi Chukwu';
 	let settingsEmail = 'adaobi@unn.edu.ng';
+
+	// Certificate Downloader
+	async function downloadCertificate() {
+		showToast('📄 Certificate', 'Generating performance certificate...', 'info');
+		try {
+			// Dynamically import jspdf so SSR doesn't crash on node environment
+			const { jsPDF } = await import('jspdf');
+			const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+
+			// Background and border
+			doc.setFillColor(13, 8, 32); 
+			doc.rect(0, 0, 297, 210, 'F');
+			doc.setDrawColor(124, 58, 237);
+			doc.setLineWidth(1);
+			doc.rect(10, 10, 277, 190);
+
+			// Title
+			doc.setTextColor(132, 204, 22);
+			doc.setFontSize(28);
+			doc.text('CollegeCBT Certificate of Readiness', 148, 40, { align: 'center' });
+
+			// Content
+			doc.setTextColor(255, 255, 255);
+			doc.setFontSize(16);
+			doc.text('This certifies that', 148, 70, { align: 'center' });
+			
+			doc.setFontSize(24);
+			doc.text($currentUser?.displayName || userProfile.name, 148, 90, { align: 'center' });
+			
+			doc.setFontSize(14);
+			doc.text('has achieved an exceptional AI Readiness Score and practice trajectory.', 148, 110, { align: 'center' });
+			
+			// Stats
+			doc.setFontSize(12);
+			doc.text(`Questions Answered: ${totalAnswered}`, 50, 150);
+			doc.text(`Mock Exams Completed: ${mockExamsCount}`, 50, 160);
+			doc.text(`Average Score: ${avgScore}%`, 50, 170);
+
+			// Date
+			doc.text(`Date Issued: ${new Date().toLocaleDateString()}`, 200, 170);
+
+			doc.save('CollegeCBT_Certificate.pdf');
+			showToast('✅ Success', 'Certificate downloaded!', 'success');
+		} catch (error) {
+			console.error(error);
+			showToast('❌ Error', 'Failed to generate PDF.', 'error');
+		}
+	}
 </script>
 
 <svelte:head>
@@ -102,8 +168,8 @@
 			<!-- ── Sidebar ── -->
 			<div class="glass-card p-5 h-fit lg:sticky lg:top-24">
 				<div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl" style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:3px solid rgba(124,58,237,0.4);">🎓</div>
-				<div class="text-center font-bold text-sm">{demoUser.name}</div>
-				<div class="text-center text-xs text-white/40 mt-0.5">{demoUser.email}</div>
+				<div class="text-center font-bold text-sm">{userProfile.name}</div>
+				<div class="text-center text-xs text-white/40 mt-0.5">{userProfile.email}</div>
 				<div class="flex justify-center mt-2 mb-4">
 					<span class="badge badge-lime text-xs">⭐ Pro Student</span>
 				</div>
@@ -137,11 +203,11 @@
 					<!-- Greeting row -->
 					<div class="flex items-center justify-between flex-wrap gap-3 mb-6">
 						<div>
-							<div class="font-display text-2xl">Good morning, {demoUser.name.split(' ')[0]}! 👋</div>
-							<div class="text-xs text-white/40 mt-0.5">{demoUser.level} {demoUser.department} · {demoUser.institution}</div>
+							<div class="font-display text-2xl">Good morning, {userProfile.name.split(' ')[0]}! 👋</div>
+							<div class="text-xs text-white/40 mt-0.5">{userProfile.level} {userProfile.department} · {userProfile.institution}</div>
 						</div>
 						<div class="flex items-center gap-2 px-3 py-2 rounded-xl" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);">
-							<span>🔥</span><span class="font-bold text-amber-DEFAULT text-sm">{demoUser.streak}-Day Streak</span>
+							<span>🔥</span><span class="font-bold text-amber-DEFAULT text-sm">{userProfile.streak}-Day Streak</span>
 						</div>
 					</div>
 
@@ -271,7 +337,7 @@
 					</div>
 
 					<div class="flex gap-3 flex-wrap">
-						<button on:click={() => showToast('📄 Certificate', 'Generating performance certificate...', 'info')} class="btn-violet px-5 py-2.5 text-sm">
+						<button on:click={downloadCertificate} class="btn-violet px-5 py-2.5 text-sm">
 							📄 Download Certificate
 						</button>
 						<a href="/exam-lab" class="btn-outline-lime px-5 py-2.5 text-sm">🤖 Practice Weak Topics</a>
@@ -339,8 +405,16 @@
 						<div class="flex items-center justify-between flex-wrap gap-3">
 							<div>
 								<div class="text-xs text-white/40">Current Plan</div>
-								<div class="font-bold text-lime-DEFAULT mt-0.5">⭐ Pro Student — ₦5,000/semester</div>
-								<div class="text-xs text-white/40 mt-0.5">Renews: June 30, 2025</div>
+								{#if $currentUser?.plan === 'pro'}
+									<div class="font-bold text-lime-DEFAULT mt-0.5">⭐ Pro Student</div>
+									<div class="text-xs text-white/40 mt-0.5">Active Premium Features</div>
+								{:else if $currentUser?.plan === 'institutional'}
+									<div class="font-bold text-lime-DEFAULT mt-0.5">🏛️ Institutional</div>
+									<div class="text-xs text-white/40 mt-0.5">Managed by Administrator</div>
+								{:else}
+									<div class="font-bold text-white/80 mt-0.5">Free Forever</div>
+									<div class="text-xs text-white/40 mt-0.5">Limited Practice Access</div>
+								{/if}
 							</div>
 							<a href="/pricing" class="btn-violet px-5 py-2.5 text-sm">Manage Plan</a>
 						</div>

@@ -2,8 +2,10 @@
 import { currentUser, authLoading, showToast } from '$lib/stores';
 import type { User } from '$lib/stores';
 import type { Auth, User as FirebaseUser } from 'firebase/auth';
+import type { Firestore } from 'firebase/firestore';
 
 let auth: Auth | null = null;
+let db: Firestore | null = null;
 let initialized = false;
 let initPromise: Promise<Auth | null> | null = null;
 
@@ -25,6 +27,7 @@ async function getFirebase(): Promise<Auth | null> {
 
 			const { initializeApp, getApps } = await import('firebase/app');
 			const { getAuth, onAuthStateChanged } = await import('firebase/auth');
+			const { getFirestore } = await import('firebase/firestore');
 
 			const app = getApps().length === 0
 				? initializeApp({
@@ -38,6 +41,7 @@ async function getFirebase(): Promise<Auth | null> {
 				: getApps()[0];
 
 			auth = getAuth(app);
+			db = getFirestore(app);
 			initialized = true;
 
 			onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
@@ -89,11 +93,17 @@ export async function signUpWithEmail(
 			return { success: true };
 		}
 
-		const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
+		const { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } = await import('firebase/auth');
 		const result = await createUserWithEmailAndPassword(authInstance, email, password);
 		await updateProfile(result.user, { displayName });
+		
+		try {
+			await sendEmailVerification(result.user);
+		} catch (e) {
+			console.error('[CollegeCBT] Email verification error:', e);
+		}
 
-		showToast('✅ Account Created!', 'Welcome to CollegeCBT!', 'success');
+		showToast('✅ Account Created!', 'Welcome to CollegeCBT! Please check your email to verify.', 'success');
 		return { success: true };
 	} catch (err: unknown) {
 		const error = err as { code?: string };
@@ -156,3 +166,4 @@ export async function signOut(): Promise<void> {
 		console.error('[CollegeCBT] Sign out error:', err);
 	}
 }
+

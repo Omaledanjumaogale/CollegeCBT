@@ -1,5 +1,13 @@
 <script lang="ts">
-	import { activeModal, showToast } from '$lib/stores';
+	import { activeModal, showToast, currentUser } from '$lib/stores';
+	import { onMount } from 'svelte';
+
+	onMount(() => {
+		// Load Flutterwave script for inline payment
+		const script = document.createElement('script');
+		script.src = 'https://checkout.flutterwave.com/v3.js';
+		document.head.appendChild(script);
+	});
 
 	const plans = [
 		{
@@ -67,11 +75,58 @@
 
 	function handlePayment(plan: typeof plans[0]) {
 		if (!plan.planId) {
-			activeModal.set('signup');
+			activeModal.set('login');
 			return;
 		}
-		showToast('💳 Payment', `Redirecting to Flutterwave for ${plan.name}...`, 'info');
-		// TODO: Integrate Flutterwave payment
+
+		if (!$currentUser) {
+			showToast('⚠️ Wait', 'Please login to upgrade your account', 'info');
+			activeModal.set('login');
+			return;
+		}
+
+		const priceRaw = plan.price.replace(',', '');
+		const amount = parseInt(priceRaw, 10);
+
+		// @ts-ignore
+		if (typeof FlutterwaveCheckout !== 'function') {
+			showToast('❌ Error', 'Payment gateway is still loading. Please try again in a few seconds.', 'error');
+			return;
+		}
+
+		showToast('💳 Payment', `Initializing Flutterwave for ${plan.name}...`, 'info');
+		
+		// @ts-ignore
+		FlutterwaveCheckout({
+			public_key: 'FLWPUBK_TEST-SANDBOXDEMOKEY-X', // Replace with real key in production
+			tx_ref: `CBT-${Date.now()}`,
+			amount: amount,
+			currency: 'NGN',
+			payment_options: 'card, banktransfer, ussd',
+			customer: {
+				email: $currentUser.email,
+				name: $currentUser.displayName || 'Student',
+			},
+			customizations: {
+				title: `CollegeCBT ${plan.name}`,
+				description: plan.period,
+				logo: 'https://collegecbt.ewinproject.org/favicon.png', // Replace with actual logo URL
+			},
+			callback: function (data: any) {
+				console.log('Payment complete:', data);
+				if (data.status === 'successful') {
+					showToast('✅ Success', `Welcome to the ${plan.name} plan!`, 'success');
+					// In a real app, update the user plan via backend webhook or directly
+					$currentUser.plan = plan.planId as 'pro' | 'institutional' | 'free';
+					currentUser.set($currentUser);
+				} else {
+					showToast('❌ Failed', 'Payment was not successful.', 'error');
+				}
+			},
+			onclose: function() {
+				// Handle payment modal close
+			}
+		});
 	}
 </script>
 
@@ -136,7 +191,7 @@
 				<p class="text-sm text-white/50">Pay ₦8,500/year instead of ₦10,000 (2×₦5,000 semesters). Best value for serious students.</p>
 			</div>
 			<button
-				on:click={() => showToast('💳 Annual Plan', 'Redirecting to annual payment...', 'info')}
+				on:click={() => handlePayment(plans[1])}
 				class="btn-violet px-6 py-3 text-sm flex-shrink-0"
 			>
 				Pay ₦8,500/year →

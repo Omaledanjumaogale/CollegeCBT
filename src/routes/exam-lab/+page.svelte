@@ -3,6 +3,8 @@
 	import { page } from '$app/stores';
 	import { labState, labConfig, showToast, currentLabQuestion, currentTheoryQuestion, labLoading } from '$lib/stores';
 	import { generateMCQ, generateTheory, getDemoMCQ, getDemoTheory, getWaecGrade, getGradeClass, getAIRecommendation } from '$lib/services/ai';
+	import { saveStudySession } from '$lib/services/convexClient';
+	import { currentUser } from '$lib/stores';
 	import { COURSES, INSTITUTION_TYPES, LEVELS, DIFFICULTIES, WAEC_GRADES, type InstitutionType } from '$lib/data/courseData';
 	import type { Question, TheoryQuestion } from '$lib/stores';
 
@@ -71,12 +73,13 @@
 	let selectedOption: string | null = null;
 	let answerResult: 'correct' | 'wrong' | null = null;
 
-	function answerLab(key: string) {
+	async function answerLab(key: string) {
 		if (labSession.answered || !labQuestion) return;
 		labSession.answered = true;
 		selectedOption = key;
 		const correct = labQuestion.correct;
-		if (key === correct) {
+		const isCorrect = key === correct;
+		if (isCorrect) {
 			labSession.correct++;
 			labSession.score += 2;
 			labSession.streak++;
@@ -88,15 +91,45 @@
 			answerResult = 'wrong';
 			showToast('❌ Wrong', `Correct answer: ${correct}. See explanation.`, 'error');
 		}
+
+		if ($currentUser?.uid) {
+			await saveStudySession($currentUser.uid, {
+				id: `lab-${Date.now()}`,
+				course: labCourse,
+				level: labLevel,
+				institutionType: labInstType,
+				questionsAnswered: 1,
+				correct: isCorrect ? 1 : 0,
+				wrong: isCorrect ? 0 : 1,
+				score: isCorrect ? 2 : 0,
+				mode: 'lab',
+				timestamp: Date.now()
+			});
+		}
 	}
 
-	function revealTheoryAnswer() {
+	async function revealTheoryAnswer() {
 		if (!labTheory) return;
 		theoryAnswerRevealed = true;
 		labSession.score += 5;
 		labSession.questionsCount++;
 		labShowScorebar = true;
 		showToast('📖 Model Answer Revealed', '+5 pts for reviewing!', 'success');
+
+		if ($currentUser?.uid) {
+			await saveStudySession($currentUser.uid, {
+				id: `lab-theory-${Date.now()}`,
+				course: labCourse,
+				level: labLevel,
+				institutionType: labInstType,
+				questionsAnswered: 1,
+				correct: 1, // consider theory revealed as "correctly attempted" for stats
+				wrong: 0,
+				score: 5,
+				mode: 'lab',
+				timestamp: Date.now()
+			});
+		}
 	}
 
 	function clearLab() {
@@ -195,9 +228,28 @@
 		await loadMockQ(mockCurrentQ + 1);
 	}
 
-	function showMockResults() {
+	async function showMockResults() {
 		clearMockTimer();
 		mockScreen = 'results';
+		
+		// Wait for reactive variables to update to their final values before saving
+		setTimeout(async () => {
+			if ($currentUser?.uid) {
+				await saveStudySession($currentUser.uid, {
+					id: `mock-${Date.now()}`,
+					course: mockCourse,
+					level: mockLevel,
+					institutionType: mockInstType,
+					questionsAnswered: mockTotal - mockSkipped,
+					correct: mockCorrect,
+					wrong: mockWrong,
+					score: mockPct,
+					mode: 'mock',
+					grade: mockGrade,
+					timestamp: Date.now()
+				});
+			}
+		}, 0);
 	}
 
 	function resetMock() {

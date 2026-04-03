@@ -1,0 +1,185 @@
+# CollegeCBT — Enterprise Platform Implementation Plan
+
+**Last Updated:** 2026-04-03  
+**Status:** ✅ PRODUCTION BUILD COMPLETE — Zero build errors, Cloudflare-ready  
+**Commit:** `78bc915` — 38 files, 15,123 insertions
+
+---
+
+## Project Overview
+
+CollegeCBT is a SvelteKit + Tailwind CSS enterprise exam-preparation platform for Nigerian students, integrating AI question generation via Claude API, Firebase Auth, and Cloudflare Pages edge deployment.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | SvelteKit 2.x (TypeScript) |
+| Styling | Tailwind CSS + Custom CSS Variables |
+| Auth | Firebase Auth (client-side only, lazy-loaded) |
+| AI | Claude 3.5 Haiku via Anthropic API |
+| Deployment | Cloudflare Pages (adapter-cloudflare) |
+| Fonts | DM Serif Display, DM Sans, JetBrains Mono, Bebas Neue |
+
+---
+
+## Phase 1: Project Scaffolding ✅ COMPLETE
+
+- [x] SvelteKit with TypeScript, Tailwind CSS, Cloudflare adapter
+- [x] `tailwind.config.js` — violet/lime/amber/rose design tokens, custom animations
+- [x] `app.css` — glassmorphism, buttons, badges, cards, forms, grade badges (376 lines)
+- [x] `svelte.config.js` — adapter-cloudflare with route inclusion
+- [x] `src/app.html` — Google Fonts preloaded, SVG+PNG favicon, theme-color meta
+
+---
+
+## Phase 2: Design System & Components ✅ COMPLETE
+
+- [x] **Navbar.svelte** — Glassmorphism fixed nav, mobile hamburger, auth-aware, ARIA-labeled
+- [x] **AuthModal.svelte** — 3-step enterprise signup + login:
+  - Step 1: Full name, DOB, email, NIN, password strength meter
+  - Step 2: Phone, WhatsApp, state of origin/residence, LGA, address
+  - Step 3: Institution type/name, faculty, department, level, matric number
+  - All 30+ form labels fully a11y-compliant (for/id pairs)
+  - Backdrop: `role="dialog"`, `aria-modal`, `tabindex="-1"`, keyboard Escape handler
+- [x] **BgMesh.svelte** — Animated orb background
+- [x] **Toast.svelte** — Auto-dismissing notifications (3.5s)
+
+---
+
+## Phase 3: Core Data Layer ✅ COMPLETE
+
+- [x] **stores.ts** — All Svelte stores: auth, UI, lab, mock, dashboard with full TypeScript interfaces
+- [x] **courseData.ts** — INSTITUTION_TYPES, COURSES, LEVELS, NIGERIA_STATES (36 states + FCT), DIFFICULTIES
+- [x] **firebase.ts** — Edge-compatible, lazy-initialized, client-side only; signUp/signIn/signOut with Firestore profile creation
+- [x] **ai.ts** — generateMCQ/generateTheory, demo fallbacks, getWaecGrade, getGradeClass, getAIRecommendation
+
+---
+
+## Phase 4: API Routes ✅ COMPLETE
+
+- [x] **`/api/generate-question`** (POST) — Edge-compatible Claude AI endpoint:
+  - Reads `ANTHROPIC_API_KEY` from `platform.env` (Cloudflare)
+  - Nigerian curriculum prompts for MCQ + Theory question types
+  - Full demo fallback — no cold-start failure possible
+  - **Fixed:** Removed invalid `export const runtime = 'edge'` (adapter-cloudflare is automatic)
+
+---
+
+## Phase 5: Pages & Routes ✅ COMPLETE
+
+| Route | Status | Notes |
+|-------|--------|-------|
+| `/` | ✅ | Hero, stats, 6 features, curriculum grid, CTA, full SEO meta |
+| `/exam-lab` | ✅ | MCQ+Theory practice lab, mock exam with timer+grading |
+| `/dashboard` | ✅ | 4 panels: overview KPIs, results, activity heatmap, settings |
+| `/pricing` | ✅ | 3-tier pricing (Free/₦5k/₦25k), Flutterwave+KoraPay strip |
+| `/auth/sign-in` | ✅ | Opens AuthModal login via onMount |
+| `/auth/sign-up` | ✅ | Opens AuthModal signup via onMount |
+
+---
+
+## Phase 6: Layout & Infrastructure ✅ COMPLETE
+
+- [x] **+layout.svelte** — Firebase auth observer, global component mounting
+- [x] **+layout.ts** — `prerender=false`, `ssr=true` for Cloudflare adapter
+
+---
+
+## Phase 7: Accessibility (A11y) ✅ COMPLETE — 30+ Fixes
+
+| File | Fixes |
+|------|-------|
+| AuthModal.svelte | 20 label/for/id pairs; backdrop role, aria-modal, tabindex, keyboard handler |
+| exam-lab/+page.svelte | 12 label/for/id pairs (Lab + Mock config panels) |
+| dashboard/+page.svelte | 6 label/for/id pairs (Settings panel) |
+
+---
+
+## Phase 8: Static Assets & SEO ✅ COMPLETE
+
+- [x] `static/favicon.svg` — SVG favicon (violet gradient + lime C letter)
+- [x] `static/robots.txt` — Crawl rules + sitemap URL
+- [x] `static/sitemap.xml` — 6 URLs with priorities and change frequencies
+
+---
+
+## Phase 9: Build Verification ✅ PASSED — Exit Code 0
+
+```
+vite v5.4.21 building SSR bundle...
+✓ 164 modules transformed (SSR)
+✓ 192 modules transformed (client)
+> Using @sveltejs/adapter-cloudflare ✔ done
+Exit code: 0
+```
+
+**Issues resolved during build:**
+1. Removed `export const runtime = 'edge'` from API route (invalid SvelteKit export)
+2. Firebase env imports refactored to `import.meta.env` with dynamic client-side loading
+3. All 30+ a11y label associations fixed across 3 files
+4. AuthModal backdrop keyboard/ARIA compliance added
+
+---
+
+## Phase 10: Git Repository ✅ COMMITTED
+
+- [x] `.gitignore` created (node_modules, .env, .svelte-kit, build artifacts excluded)
+- [x] Initial commit `78bc915` — 38 files, 15,123 insertions
+
+**Next step — push to GitHub:**
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/collegecbt.git
+git branch -M main
+git push -u origin main
+```
+
+---
+
+## Remaining / Future Work
+
+### Priority 1 — Pre-Launch (Required)
+- [ ] Replace `.env` placeholders with real Firebase project credentials
+- [ ] Add `ANTHROPIC_API_KEY` to Cloudflare Pages environment variables
+- [ ] Connect Cloudflare Pages project to GitHub repository
+- [ ] Configure custom domain: `collegecbt.ewinproject.org`
+
+### Priority 2 — Feature Completion
+- [ ] Firebase Firestore: persist study sessions (currently in-memory only)
+- [ ] Dashboard: load real Firestore data instead of mock data
+- [ ] Performance certificate PDF generation (Pro users)
+- [ ] Email verification after signup
+
+### Priority 3 — Payments
+- [ ] Integrate Flutterwave or KoraPay for Student Pro (₦5,000/semester)
+- [ ] Institutional payment (₦25,000/year)
+- [ ] Subscription gating (lock Pro features for free tier)
+
+### Priority 4 — Growth & SEO
+- [ ] JSON-LD structured data (schema.org/EducationalApplication)
+- [ ] Dynamic Open Graph image generation per course
+- [ ] Blog/resources section with exam tips
+
+---
+
+## Cloudflare Pages Deployment Checklist
+
+- [ ] Build command: `npm run build`
+- [ ] Output directory: `.svelte-kit/cloudflare`
+- [ ] Node.js compatibility flag enabled in Cloudflare settings
+- [ ] Environment variables set in Cloudflare dashboard (see table below)
+- [ ] Custom domain connected and SSL active
+
+## Environment Variables
+
+| Variable | Required | Source |
+|----------|----------|--------|
+| `PUBLIC_FIREBASE_API_KEY` | ✅ | Firebase Console → Project Settings |
+| `PUBLIC_FIREBASE_AUTH_DOMAIN` | ✅ | Firebase Console |
+| `PUBLIC_FIREBASE_PROJECT_ID` | ✅ | Firebase Console |
+| `PUBLIC_FIREBASE_STORAGE_BUCKET` | ✅ | Firebase Console |
+| `PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | ✅ | Firebase Console |
+| `PUBLIC_FIREBASE_APP_ID` | ✅ | Firebase Console |
+| `ANTHROPIC_API_KEY` | ⭕ Optional | Anthropic Console (demo fallback active) |

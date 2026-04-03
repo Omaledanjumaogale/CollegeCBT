@@ -38,10 +38,19 @@
 	<script type="application/ld+json">
 	{JSON.stringify({
 		"@context": "https://schema.org",
-		"@type": "WebSite",
+		"@type": "WebApplication",
 		"name": "CollegeCBT",
+		"applicationCategory": "EducationalApplication",
+		"operatingSystem": "All",
 		"url": "https://collegecbt.ewinproject.org",
-		"description": "AI-powered exam practice platform for Nigerian higher education students",
+		"description": "Enterprise-grade Exam Preparation Platform for Nigerian Students featuring AI question generation and grade prediction.",
+		"offers": {
+			"@type": "AggregateOffer",
+			"priceCurrency": "NGN",
+			"lowPrice": "0",
+			"highPrice": "5000",
+			"offerCount": "2"
+		},
 		"potentialAction": {
 			"@type": "SearchAction",
 			"target": "https://collegecbt.ewinproject.org/exam-lab?course={search_term_string}",
