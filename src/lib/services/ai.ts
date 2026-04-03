@@ -8,6 +8,7 @@ interface GenerateOptions {
 	institutionType: string;
 	topic?: string;
 	difficulty?: string;
+	uid?: string; // pass UID for server-side plan verification
 }
 
 // Demo fallbacks when AI is unavailable
@@ -58,13 +59,17 @@ export async function generateMCQ(options: GenerateOptions): Promise<Question> {
 			body: JSON.stringify({ ...options, type: 'MCQ' })
 		});
 
-		if (!response.ok) throw new Error(`API error: ${response.status}`);
+		if (!response.ok) {
+			const err = await response.json().catch(() => ({ error: 'API Error' }));
+			throw { message: err.error, status: response.status };
+		}
 		const data = await response.json();
 		return {
 			id: `q-${Date.now()}`,
 			...data
 		};
-	} catch {
+	} catch (e: any) {
+		if (e.status) throw e; // Repropagate identified errors (403, 429)
 		console.warn('AI generation failed, using demo question');
 		return getDemoMCQ(options.course);
 	}
@@ -78,9 +83,13 @@ export async function generateTheory(options: GenerateOptions): Promise<TheoryQu
 			body: JSON.stringify({ ...options, type: 'Theory' })
 		});
 
-		if (!response.ok) throw new Error(`API error: ${response.status}`);
+		if (!response.ok) {
+			const err = await response.json().catch(() => ({ error: 'API Error' }));
+			throw { message: err.error, status: response.status };
+		}
 		return await response.json();
-	} catch {
+	} catch (e: any) {
+		if (e.status) throw e;
 		console.warn('AI generation failed, using demo theory question');
 		return getDemoTheory(options.course);
 	}

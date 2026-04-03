@@ -4,6 +4,7 @@
 	import { getUserSessions } from '$lib/services/convexClient';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { updateUserProfile } from '$lib/services/firebase';
 
 	$: if (!$isAuthenticated && typeof window !== 'undefined') {
 		// show login modal if not authenticated
@@ -15,10 +16,10 @@
 		name: $currentUser?.displayName || 'Student',
 		email: $currentUser?.email || '',
 		plan: $currentUser?.plan || 'Free',
-		institution: 'University of Nigeria, Nsukka', // Future: from real user profile
-		department: 'Computer Science', // Future: from real user profile
-		level: '300L', // Future: from real user profile
-		streak: 14 // Future: calculate from sessions
+		institution: 'University of Nigeria, Nsukka',
+		department: 'Computer Science',
+		level: '300L',
+		streak: 14
 	};
 
 	let userSessions: StudySession[] = [];
@@ -41,7 +42,7 @@
 		{ icon: '🎯', value: '78', label: 'AI Readiness Score', change: 'Target: 85+', color: '#22d3ee' }
 	];
 
-	// Extract recent history to blend with demo activity for empty states
+	// Recent activity — blend real + demo data
 	$: recentActivity = [
 		...userSessions.map(s => ({
 			icon: s.mode === 'mock' ? '⏱️' : '🤖',
@@ -50,10 +51,12 @@
 			meta: new Date(s.timestamp).toLocaleString(),
 			badge: s.mode === 'mock' ? `Score: ${Math.round(s.score)}%` : `Correct: ${s.correct}`,
 			badgeColor: s.mode === 'mock' && s.score >= 70 ? 'badge-lime' : 'badge-violet'
-		})).slice(0, 4),
+		})).slice(0, 3),
 		{ icon: '✅', iconBg: 'rgba(132,204,22,0.15)', title: 'Mock Exam — Database Management Systems', meta: 'Today, 10:42 AM · 20 questions · 90s/question', badge: 'A1 — 82%', badgeColor: 'badge-lime' },
-		{ icon: '🤖', iconBg: 'rgba(124,58,237,0.15)', title: 'Exam Lab — Computer Networks (MCQ)', meta: 'Yesterday, 7:15 PM · 18 questions answered', badge: '71% correct', badgeColor: 'badge-amber' }
-	].slice(0, 5);
+		{ icon: '🤖', iconBg: 'rgba(124,58,237,0.15)', title: 'Exam Lab — Computer Networks (MCQ)', meta: 'Yesterday, 7:15 PM · 18 questions answered', badge: '71% correct', badgeColor: 'badge-amber' },
+		{ icon: '⏱️', iconBg: 'rgba(132,204,22,0.15)', title: 'Mock Exam — Data Structures & Algorithms', meta: '2 days ago, 4:20 PM · 15 questions', badge: 'B2 — 73%', badgeColor: 'badge-amber' },
+		{ icon: '🤖', iconBg: 'rgba(124,58,237,0.15)', title: 'Exam Lab — Operating Systems (Theory)', meta: '3 days ago, 9:10 AM · 12 theory questions', badge: '67% correct', badgeColor: 'badge-violet' },
+	].slice(0, 6);
 
 	const recommendations = [
 		{ icon: '🗄️', title: 'Database Normalization', meta: 'DBMS · 300L · 45% avg', link: '/exam-lab?course=Database+Management+Systems&inst=University' },
@@ -62,7 +65,21 @@
 		{ icon: '🔍', title: 'SQL Query Optimization', meta: 'DBMS · 300L · 58% avg', link: '/exam-lab?course=Database+Management+Systems&inst=University' }
 	];
 
-	// Bar chart data (mock exam scores)
+	// Topic heatmap — 10 topics with correct dynamic color binding
+	const heatmap: { topic: string; pct: number; color: string; label: string }[] = [
+		{ topic: 'Database Normalization', pct: 45, color: '#e11d48', label: 'Needs Work' },
+		{ topic: 'Computer Networks', pct: 64, color: '#f59e0b', label: 'Developing' },
+		{ topic: 'Data Structures', pct: 82, color: '#84cc16', label: 'Strong' },
+		{ topic: 'SQL Queries', pct: 58, color: '#f59e0b', label: 'Developing' },
+		{ topic: 'Algorithm Analysis', pct: 71, color: '#84cc16', label: 'Good' },
+		{ topic: 'Operating Systems', pct: 38, color: '#e11d48', label: 'Needs Work' },
+		{ topic: 'Software Engineering', pct: 76, color: '#84cc16', label: 'Strong' },
+		{ topic: 'Compiler Design', pct: 52, color: '#f59e0b', label: 'Developing' },
+		{ topic: 'Computer Architecture', pct: 68, color: '#f59e0b', label: 'Good' },
+		{ topic: 'Discrete Mathematics', pct: 85, color: '#84cc16', label: 'Strong' }
+	];
+
+	// Bar chart data (mock exam score trajectory)
 	const chartData = [58, 62, 65, 60, 70, 72, 68, 75, 79, 82];
 	const maxVal = 100;
 	const TARGET_LINE = 75;
@@ -79,7 +96,14 @@
 	let gaugeNum = 0;
 	onMount(async () => {
 		if ($isAuthenticated && $currentUser?.uid) {
-			userSessions = await getUserSessions($currentUser.uid);
+			try {
+				userSessions = await getUserSessions($currentUser.uid);
+			} catch (e) {
+				console.warn('[Dashboard] Could not load sessions:', e);
+			} finally {
+				loadingSessions = false;
+			}
+		} else {
 			loadingSessions = false;
 		}
 
@@ -98,9 +122,13 @@
 		}, 300);
 	});
 
-	// Form state for settings
+	// Settings form state — bound with proper IDs
 	let settingsName = 'Adaobi Chukwu';
 	let settingsEmail = 'adaobi@unn.edu.ng';
+	let settingsPhone = '08012345678';
+	let settingsInstitution = 'University of Nigeria, Nsukka';
+	let settingsDept = 'Computer Science';
+	let settingsLevel = '300 Level';
 
 	// Certificate Downloader
 	async function downloadCertificate() {
@@ -309,15 +337,25 @@
 
 					<!-- Heatmap -->
 					<div class="glass-card p-5 mb-5">
-						<div class="font-bold text-sm mb-4">📊 Topic Performance Heatmap</div>
-						<div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+						<div class="flex items-center justify-between mb-4">
+							<div class="font-bold text-sm">📊 Topic Performance Heatmap</div>
+							<div class="flex items-center gap-3 text-xs">
+								<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#e11d48;"></span><span class="text-white/40">Needs Work</span></span>
+								<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#f59e0b;"></span><span class="text-white/40">Developing</span></span>
+								<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#84cc16;"></span><span class="text-white/40">Strong</span></span>
+							</div>
+						</div>
+						<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
 							{#each heatmap as h}
-								<div class="glass-card p-3">
-									<div class="text-xs font-semibold text-white/80 mb-2">{h.topic}</div>
-									<div class="heat-bar mb-2">
+								<div class="p-3 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);">
+									<div class="text-[11px] font-semibold text-white/70 mb-2 leading-tight">{h.topic}</div>
+									<div class="h-1.5 w-full rounded-full mb-2" style="background:rgba(255,255,255,0.06);">
 										<div class="h-full rounded-full transition-all duration-700" style="width:{h.pct}%;background:{h.color};"></div>
 									</div>
-									<div class="font-mono text-sm font-bold" style="color:{h.color};">{h.pct}% {h.pct >= 75 ? '✓' : h.pct < 55 ? '⚠️' : ''}</div>
+									<div class="flex items-center justify-between">
+										<span class="font-mono text-sm font-bold" style="color:{h.color};">{h.pct}%</span>
+										<span class="text-[10px]">{h.pct >= 75 ? '✓' : h.pct < 55 ? '⚠️' : '~'}</span>
+									</div>
 								</div>
 							{/each}
 						</div>
@@ -374,28 +412,48 @@
 							</div>
 							<div>
 								<label for="s-email" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Email</label>
-								<input id="s-email" type="email" bind:value={settingsEmail} class="form-input" autocomplete="email" />
+								<input id="s-email" type="email" bind:value={settingsEmail} class="form-input" autocomplete="email" readonly />
 							</div>
 							<div>
 								<label for="s-phone" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Phone Number</label>
-								<input id="s-phone" type="tel" class="form-input" value="08012345678" autocomplete="tel" />
+								<input id="s-phone" type="tel" bind:value={settingsPhone} class="form-input" autocomplete="tel" />
 							</div>
 							<div>
 								<label for="s-institution" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Institution</label>
-								<input id="s-institution" type="text" class="form-input" value="University of Nigeria, Nsukka" />
+								<input id="s-institution" type="text" bind:value={settingsInstitution} class="form-input" />
 							</div>
 							<div>
 								<label for="s-dept" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Department</label>
-								<input id="s-dept" type="text" class="form-input" value="Computer Science" />
+								<input id="s-dept" type="text" bind:value={settingsDept} class="form-input" />
 							</div>
 							<div>
 								<label for="s-level" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Current Level</label>
-								<select id="s-level" class="form-select">
-									<option>100 Level</option><option>200 Level</option><option selected>300 Level</option><option>400 Level</option>
+								<select id="s-level" bind:value={settingsLevel} class="form-select">
+									<option>100 Level</option><option>200 Level</option><option>300 Level</option><option>400 Level</option><option>500 Level</option>
 								</select>
 							</div>
 						</div>
-						<button on:click={() => showToast('✅ Profile Saved', 'Your settings have been updated.', 'success')} class="btn-violet px-5 py-2.5 text-sm mt-4">
+						<button 
+							on:click={async () => {
+								if ($currentUser?.uid) {
+									const res = await updateUserProfile($currentUser.uid, {
+										displayName: settingsName,
+										contact: { phoneNumber: settingsPhone },
+										academic: {
+											institutionName: settingsInstitution,
+											department: settingsDept,
+											level: settingsLevel as any
+										}
+									});
+									if (res.success) {
+										showToast('✅ Profile Saved', 'Your settings have been updated.', 'success');
+									} else {
+										showToast('❌ Update Failed', res.error || 'Check connection', 'error');
+									}
+								}
+							}} 
+							class="btn-violet px-5 py-2.5 text-sm mt-4"
+						>
 							Save Changes
 						</button>
 					</div>

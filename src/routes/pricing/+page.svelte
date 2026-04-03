@@ -88,6 +88,9 @@
 		const priceRaw = plan.price.replace(',', '');
 		const amount = parseInt(priceRaw, 10);
 
+		// Initialize Flutterwave
+		const tx_ref = `CBT-${$currentUser.uid}-${Date.now()}`;
+
 		// @ts-ignore
 		if (typeof FlutterwaveCheckout !== 'function') {
 			showToast('❌ Error', 'Payment gateway is still loading. Please try again in a few seconds.', 'error');
@@ -96,10 +99,13 @@
 
 		showToast('💳 Payment', `Initializing Flutterwave for ${plan.name}...`, 'info');
 		
+		// Access ENV safely at runtime
+		const flwKey = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || 'FLWPUBK_TEST-SANDBOXDEMOKEY-X';
+
 		// @ts-ignore
 		FlutterwaveCheckout({
-			public_key: 'FLWPUBK_TEST-SANDBOXDEMOKEY-X', // Replace with real key in production
-			tx_ref: `CBT-${Date.now()}`,
+			public_key: flwKey, 
+			tx_ref: tx_ref,
 			amount: amount,
 			currency: 'NGN',
 			payment_options: 'card, banktransfer, ussd',
@@ -110,15 +116,15 @@
 			customizations: {
 				title: `CollegeCBT ${plan.name}`,
 				description: plan.period,
-				logo: 'https://collegecbt.ewinproject.org/favicon.png', // Replace with actual logo URL
+				logo: 'https://collegecbt.dev/favicon.png', 
 			},
 			callback: function (data: any) {
-				console.log('Payment complete:', data);
-				if (data.status === 'successful') {
-					showToast('✅ Success', `Welcome to the ${plan.name} plan!`, 'success');
-					// In a real app, update the user plan via backend webhook or directly
-					$currentUser.plan = plan.planId as 'pro' | 'institutional' | 'free';
-					currentUser.set($currentUser);
+				console.log('Payment process complete:', data);
+				if (data.status === 'successful' || data.status === 'completed') {
+					showToast('✅ Success', `Payment processed! We are verifying your upgrade now...`, 'success');
+					// The user's plan will be updated automatically via the backend webhook.
+					// We refresh the page to reload the profile state from Firestore.
+					setTimeout(() => window.location.reload(), 3000);
 				} else {
 					showToast('❌ Failed', 'Payment was not successful.', 'error');
 				}

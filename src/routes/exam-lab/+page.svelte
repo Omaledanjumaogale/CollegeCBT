@@ -57,14 +57,35 @@
 		theoryAnswerRevealed = false;
 		userTheoryAnswer = '';
 
+		const opts = { 
+			course: labCourse, 
+			level: labLevel, 
+			institutionType: labInstType, 
+			topic: labTopic, 
+			difficulty: labDiff,
+			uid: $currentUser?.uid
+		};
+
 		try {
 			if (labQtype === 'MCQ') {
-				labQuestion = await generateMCQ({ course: labCourse, level: labLevel, institutionType: labInstType, topic: labTopic, difficulty: labDiff });
+				labQuestion = await generateMCQ(opts);
 			} else {
-				labTheory = await generateTheory({ course: labCourse, level: labLevel, institutionType: labInstType, topic: labTopic, difficulty: labDiff });
+				labLevel = labLevel || '300 Level';
+				labTheory = await generateTheory(opts);
 			}
 			labSession.questionsCount++;
 			labShowScorebar = true;
+		} catch (err: any) {
+			console.error('[ExamLab] Error:', err);
+			if (err.status === 403) {
+				showToast('💎 Pro Feature', err.message || 'Upgrade to Pro to access Theory questions.', 'info');
+				activeTab = 'lab';
+				labQtype = 'MCQ'; // falling back to MCQ
+			} else if (err.status === 429) {
+				showToast('⏱️ Limit Reached', err.message || 'You have reached your limit. Please wait.', 'error');
+			} else {
+				showToast('❌ Error', 'Could not generate question. Please check your connection.', 'error');
+			}
 		} finally {
 			labLoading_ = false;
 		}
@@ -189,8 +210,18 @@
 		clearMockTimer();
 		if (!mockQuestions[idx]) {
 			try {
-				mockQuestions[idx] = await generateMCQ({ course: mockCourse, level: mockLevel, institutionType: mockInstType, difficulty: mockDiff });
-			} catch {
+				mockQuestions[idx] = await generateMCQ({ 
+					course: mockCourse, 
+					level: mockLevel, 
+					institutionType: mockInstType, 
+					difficulty: mockDiff,
+					uid: $currentUser?.uid
+				});
+			} catch (err: any) {
+				console.error('[MockExam] Generation failed:', err);
+				if (err.status === 429) {
+					showToast('⏱️ Limit Reached', 'Slow down! You are generating too fast.', 'error');
+				}
 				mockQuestions[idx] = getDemoMCQ(mockCourse);
 			}
 		}

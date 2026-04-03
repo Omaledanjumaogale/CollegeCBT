@@ -27,7 +27,7 @@ async function getFirebase(): Promise<Auth | null> {
 
 			const { initializeApp, getApps } = await import('firebase/app');
 			const { getAuth, onAuthStateChanged } = await import('firebase/auth');
-			const { getFirestore } = await import('firebase/firestore');
+			const { getFirestore, doc, getDoc } = await import('firebase/firestore');
 
 			const app = getApps().length === 0
 				? initializeApp({
@@ -44,16 +44,36 @@ async function getFirebase(): Promise<Auth | null> {
 			db = getFirestore(app);
 			initialized = true;
 
-			onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+			onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
 				if (firebaseUser) {
-					const user: User = {
+					let userData: User = {
 						uid: firebaseUser.uid,
 						email: firebaseUser.email || '',
-						displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Student',
+						displayName: firebaseUser.displayName || 'Student',
 						photoURL: firebaseUser.photoURL || undefined,
 						plan: 'free'
 					};
-					currentUser.set(user);
+
+					// Attempt to fetch profile from Firestore
+					try {
+						if (db) {
+							const userDocRef = doc(db, 'users', firebaseUser.uid);
+							const userDoc = await getDoc(userDocRef);
+							if (userDoc.exists()) {
+								const data = userDoc.data();
+								userData = {
+									...userData,
+									...data,
+									uid: firebaseUser.uid, // ensure UID is correct
+									plan: data.plan || 'free'
+								};
+							}
+						}
+					} catch (e) {
+						console.error('[CollegeCBT] Firestore pull error:', e);
+					}
+
+					currentUser.set(userData);
 				} else {
 					currentUser.set(null);
 				}
@@ -81,22 +101,51 @@ export async function initAuth(): Promise<void> {
 export async function signUpWithEmail(
 	email: string,
 	password: string,
-	displayName: string
+	displayName: string,
+	profileData: any // Pass full profile data object
 ): Promise<{ success: boolean; error?: string }> {
 	try {
 		const authInstance = await getFirebase();
 		if (!authInstance) {
 			// Demo mode: simulate success
-			const user: User = { uid: `demo-${Date.now()}`, email, displayName, plan: 'free' };
+			const user: User = { 
+				uid: `demo-${Date.now()}`, 
+				email, 
+				displayName, 
+				plan: 'free',
+				...profileData
+			};
 			currentUser.set(user);
 			showToast('✅ Account Created!', 'Welcome to CollegeCBT! (Demo mode)', 'success');
 			return { success: true };
 		}
 
 		const { createUserWithEmailAndPassword, updateProfile, sendEmailVerification } = await import('firebase/auth');
+		const { doc, setDoc } = await import('firebase/firestore');
+
 		const result = await createUserWithEmailAndPassword(authInstance, email, password);
 		await updateProfile(result.user, { displayName });
 		
+		// Send Verification Email
+		try {
+			await sendEmailVerification(result.user);
+			showToast('✉️ Verify Email', "We've sent a link to " + email, 'info');
+		} catch (e) {
+			console.warn('[Firebase] Verification email failed:', e);
+		}
+		
+		// Create Firestore profile record
+		if (db) {
+			await setDoc(doc(db, 'users', result.user.uid), {
+				uid: result.user.uid,
+				email,
+				displayName,
+				plan: 'free', // Default plan
+				createdAt: Date.now(),
+				...profileData
+			});
+		}
+
 		try {
 			await sendEmailVerification(result.user);
 		} catch (e) {
@@ -164,6 +213,35 @@ export async function signOut(): Promise<void> {
 		showToast('👋 Signed out', 'See you next time!', 'info');
 	} catch (err) {
 		console.error('[CollegeCBT] Sign out error:', err);
+	}
+}
+
+export async function updateUserProfile(
+	uid: string,
+	data: Partial<User>
+): Promise<{ success: boolean; error?: string }> {
+	try {
+		const authInstance = await getFirebase();
+		if (!authInstance || !db) {
+			// Demo mode behavior
+			currentUser.update(u => u ? ({ ...u, ...data }) : null);
+			return { success: true };
+		}
+
+		const { doc, updateDoc } = await import('firebase/firestore');
+		const userDocRef = doc(db, 'users', uid);
+		
+		await updateDoc(userDocRef, {
+			...data,
+			updatedAt: Date.now()
+		});
+
+		// Refresh the local store
+		currentUser.update(u => u ? ({ ...u, ...data }) : null);
+		return { success: true };
+	} catch (err) {
+		console.error('[CollegeCBT] Profile update error:', err);
+		return { success: false, error: 'Failed to update profile.' };
 	}
 }
 

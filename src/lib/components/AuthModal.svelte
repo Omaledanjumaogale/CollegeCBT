@@ -116,7 +116,27 @@
 			return;
 		}
 		loading = true;
-		const result = await signUpWithEmail(suEmail, suPassword, suFullName);
+		
+		const profileData = {
+			dob: suDob,
+			nin: suNin,
+			phone: suPhone,
+			whatsapp: suWhatsapp,
+			stateOfOrigin: suStateOrigin,
+			stateOfResidence: suStateRes,
+			lga: suLga,
+			address: suAddress,
+			academicProfile: {
+				institutionType: suInstType,
+				institutionName: suInstName,
+				faculty: suFaculty,
+				department: suDept,
+				level: suLevel,
+				matricNumber: suMatric
+			}
+		};
+
+		const result = await signUpWithEmail(suEmail, suPassword, suFullName, profileData);
 		loading = false;
 		if (result.success) {
 			signupSuccess = true;

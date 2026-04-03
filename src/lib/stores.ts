@@ -8,12 +8,18 @@ export interface User {
 	photoURL?: string;
 	plan: 'free' | 'pro' | 'institutional';
 	academicProfile?: AcademicProfile;
+	nin?: string;
+	phone?: string;
+	whatsapp?: string;
+	dob?: string;
+	lga?: string;
+	address?: string;
 }
 
 export interface AcademicProfile {
 	institutionType: string;
 	institutionName: string;
-	faculty: string;
+	faculty?: string;
 	department: string;
 	level: string;
 	matricNumber?: string;
