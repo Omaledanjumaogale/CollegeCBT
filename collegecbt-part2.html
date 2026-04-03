@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CollegeCBT — AI Exam Lab & Mock Exam Engine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--bg:#0d0820;--violet:#7c3aed;--vl:#a78bfa;--lime:#84cc16;--amber:#f59e0b;--rose:#e11d48;--glass:rgba(255,255,255,0.05);--gb:rgba(255,255,255,0.10);--tx:#ffffff;--ts:#94a3b8;--card:#1a1535;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--violet);border-radius:3px;}
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);animation:od 12s ease-in-out infinite alternate;}
+.o1{width:500px;height:500px;background:rgba(124,58,237,0.15);top:-100px;left:-100px;}
+.o2{width:400px;height:400px;background:rgba(132,204,22,0.07);bottom:-80px;right:-80px;animation-delay:-6s;}
+.o3{width:350px;height:350px;background:rgba(245,158,11,0.07);top:50%;left:30%;animation-delay:-3s;}
+@keyframes od{0%{transform:translate(0,0);}100%{transform:translate(30px,20px) scale(1.08);}}
+.gg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);background-size:60px 60px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 1rem;border-bottom:1px solid var(--gb);backdrop-filter:blur(20px);background:rgba(13,8,32,0.9);}
+.ni{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:68px;}
+.logo{font-family:'DM Serif Display',serif;font-size:1.5rem;letter-spacing:-0.02em;background:linear-gradient(135deg,#fff 40%,var(--vl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.logo span{-webkit-text-fill-color:var(--lime);}
+.nl{display:flex;align-items:center;gap:0.25rem;}
+.nk{padding:0.5rem 0.85rem;border-radius:8px;color:var(--ts);font-size:0.875rem;font-weight:500;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
+.nk:hover,.nk.act{color:var(--tx);background:var(--glass);}
+.nk.act{color:var(--vl);border:1px solid rgba(124,58,237,0.3);}
+.na{display:flex;gap:0.5rem;align-items:center;}
+.bg{padding:0.5rem 1rem;border-radius:10px;border:1px solid var(--gb);background:transparent;color:var(--tx);font-size:0.875rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.bg:hover{background:var(--glass);border-color:var(--violet);}
+.bp{padding:0.5rem 1.25rem;border-radius:10px;background:var(--violet);border:none;color:#fff;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;text-decoration:none;display:inline-block;}
+.bp:hover{background:#6d28d9;}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border-radius:8px;background:var(--glass);border:1px solid var(--gb);}
+.hbg span{display:block;width:22px;height:2px;background:var(--tx);border-radius:2px;transition:all 0.3s;}
+.hbg.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+.hbg.open span:nth-child(2){opacity:0;}
+.hbg.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+.mnav{display:none;position:fixed;top:68px;left:0;right:0;z-index:99;background:rgba(13,8,32,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--gb);padding:1rem;flex-direction:column;gap:0.5rem;}
+.mnav.open{display:flex;}
+.mnav .nk{display:block;padding:0.75rem 1rem;}
+.mnav .na{flex-direction:column;gap:0.5rem;padding-top:0.5rem;}
+.mnav .bg,.mnav .bp{width:100%;padding:0.75rem;text-align:center;}
+.pw{max-width:1280px;margin:0 auto;padding:100px 1rem 4rem;position:relative;z-index:1;}
+.ph{text-align:center;margin-bottom:3rem;}
+.pbadge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;border-radius:100px;border:1px solid rgba(124,58,237,0.3);background:rgba(124,58,237,0.1);color:var(--vl);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:1rem;}
+.ptitle{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4vw,3rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:0.75rem;}
+.hl{background:linear-gradient(135deg,var(--vl),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.pdesc{color:var(--ts);font-size:1rem;max-width:600px;margin:0 auto;}
+.mtbar{display:flex;gap:0.5rem;margin-bottom:2.5rem;border:1px solid var(--gb);border-radius:16px;padding:0.4rem;background:rgba(0,0,0,0.25);overflow-x:auto;}
+.mtab{flex:1;min-width:fit-content;padding:0.75rem 1.5rem;border-radius:12px;border:none;background:transparent;color:var(--ts);font-size:0.925rem;font-weight:600;cursor:pointer;transition:all 0.25s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.mtab.active{background:var(--violet);color:#fff;box-shadow:0 4px 20px rgba(124,58,237,0.4);}
+.mtab:hover:not(.active){color:#fff;background:rgba(124,58,237,0.15);}
+.tp{display:none;}.tp.active{display:block;}
+.cfg{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--gb);border-radius:20px;padding:2rem;margin-bottom:2rem;}
+.cftitle{font-weight:700;font-size:1rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem;}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
+.cfl{font-size:0.8rem;font-weight:600;color:var(--ts);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:0.4rem;}
+.cfs,.cfi{padding:0.7rem 1rem;border-radius:10px;border:1px solid var(--gb);background:rgba(0,0,0,0.25);color:#fff;font-size:0.875rem;font-family:'DM Sans',sans-serif;transition:all 0.2s;width:100%;}
+.cfs{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;background-color:rgba(0,0,0,0.25);padding-right:2rem;}
+.cfs:focus,.cfi:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,58,237,0.15);}
+.cfs option{background:#1a1535;}
+.cfacts{display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;}
+.bgen{padding:0.875rem 2rem;border-radius:12px;background:var(--violet);color:#fff;border:1px solid rgba(124,58,237,0.4);font-size:1rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.25s;box-shadow:0 0 30px rgba(124,58,237,0.3);display:flex;align-items:center;gap:0.5rem;}
+.bgen:hover{background:#6d28d9;transform:translateY(-2px);}
+.bgen:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+.breset{padding:0.875rem 2rem;border-radius:12px;background:rgba(132,204,22,0.15);border:1px solid rgba(132,204,22,0.3);color:var(--lime);font-size:1rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.scorebar{background:var(--glass);border:1px solid var(--gb);border-radius:14px;padding:1rem 1.5rem;margin-bottom:1.5rem;display:flex;gap:2rem;align-items:center;flex-wrap:wrap;display:none;}
+.sbi{display:flex;align-items:center;gap:0.5rem;}
+.sbl{font-size:0.8rem;color:var(--ts);}
+.sbv{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:600;}
+.qa{min-height:300px;}
+.ql{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:1rem;}
+.spin{width:40px;height:40px;border:3px solid var(--gb);border-top-color:var(--violet);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ltext{color:var(--ts);font-size:0.9rem;}
+.qcard{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--gb);border-radius:20px;overflow:hidden;position:relative;}
+.qcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--violet),var(--lime));}
+.qtop{padding:1.5rem 1.5rem 1rem;border-bottom:1px solid var(--gb);}
+.qmeta{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;}
+.qb{display:inline-flex;align-items:center;gap:0.35rem;padding:0.3rem 0.75rem;border-radius:100px;font-size:0.75rem;font-weight:600;}
+.qbc{background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:var(--vl);}
+.qbt{background:rgba(132,204,22,0.12);border:1px solid rgba(132,204,22,0.25);color:var(--lime);}
+.qbs{background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);color:var(--amber);font-family:'JetBrains Mono',monospace;}
+.qtext{font-size:1.05rem;color:#e2e8f0;line-height:1.7;font-weight:500;}
+.qbody{padding:1.5rem;}
+.mopts{display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1.5rem;}
+.mopt{display:flex;align-items:flex-start;gap:0.75rem;padding:1rem 1.25rem;border-radius:12px;border:1px solid var(--gb);background:rgba(255,255,255,0.03);cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;color:var(--ts);font-size:0.9rem;width:100%;text-align:left;}
+.mopt:hover:not(:disabled){border-color:var(--violet);background:rgba(124,58,237,0.1);color:#fff;}
+.mopt.correct{border-color:var(--lime)!important;background:rgba(132,204,22,0.1)!important;color:var(--lime)!important;}
+.mopt.wrong{border-color:var(--rose)!important;background:rgba(225,29,72,0.1)!important;color:var(--rose)!important;}
+.okey{width:28px;height:28px;border-radius:8px;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;flex-shrink:0;font-family:'JetBrains Mono',monospace;}
+.expbox{border-radius:14px;padding:1.25rem;margin-bottom:1rem;border:1px solid;animation:fi 0.4s ease;}
+.expbox.ce{background:rgba(132,204,22,0.08);border-color:rgba(132,204,22,0.25);color:#a3e635;}
+.expbox.we{background:rgba(225,29,72,0.06);border-color:rgba(225,29,72,0.2);color:#fb7185;}
+@keyframes fi{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.etitle{font-weight:700;font-size:0.9rem;margin-bottom:0.75rem;}
+.ebody{font-size:0.875rem;line-height:1.7;color:#e2e8f0;}
+.dlist{margin-top:0.75rem;display:flex;flex-direction:column;gap:0.5rem;}
+.di{padding:0.65rem 1rem;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid var(--gb);font-size:0.82rem;line-height:1.5;}
+.di strong{color:var(--rose);}
+.enote{margin-top:1rem;padding:0.75rem 1rem;border-radius:10px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);font-size:0.82rem;color:var(--vl);}
+.tharea textarea{width:100%;min-height:120px;padding:1rem;border-radius:12px;border:1px solid var(--gb);background:rgba(0,0,0,0.25);color:#fff;font-size:0.9rem;font-family:'DM Sans',sans-serif;resize:vertical;transition:all 0.2s;}
+.tharea textarea:focus{outline:none;border-color:var(--violet);}
+.thma{margin-top:1rem;padding:1.25rem;border-radius:14px;background:rgba(132,204,22,0.07);border:1px solid rgba(132,204,22,0.2);animation:fi 0.4s ease;display:none;}
+.thma.vis{display:block;}
+.kpoints{display:flex;flex-direction:column;gap:0.5rem;margin:0.75rem 0;}
+.kp{display:flex;gap:0.75rem;padding:0.6rem 0.85rem;border-radius:8px;background:rgba(0,0,0,0.2);border:1px solid var(--gb);font-size:0.83rem;}
+.kpm{color:var(--lime);font-weight:700;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+.ms{margin-top:1rem;padding:0.75rem;border-radius:8px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);font-size:0.82rem;color:var(--vl);}
+.lacts{display:flex;gap:0.75rem;flex-wrap:wrap;}
+.bnxt{padding:0.75rem 1.5rem;border-radius:10px;background:var(--violet);color:#fff;border:none;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.bnxt:hover{background:#6d28d9;transform:translateY(-1px);}
+.bth{padding:0.75rem 1.5rem;border-radius:10px;background:rgba(132,204,22,0.15);color:var(--lime);border:1px solid rgba(132,204,22,0.3);font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.bth:hover{background:rgba(132,204,22,0.25);}
+.tring{position:relative;width:100px;height:100px;}
+.tring svg{transform:rotate(-90deg);}
+.tc-bg{fill:none;stroke:rgba(255,255,255,0.08);stroke-width:6;}
+.tc{fill:none;stroke:var(--lime);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke 0.5s;}
+.tval{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:600;color:var(--lime);}
+.tval.warn{color:var(--amber);}.tval.dang{color:var(--rose);}
+.tc.warn{stroke:var(--amber);}.tc.dang{stroke:var(--rose);}
+.qstrip{display:flex;gap:0.4rem;flex-wrap:wrap;padding:1rem;border-radius:14px;background:var(--glass);border:1px solid var(--gb);margin-bottom:1.5rem;}
+.qnb{width:36px;height:36px;border-radius:8px;border:1px solid var(--gb);background:transparent;color:var(--ts);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'JetBrains Mono',monospace;}
+.qnb:hover:not(:disabled){border-color:var(--violet);color:#fff;}
+.qnb.ac{background:rgba(132,204,22,0.2);border-color:var(--lime);color:var(--lime);}
+.qnb.aw{background:rgba(225,29,72,0.2);border-color:var(--rose);color:var(--rose);}
+.qnb.sk{background:rgba(245,158,11,0.15);border-color:var(--amber);color:var(--amber);}
+.qnb.cur{background:var(--violet);border-color:var(--violet);color:#fff;box-shadow:0 0 12px rgba(124,58,237,0.4);}
+.mpb{height:4px;background:var(--gb);border-radius:2px;margin-bottom:1.5rem;overflow:hidden;}
+.mpbf{height:100%;background:linear-gradient(90deg,var(--violet),var(--lime));border-radius:2px;transition:width 0.5s ease;}
+.rscreen{display:none;}.rscreen.active{display:block;}
+.gdisp{text-align:center;padding:2.5rem;border-radius:20px;background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(132,204,22,0.1));border:1px solid rgba(124,58,237,0.3);margin-bottom:2rem;}
+.glabel{font-size:0.85rem;color:var(--ts);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;}
+.gval{font-family:'Bebas Neue',sans-serif;font-size:5rem;line-height:1;margin-bottom:0.25rem;}
+.ga1{color:var(--lime);}.gb2{color:#22d3ee;}.gb3{color:#67e8f9;}.gc4,.gc5,.gc6{color:var(--amber);}.gd7{color:#f97316;}.ge8,.gf9{color:var(--rose);}
+.gpct{font-family:'JetBrains Mono',monospace;font-size:1.5rem;color:var(--ts);}
+.gtgt{font-size:0.9rem;margin-top:0.5rem;}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:2rem;}
+.rstat{padding:1.25rem;border-radius:14px;background:var(--glass);border:1px solid var(--gb);text-align:center;}
+.rsn{font-family:'Bebas Neue',sans-serif;font-size:2rem;margin-bottom:0.25rem;}
+.rsl{font-size:0.8rem;color:var(--ts);}
+.tbd{margin-bottom:2rem;}
+.tbr{display:flex;align-items:center;gap:1rem;margin-bottom:0.75rem;}
+.tbl{width:160px;font-size:0.83rem;color:var(--ts);flex-shrink:0;}
+.tbt{flex:1;height:8px;background:var(--gb);border-radius:4px;overflow:hidden;}
+.tbf{height:100%;border-radius:4px;transition:width 1s ease;}
+.tbp{width:45px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:0.8rem;flex-shrink:0;}
+.revitem{padding:1.25rem;border-radius:14px;border:1px solid var(--gb);background:var(--glass);margin-bottom:1rem;}
+.revhd{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;}
+.revqn{font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--ts);}
+.revst{padding:0.2rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:600;}
+.revst.correct{background:rgba(132,204,22,0.15);color:var(--lime);}
+.revst.wrong{background:rgba(225,29,72,0.15);color:var(--rose);}
+.revst.skipped{background:rgba(245,158,11,0.15);color:var(--amber);}
+.revqt{font-size:0.9rem;color:#e2e8f0;margin-bottom:0.5rem;font-weight:500;}
+.revan{font-size:0.83rem;color:var(--ts);}
+.revan strong{color:var(--lime);}
+.airec{padding:1.5rem;border-radius:16px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);}
+.airec-t{font-weight:700;color:var(--vl);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;}
+.airec-b{font-size:0.9rem;color:#e2e8f0;line-height:1.7;}
+.pnav{padding:1.5rem 1rem;background:rgba(0,0,0,0.4);border-top:1px solid var(--gb);position:relative;z-index:1;}
+.pni{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.pnt{font-size:0.875rem;color:var(--ts);}
+.pls{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.pl{padding:0.5rem 1rem;border-radius:8px;font-size:0.8rem;font-weight:600;text-decoration:none;border:1px solid var(--gb);color:var(--ts);transition:all 0.2s;}
+.pl:hover,.pl.cur{background:var(--violet);border-color:var(--violet);color:#fff;}
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:200;padding:1rem 1.5rem;border-radius:14px;background:var(--card);border:1px solid var(--gb);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.tt{font-weight:700;font-size:0.9rem;margin-bottom:0.25rem;}
+.tm{font-size:0.8rem;color:var(--ts);}
+@media(max-width:768px){.nl,.na{display:none;}.hbg{display:flex;}.cgrid{grid-template-columns:1fr;}.rgrid{grid-template-columns:repeat(2,1fr);}.tbl{width:100px;}}
+@media(max-width:480px){.rgrid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="bg-mesh"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div></div>
+<div class="gg"></div>
+<nav>
+  <div class="ni">
+    <a href="collegecbt-part1.html" class="logo">College<span>CBT</span></a>
+    <div class="nl">
+      <a href="collegecbt-part1.html#features" class="nk">Features</a>
+      <a href="collegecbt-part1.html#curriculum" class="nk">Curriculum</a>
+      <a href="#examlab" class="nk act">Exam Lab</a>
+      <a href="#mock" class="nk">Mock Exam</a>
+      <a href="collegecbt-part3.html#pricing" class="nk">Pricing</a>
+      <a href="collegecbt-part3.html#dashboard" class="nk">Dashboard</a>
+    </div>
+    <div class="na">
+      <a href="collegecbt-part3.html#auth" class="bg">Sign In</a>
+      <a href="collegecbt-part3.html#auth" class="bp">Get Started →</a>
+    </div>
+    <div class="hbg" id="hbg" onclick="toggleNav()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+<div class="mnav" id="mnav">
+  <a href="collegecbt-part1.html" class="nk">Home</a>
+  <a href="#examlab" class="nk" onclick="closeNav()">Exam Lab</a>
+  <a href="#mock" class="nk" onclick="closeNav()">Mock Exam</a>
+  <a href="collegecbt-part3.html#pricing" class="nk">Pricing</a>
+  <div class="na">
+    <a href="collegecbt-part3.html#auth" class="bg">Sign In</a>
+    <a href="collegecbt-part3.html#auth" class="bp">Get Started →</a>
+  </div>
+</div>
+<div class="pw">
+  <div class="ph">
+    <div class="pbadge">🤖 AI-Powered Practice Engine</div>
+    <h1 class="ptitle">Practice Smart. <span class="hl">Score Higher.</span></h1>
+    <p class="pdesc">Generate unlimited exam questions for any course in Nigerian higher institutions — with full explanations and timed mock exams.</p>
+  </div>
+  <div class="mtbar">
+    <button class="mtab active" id="tab-examlab" onclick="swTab('examlab')">🤖 AI Exam Lab</button>
+    <button class="mtab" id="tab-mock" onclick="swTab('mock')">⏱️ Mock Exam</button>
+  </div>
+  <div class="tp active" id="tp-examlab">
+    <div class="cfg">
+      <div class="cftitle">⚙️ Configure Your Practice Session</div>
+      <div class="cgrid">
+        <div><label class="cfl">Institution Type</label><select class="cfs" id="lInst" onchange="updCourses('lab')"><option value="">Select Type</option><option>University</option><option>Polytechnic</option><option>College of Education</option><option>IEI / Technical</option></select></div>
+        <div><label class="cfl">Course / Subject</label><select class="cfs" id="lCourse"><option value="">Select institution first</option></select></div>
+        <div><label class="cfl">Level</label><select class="cfs" id="lLevel"><option>100 Level</option><option>200 Level</option><option value="300 Level" selected>300 Level</option><option>400 Level</option><option>500/600 Level</option><option>Postgraduate</option><option>ND</option><option>HND</option><option>Post-HND</option><option>NCE</option></select></div>
+        <div><label class="cfl">Question Type</label><select class="cfs" id="lQtype"><option value="MCQ">Multiple Choice (MCQ)</option><option value="Theory">Theory / Essay</option></select></div>
+        <div><label class="cfl">Topic (Optional)</label><input type="text" class="cfi" id="lTopic" placeholder="e.g. Normalization, Ohm's Law..."/></div>
+        <div><label class="cfl">Difficulty</label><select class="cfs" id="lDiff"><option value="mixed">Mixed</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></div>
+      </div>
+      <div class="cfacts">
+        <button class="bgen" id="lBtn" onclick="genLab()">🤖 Generate Question</button>
+        <button class="breset" onclick="clearLab()">🔄 Reset</button>
+      </div>
+    </div>
+    <div class="scorebar" id="scorebar">
+      <div class="sbi"><span class="sbl">Questions:</span><span class="sbv" id="sqc" style="color:var(--vl);">0</span></div>
+      <div class="sbi"><span class="sbl">Correct:</span><span class="sbv" id="sco" style="color:var(--lime);">0</span></div>
+      <div class="sbi"><span class="sbl">Wrong:</span><span class="sbv" id="swr" style="color:var(--rose);">0</span></div>
+      <div class="sbi"><span class="sbl">Score:</span><span class="sbv" id="ssc" style="color:var(--amber);">0 pts</span></div>
+      <div class="sbi"><span class="sbl">Streak:</span><span class="sbv" id="sst" style="color:var(--amber);">🔥 0</span></div>
+    </div>
+    <div class="qa" id="labQA"><div style="text-align:center;padding:4rem 2rem;color:var(--ts);"><div style="font-size:3rem;margin-bottom:1rem;">🤖</div><div style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">Ready to practice?</div><div style="font-size:0.9rem;">Configure your session above and click Generate Question.</div></div></div>
+  </div>
+  <div class="tp" id="tp-mock">
+    <div id="mockCfgSec">
+      <div class="cfg">
+        <div class="cftitle">⚙️ Set Up Your Mock Exam</div>
+        <div class="cgrid">
+          <div><label class="cfl">Institution Type</label><select class="cfs" id="mInst" onchange="updCourses('mock')"><option value="">Select Type</option><option>University</option><option>Polytechnic</option><option>College of Education</option><option>IEI / Technical</option></select></div>
+          <div><label class="cfl">Course / Subject</label><select class="cfs" id="mCourse"><option value="">Select institution first</option></select></div>
+          <div><label class="cfl">Level</label><select class="cfs" id="mLevel"><option>100 Level</option><option>200 Level</option><option value="300 Level" selected>300 Level</option><option>400 Level</option><option>ND</option><option>HND</option><option>NCE</option></select></div>
+          <div><label class="cfl">Questions</label><select class="cfs" id="mQcount"><option value="5">5 Questions (~7.5 min)</option><option value="10" selected>10 Questions (~15 min)</option><option value="20">20 Questions (~30 min)</option><option value="30">30 Questions (~45 min)</option></select></div>
+          <div><label class="cfl">Time per Question</label><select class="cfs" id="mTime"><option value="60">60 seconds</option><option value="90" selected>90 seconds (Standard)</option><option value="120">120 seconds</option></select></div>
+          <div><label class="cfl">Difficulty</label><select class="cfs" id="mDiff"><option value="mixed" selected>Mixed (Recommended)</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></div>
+        </div>
+        <div class="cfacts"><button class="bgen" onclick="startMock()">⏱️ Start Mock Exam</button></div>
+      </div>
+      <div class="cfg" style="margin-top:1.5rem;">
+        <div class="cftitle">📊 WAEC Grading Reference (A1–F9)</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;">
+          <div style="padding:0.75rem;border-radius:10px;background:rgba(132,204,22,0.1);border:1px solid rgba(132,204,22,0.2);text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--lime);">A1</div><div style="font-size:0.8rem;color:var(--ts);">≥75% Distinction</div></div>
+          <div style="padding:0.75rem;border-radius:10px;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.2);text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#22d3ee;">B2</div><div style="font-size:0.8rem;color:var(--ts);">≥70% Very Good</div></div>
+          <div style="padding:0.75rem;border-radius:10px;background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.15);text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#67e8f9;">B3</div><div style="font-size:0.8rem;color:var(--ts);">≥65% Good</div></div>
+          <div style="padding:0.75rem;border-radius:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--amber);">C4</div><div style="font-size:0.8rem;color:var(--ts);">≥60% Credit</div></div>
+          <div style="padding:0.75rem;border-radius:10px;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.15);text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:#fb923c;">D7</div><div style="font-size:0.8rem;color:var(--ts);">≥45% Pass</div></div>
+          <div style="padding:0.75rem;border-radius:10px;background:rgba(225,29,72,0.08);border:1px solid rgba(225,29,72,0.15);text-align:center;"><div style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--rose);">F9</div><div style="font-size:0.8rem;color:var(--ts);">&lt;40% Fail</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="mockActive" style="display:none;">
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:center;margin-bottom:1.5rem;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
+          <div class="tring"><svg viewBox="0 0 100 100" width="100" height="100"><circle class="tc-bg" cx="50" cy="50" r="42"/><circle class="tc" id="tc" cx="50" cy="50" r="42" stroke-dasharray="263.9" stroke-dashoffset="0"/></svg><div class="tval" id="tval">1:30</div></div>
+          <div style="text-align:center;font-size:0.85rem;color:var(--ts);" id="qprog">Q 1 of 10</div>
+        </div>
+        <div>
+          <div class="mpb"><div class="mpbf" id="mpbf" style="width:0%"></div></div>
+          <div class="qstrip" id="qstrip"></div>
+        </div>
+      </div>
+      <div class="qa" id="mockQA"><div class="ql"><div class="spin"></div><div class="ltext">Loading question...</div></div></div>
+      <div style="display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;">
+        <button class="bnxt" id="skipBtn" onclick="skipQ()">Skip →</button>
+        <button class="bnxt" id="nextBtn" onclick="nextQ()" style="display:none;">Next Question →</button>
+        <button class="bth" onclick="endEarly()">🏁 Finish Exam</button>
+      </div>
+    </div>
+    <div class="rscreen" id="mockResults"></div>
+  </div>
+</div>
+<div class="pnav"><div class="pni"><div class="pnt">CollegeCBT — 3-Part Application</div><div class="pls"><a href="collegecbt-part1.html" class="pl">Part 1: Landing & Curriculum</a><a href="#" class="pl cur">Part 2: Exam Lab & Mock Exam</a><a href="collegecbt-part3.html" class="pl">Part 3: Dashboard, Auth & Pricing</a></div></div></div>
+<div class="toast" id="toast"><div class="tt" id="ttitle"></div><div class="tm" id="tmsg"></div></div>
+<script>
+const COURSES={
+  'University':['Introduction to Computer Science','General Mathematics I','General Physics I','General Chemistry I','Introduction to Economics','Use of English & Communication','Data Structures & Algorithms','Object-Oriented Programming','Engineering Mechanics','Financial Accounting I','Law of Contract','Database Management Systems','Computer Networks','Electrical Circuit Theory','Human Anatomy','Organic Chemistry','Constitutional Law','Fluid Mechanics','Biochemistry','Macroeconomics','Artificial Intelligence & ML','Software Engineering','Structural Analysis','Pharmacology','Econometrics','Advanced Cyber Security','Surgery & Clinical Medicine','Clinical Pharmacy','MBA Strategic Management','M.Sc. Research Methodology'],
+  'Polytechnic':['Computer Science (ND)','Accountancy (ND)','Electrical Engineering (ND)','Marketing (ND)','Architectural Technology (ND)','Civil Engineering (ND)','Business Administration (ND)','Computer Science (HND)','Accountancy (HND)','Civil Engineering (HND)','Mechanical Engineering (HND)','Banking & Finance (HND)','Business Management (Post-HND)','ICT & Networking (NID)'],
+  'College of Education':['General Education Studies','Mathematics Education','English Language Education','Early Childhood & Care Education','Vocational & Technical Education','Integrated Science Education','Social Studies Education','Primary Education Studies','B.Ed. Primary Education','B.Ed. Educational Management'],
+  'IEI / Technical':['ICT & Computer Networking (NID)','Oil & Gas Technology (NID)','Film Production & Media (NID)','Auto-Mechanics','Electrical Installation','Marine Engineering (NID)','Aircraft Engineering Technology','Carpentry & Joinery']
+};
+function updCourses(mode){
+  const inst=document.getElementById(mode==='lab'?'lInst':'mInst').value;
+  const sel=document.getElementById(mode==='lab'?'lCourse':'mCourse');
+  sel.innerHTML='<option value="">Select a course</option>';
+  if(inst&&COURSES[inst])COURSES[inst].forEach(c=>sel.add(new Option(c,c)));
+}
+function toggleNav(){document.getElementById('hbg').classList.toggle('open');document.getElementById('mnav').classList.toggle('open');}
+function closeNav(){document.getElementById('hbg').classList.remove('open');document.getElementById('mnav').classList.remove('open');}
+function swTab(id){
+  document.querySelectorAll('.mtab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.getElementById('tp-'+id).classList.add('active');
+  if(id==='mock')document.getElementById('tp-mock').scrollIntoView({behavior:'smooth'});
+}
+async function callClaude(prompt,max){
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:max||1000,messages:[{role:'user',content:prompt}]})});
+  if(!r.ok)throw new Error('API '+r.status);
+  const d=await r.json();return d.content.map(b=>b.text||'').join('');
+}
+function mcqPrompt(c,l,i,t,d){return `You are a Nigerian ${i} exam expert. Generate ONE multiple-choice question for: ${c}, ${l}.${t?' Topic: '+t+'.':''} Difficulty: ${d}.\nReturn ONLY valid JSON (no backticks):\n{"question":"...","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"A","explanations":{"correct":"Why correct option is right.","A":"Why A is right or wrong (if wrong: specific misconception).","B":"Why B is wrong: misconception.","C":"Why C is wrong: misconception.","D":"Why D is wrong: misconception."},"examiner_note":"What this tests and common errors.","topic":"${t||'General'}"}`;}
+function thPrompt(c,l,i,t,d){return `You are a Nigerian ${i} exam expert. Generate ONE theory question for: ${c}, ${l}.${t?' Topic: '+t+'.':''} Difficulty: ${d}.\nReturn ONLY valid JSON:\n{"question":"...","key_points":[{"point":"...","marks":3}],"model_answer":"150-200 word model answer...","examiner_notes":"What examiners look for.","mark_scheme":"Total marks and allocation.","topic":"${t||'General'}"}`;}
+let LS={qc:0,co:0,wr:0,sc:0,st:0,ans:false};
+function genLab(){
+  const c=document.getElementById('lCourse').value,i=document.getElementById('lInst').value,l=document.getElementById('lLevel').value,qt=document.getElementById('lQtype').value,t=document.getElementById('lTopic').value,d=document.getElementById('lDiff').value;
+  if(!c||!i){showToast('⚠️ Missing Info','Select institution type and course first.');return;}
+  document.getElementById('scorebar').style.display='flex';
+  document.getElementById('labQA').innerHTML='<div class="ql"><div class="spin"></div><div class="ltext">Claude AI is generating a contextual question...</div></div>';
+  document.getElementById('lBtn').disabled=true;LS.ans=false;
+  const prompt=qt==='MCQ'?mcqPrompt(c,l,i,t,d):thPrompt(c,l,i,t,d);
+  callClaude(prompt,1200).then(raw=>{LS.qc++;updScore();const data=JSON.parse(raw.replace(/```json|```/g,'').trim());qt==='MCQ'?renderMCQ(data,c,l):renderTh(data,c,l);}).catch(()=>{LS.qc++;updScore();document.getElementById('lQtype').value==='MCQ'?renderMCQ(demoMCQ(c),c,l):renderTh(demoTh(c),c,l);}).finally(()=>document.getElementById('lBtn').disabled=false);
+}
+function renderMCQ(data,c,l){
+  const ks=['A','B','C','D'];
+  document.getElementById('labQA').innerHTML=`<div class="qcard"><div class="qtop"><div class="qmeta"><span class="qb qbc">🎓 ${c}</span><span class="qb qbt">MCQ · ${l}</span><span class="qb qbs">Q${LS.qc}</span></div><div class="qtext">${data.question}</div></div><div class="qbody"><div class="mopts" id="lOpts">${ks.map(k=>`<button class="mopt" onclick="ansLab(this,'${k}',${JSON.stringify(data).replace(/\\/g,'\\\\').replace(/'/g,"&#39;")})" data-k="${k}"><span class="okey">${k}</span><span>${data.options[k]}</span></button>`).join('')}</div><div id="lExp"></div><div class="lacts" id="lActs" style="display:none;"><button class="bnxt" onclick="genLab()">Next Question →</button></div></div></div>`;
+}
+function ansLab(btn,chosen,data){
+  if(LS.ans)return;LS.ans=true;
+  document.querySelectorAll('#lOpts .mopt').forEach(o=>{o.disabled=true;o.style.cursor='default';});
+  const cor=data.correct;
+  document.querySelectorAll('#lOpts .mopt').forEach(o=>{const k=o.dataset.k;if(k===cor)o.classList.add('correct');else if(k===chosen&&chosen!==cor)o.classList.add('wrong');});
+  if(chosen===cor){LS.co++;LS.sc+=2;LS.st++;showToast('✅ Correct! +2pts','Great work! See explanation below.');}
+  else{LS.wr++;LS.st=0;showToast('❌ Wrong','Correct: '+cor+'. See explanation.');}
+  updScore();
+  const exp=document.getElementById('lExp');
+  const ok=chosen===cor;
+  let dh='';['A','B','C','D'].forEach(k=>{if(k!==data.correct&&data.explanations&&data.explanations[k])dh+=`<div class="di"><strong>❌ ${k}:</strong> ${data.explanations[k]}</div>`;});
+  exp.innerHTML=`<div class="expbox ${ok?'ce':'we'}"><div class="etitle">${ok?'✅ Correct!':'❌ Incorrect — Correct: '+data.correct+'. '+data.options[data.correct]}</div><div class="ebody">${(data.explanations&&data.explanations.correct)||''}</div>${dh?`<div class="dlist">${dh}</div>`:''} ${data.examiner_note?`<div class="enote">📌 <strong>Examiner:</strong> ${data.examiner_note}</div>`:''}</div>`;
+  document.getElementById('lActs').style.display='flex';
+}
+function renderTh(data,c,l){
+  document.getElementById('labQA').innerHTML=`<div class="qcard"><div class="qtop"><div class="qmeta"><span class="qb qbc">🎓 ${c}</span><span class="qb qbt">Theory · ${l}</span><span class="qb qbs">Q${LS.qc}</span></div><div class="qtext">${data.question}</div></div><div class="qbody tharea"><p style="font-size:0.85rem;color:var(--ts);margin-bottom:0.75rem;">Write your answer, then reveal the model answer:</p><textarea id="thAns" placeholder="Type your answer here..."></textarea><div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap;"><button class="bth" onclick="showThAns(${JSON.stringify(data).replace(/\\/g,'\\\\').replace(/'/g,"&#39;")})">📖 Show Model Answer</button><button class="bnxt" onclick="genLab()">Next →</button></div><div class="thma" id="thMA"></div></div></div>`;
+}
+function showThAns(data){
+  const ma=document.getElementById('thMA');if(!ma)return;
+  const kp=(data.key_points||[]).map(k=>`<div class="kp"><span class="kpm">[${k.marks||2}m]</span><span>${k.point}</span></div>`).join('');
+  ma.innerHTML=`<div style="font-weight:700;margin-bottom:0.5rem;">📚 Model Answer</div><div style="font-size:0.875rem;line-height:1.7;color:#e2e8f0;">${data.model_answer||'See course material.'}</div>${kp?`<div style="margin:0.75rem 0;"><strong style="font-size:0.82rem;color:var(--ts);">KEY POINTS:</strong><div class="kpoints">${kp}</div></div>`:''} ${data.mark_scheme?`<div class="ms">📊 <strong>Mark Scheme:</strong> ${data.mark_scheme}</div>`:''} ${data.examiner_notes?`<div class="enote">📌 <strong>Examiner:</strong> ${data.examiner_notes}</div>`:''}`;
+  ma.classList.add('vis');LS.sc+=5;updScore();showToast('📖 Model Answer Revealed','+5 pts for reviewing!');
+}
+function updScore(){document.getElementById('sqc').textContent=LS.qc;document.getElementById('sco').textContent=LS.co;document.getElementById('swr').textContent=LS.wr;document.getElementById('ssc').textContent=LS.sc+' pts';document.getElementById('sst').textContent='🔥 '+LS.st;}
+function clearLab(){LS={qc:0,co:0,wr:0,sc:0,st:0,ans:false};document.getElementById('scorebar').style.display='none';document.getElementById('labQA').innerHTML='<div style="text-align:center;padding:4rem 2rem;color:var(--ts);"><div style="font-size:3rem;margin-bottom:1rem;">🤖</div><div style="font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;">Ready to practice?</div><div style="font-size:0.9rem;">Configure your session above and click Generate Question.</div></div>';}
+let MS={course:'',inst:'',level:'',total:10,tpq:90,diff:'mixed',cur:0,qs:[],ans:[],timer:null,tl:90,sc:0,co:0,wr:0,sk:0};
+function startMock(){
+  const c=document.getElementById('mCourse').value,i=document.getElementById('mInst').value;
+  if(!c||!i){showToast('⚠️ Setup Required','Select institution type and course.');return;}
+  MS={course:c,inst:i,level:document.getElementById('mLevel').value,total:parseInt(document.getElementById('mQcount').value),tpq:parseInt(document.getElementById('mTime').value),diff:document.getElementById('mDiff').value,cur:0,qs:[],ans:[],timer:null,tl:0,sc:0,co:0,wr:0,sk:0};
+  document.getElementById('mockCfgSec').style.display='none';
+  document.getElementById('mockActive').style.display='block';
+  document.getElementById('mockResults').className='rscreen';
+  buildStrip();loadQ(0);
+}
+function buildStrip(){
+  const s=document.getElementById('qstrip');s.innerHTML='';
+  for(let i=0;i<MS.total;i++){const b=document.createElement('button');b.className='qnb'+(i===0?' cur':'');b.textContent=i+1;b.id='qn'+i;s.appendChild(b);}
+}
+function setNav(idx,cls){const b=document.getElementById('qn'+idx);if(b){b.classList.remove('cur','ac','aw','sk');if(cls)b.classList.add(cls);}}
+function setCur(idx){document.querySelectorAll('.qnb').forEach(b=>b.classList.remove('cur'));const b=document.getElementById('qn'+idx);if(b)b.classList.add('cur');}
+async function loadQ(idx){
+  setCur(idx);
+  document.getElementById('qprog').textContent='Q '+(idx+1)+' of '+MS.total;
+  document.getElementById('mpbf').style.width=((idx/MS.total)*100)+'%';
+  document.getElementById('mockQA').innerHTML='<div class="ql"><div class="spin"></div><div class="ltext">Generating question '+(idx+1)+'...</div></div>';
+  document.getElementById('skipBtn').style.display='inline-flex';
+  document.getElementById('nextBtn').style.display='none';
+  clrTimer();
+  if(MS.qs[idx]){renderMockQ(MS.qs[idx],idx);return;}
+  try{const raw=await callClaude(mcqPrompt(MS.course,MS.level,MS.inst,'',MS.diff),900);MS.qs[idx]=JSON.parse(raw.replace(/```json|```/g,'').trim());}catch(e){MS.qs[idx]=demoMCQ(MS.course);}
+  renderMockQ(MS.qs[idx],idx);
+}
+function renderMockQ(data,idx){
+  const ks=['A','B','C','D'];
+  document.getElementById('mockQA').innerHTML=`<div class="qcard"><div class="qtop"><div class="qmeta"><span class="qb qbc">🎓 ${MS.course}</span><span class="qb qbt">Q${idx+1} of ${MS.total}</span></div><div class="qtext">${data.question}</div></div><div class="qbody"><div class="mopts" id="mOpts">${ks.map(k=>`<button class="mopt" onclick="ansM(this,'${k}',${idx})" data-k="${k}"><span class="okey">${k}</span><span>${data.options[k]}</span></button>`).join('')}</div><div id="mExp"></div></div></div>`;
+  startTimer(idx);
+}
+function ansM(btn,chosen,idx){
+  clrTimer();
+  const data=MS.qs[idx],cor=data.correct;
+  document.querySelectorAll('#mOpts .mopt').forEach(o=>{o.disabled=true;o.style.cursor='default';});
+  document.querySelectorAll('#mOpts .mopt').forEach(o=>{const k=o.dataset.k;if(k===cor)o.classList.add('correct');else if(k===chosen&&chosen!==cor)o.classList.add('wrong');});
+  const ok=chosen===cor;
+  MS.ans[idx]={chosen,correct:cor,ok,sk:false};
+  if(ok){MS.co++;MS.sc+=2;setNav(idx,'ac');}else{MS.wr++;setNav(idx,'aw');}
+  const exp=document.getElementById('mExp');
+  if(exp)exp.innerHTML=`<div class="expbox ${ok?'ce':'we'}" style="margin-top:1rem;"><div class="etitle">${ok?'✅ Correct!':'❌ Wrong — Correct: '+cor+'. '+data.options[cor]}</div><div class="ebody" style="font-size:0.82rem;">${(data.explanations&&data.explanations.correct)||''}</div></div>`;
+  document.getElementById('skipBtn').style.display='none';
+  document.getElementById('nextBtn').style.display='inline-flex';
+  if(idx===MS.total-1){document.getElementById('nextBtn').textContent='🏁 View Results';document.getElementById('nextBtn').onclick=showResults;}
+}
+function skipQ(){clrTimer();const idx=MS.cur;MS.ans[idx]={chosen:null,correct:MS.qs[idx]?.correct,ok:false,sk:true};MS.sk++;setNav(idx,'sk');nextQ();}
+function nextQ(){MS.cur++;if(MS.cur>=MS.total){showResults();return;}loadQ(MS.cur);}
+function endEarly(){showResults();}
+function startTimer(idx){
+  MS.tl=MS.tpq;const circ=document.getElementById('tc'),disp=document.getElementById('tval'),total=MS.tpq,C=263.9;
+  function upd(){const t=MS.tl,m=Math.floor(t/60),s=(t%60).toString().padStart(2,'0');if(disp)disp.textContent=m+':'+s;if(circ)circ.style.strokeDashoffset=C*(1-t/total);const cls=t<=10?'dang':t<=20?'warn':'';if(disp){disp.className='tval'+(cls?' '+cls:'');}if(circ){circ.className='tc'+(cls?' '+cls:'');}}
+  upd();MS.timer=setInterval(()=>{MS.tl--;upd();if(MS.tl<=0){clearInterval(MS.timer);skipQ();}},1000);
+}
+function clrTimer(){if(MS.timer){clearInterval(MS.timer);MS.timer=null;}}
+function waecGrade(p){if(p>=75)return'A1';if(p>=70)return'B2';if(p>=65)return'B3';if(p>=60)return'C4';if(p>=55)return'C5';if(p>=50)return'C6';if(p>=45)return'D7';if(p>=40)return'E8';return'F9';}
+function showResults(){
+  clrTimer();document.getElementById('mockActive').style.display='none';
+  const total=MS.total,pct=Math.round((MS.co/total)*100),grade=waecGrade(pct);
+  const gc=pct>=75?'ga1':pct>=65?'gb2':pct>=55?'gc4':pct>=45?'gd7':'gf9';
+  const passed=pct>=75;
+  const topics={};
+  MS.qs.forEach((q,i)=>{const t=q.topic||'General';if(!topics[t])topics[t]={co:0,tot:0};topics[t].tot++;if(MS.ans[i]&&MS.ans[i].ok)topics[t].co++;});
+  const tbHtml=Object.entries(topics).map(([t,v])=>{const p=Math.round((v.co/v.tot)*100),col=p>=75?'var(--lime)':p>=50?'var(--amber)':'var(--rose)';return`<div class="tbr"><div class="tbl">${t}</div><div class="tbt"><div class="tbf" style="width:${p}%;background:${col};"></div></div><div class="tbp" style="color:${col};">${p}%</div></div>`;}).join('');
+  const revHtml=MS.qs.map((q,i)=>{const a=MS.ans[i]||{},st=a.sk?'skipped':a.ok?'correct':'wrong';return`<div class="revitem"><div class="revhd"><span class="revqn">Q${i+1}</span><span class="revst ${st}">${st.toUpperCase()}</span></div><div class="revqt">${q.question}</div><div class="revan">Correct: <strong>${q.correct}. ${q.options[q.correct]}</strong>${a.chosen&&!a.sk&&!a.ok?` · Your answer: <span style="color:var(--rose);">${a.chosen}. ${q.options[a.chosen]}</span>`:''}</div></div>`;}).join('');
+  const rec=pct>=75?'Outstanding! You are exam-ready. Maintain this by tackling harder questions and advanced topics.':pct>=60?'Good effort! You are close to the 75% target. Focus on weak topics and retake the mock.':pct>=45?'Progress noted, but more practice needed. Review full explanations for wrong answers before retrying.':'Intensive revision required. Use the Exam Lab topic-by-topic before attempting another mock.';
+  const el=document.getElementById('mockResults');
+  el.innerHTML=`<div class="gdisp"><div class="glabel">Your WAEC Grade</div><div class="gval ${gc}">${grade}</div><div class="gpct">${MS.co} / ${total} — ${pct}%</div><div class="gtgt" style="color:${passed?'var(--lime)':'var(--rose);'};">${passed?'🎉 Target Achieved! (75%+)':'⚠️ Below 75% Target — Keep Practising'}</div></div><div class="rgrid"><div class="rstat"><div class="rsn" style="color:var(--lime);">${MS.co}</div><div class="rsl">Correct Answers</div></div><div class="rstat"><div class="rsn" style="color:var(--rose);">${MS.wr}</div><div class="rsl">Wrong Answers</div></div><div class="rstat"><div class="rsn" style="color:var(--amber);">${MS.sk}</div><div class="rsl">Skipped</div></div></div><div class="tbd"><div style="font-weight:700;margin-bottom:1rem;">📊 Topic Performance</div>${tbHtml||'<p style="color:var(--ts);font-size:0.875rem;">No topic breakdown available.</p>'}</div><div class="airec" style="margin-bottom:2rem;"><div class="airec-t">🤖 AI Recommendation</div><div class="airec-b">${rec}</div></div><div style="margin-bottom:2rem;"><div style="font-weight:700;margin-bottom:1rem;">📋 Full Question Review</div>${revHtml}</div><div style="display:flex;gap:1rem;flex-wrap:wrap;"><button class="bgen" onclick="resetMock()">🔄 Take Another Mock</button><button class="bth" onclick="swTab('examlab')">🤖 Practice in Exam Lab</button><a href="collegecbt-part3.html#dashboard" class="bnxt" style="display:inline-flex;align-items:center;text-decoration:none;padding:0.75rem 1.5rem;">📊 View Dashboard</a></div>`;
+  el.className='rscreen active';el.scrollIntoView({behavior:'smooth'});
+}
+function resetMock(){document.getElementById('mockCfgSec').style.display='block';document.getElementById('mockActive').style.display='none';document.getElementById('mockResults').className='rscreen';}
+function demoMCQ(c){return{question:`In the context of ${c}, which of the following best describes encapsulation in software design?`,options:{A:'Hiding internal implementation details and exposing only a public interface.',B:'A technique for sorting data arrays in O(n log n) time.',C:'The recursive decomposition of a problem into smaller subproblems.',D:'A database schema design pattern for reducing redundancy.'},correct:'A',explanations:{correct:'Encapsulation wraps data and methods together, hiding internal complexity and exposing only necessary interfaces — a core OOP principle.',A:'Correct — Encapsulation hides implementation details.',B:'This describes merge sort or quicksort time complexity, not encapsulation.',C:'This describes recursion or divide-and-conquer algorithms.',D:'This describes database normalization, not encapsulation.'},examiner_note:'Often confused with abstraction. Abstraction hides complexity conceptually; encapsulation hides it through access control in code.',topic:'Core Concepts'};}
+function demoTh(c){return{question:`Discuss the fundamental principles of ${c} and their practical applications in the Nigerian context. Provide relevant examples. (20 marks)`,key_points:[{point:'Define the core concept with academic precision.',marks:4},{point:'Explain at least 3 practical applications in the Nigerian context.',marks:6},{point:'Provide relevant examples with justification.',marks:6},{point:'Demonstrate understanding of limitations and implications.',marks:4}],model_answer:`The subject of ${c} encompasses foundational principles that drive modern practice in Nigeria and globally. At its core, the discipline involves systematic approaches to understanding, analyzing, and applying academic principles within professional contexts. Nigerian practitioners across telecommunications, finance, healthcare, and the public sector leverage these principles to enhance service delivery and organizational performance. For instance, in the technology sector, these concepts underpin platform development and systems design. In financial services, they inform analytical decision-making and risk management. Government agencies apply them for policy formulation and implementation. Students must demonstrate both theoretical mastery and contextual application in examination responses, citing specific Nigerian institutions and scenarios.`,examiner_notes:'Award marks for structure, clarity, specific examples, and Nigerian context. Deduct for vague or unsupported assertions.',mark_scheme:'Total: 20 marks. Definition: 4m. Applications: 6m. Examples: 6m. Implications: 4m.',topic:'Applied Concepts'};}
+function showToast(t,m){const el=document.getElementById('toast');document.getElementById('ttitle').textContent=t;document.getElementById('tmsg').textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),3500);}
+window.addEventListener('load',()=>{
+  const p=new URLSearchParams(window.location.search);
+  if(p.get('course')){
+    const c=p.get('course'),i=p.get('inst')||'University',mode=p.get('mode');
+    if(mode==='mock'){swTab('mock');const ms=document.getElementById('mInst');if(ms){ms.value=i;updCourses('mock');}setTimeout(()=>{const mc=document.getElementById('mCourse');if(mc)Array.from(mc.options).forEach(o=>{if(o.value===c||o.text===c)o.selected=true;});},150);}
+    else{const ls=document.getElementById('lInst');if(ls){ls.value=i;updCourses('lab');}setTimeout(()=>{const lc=document.getElementById('lCourse');if(lc)Array.from(lc.options).forEach(o=>{if(o.value===c||o.text===c)o.selected=true;});},150);}
+    showToast('📚 Course Pre-loaded',c+' — configure and generate a question!');
+  }
+  if(window.location.hash==='#mock')swTab('mock');
+});
+</script>
+</body>
+</html>

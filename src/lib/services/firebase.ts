@@ -1,0 +1,158 @@
+// ── Firebase Authentication Service ── (Edge-compatible, lazy-loaded)
+import { currentUser, authLoading, showToast } from '$lib/stores';
+import type { User } from '$lib/stores';
+import type { Auth, User as FirebaseUser } from 'firebase/auth';
+
+let auth: Auth | null = null;
+let initialized = false;
+let initPromise: Promise<Auth | null> | null = null;
+
+async function getFirebase(): Promise<Auth | null> {
+	if (initialized) return auth;
+	if (initPromise) return initPromise;
+
+	initPromise = (async () => {
+		try {
+			// Dynamic import of env vars to avoid static analysis issues at edge
+			const { PUBLIC_FIREBASE_API_KEY, PUBLIC_FIREBASE_AUTH_DOMAIN, PUBLIC_FIREBASE_PROJECT_ID, PUBLIC_FIREBASE_STORAGE_BUCKET, PUBLIC_FIREBASE_MESSAGING_SENDER_ID, PUBLIC_FIREBASE_APP_ID } = await import('$env/static/public');
+
+			if (!PUBLIC_FIREBASE_API_KEY || PUBLIC_FIREBASE_API_KEY.includes('placeholder')) {
+				console.warn('[CollegeCBT] Firebase not configured — using demo mode');
+				authLoading.set(false);
+				initialized = true;
+				return null;
+			}
+
+			const { initializeApp, getApps } = await import('firebase/app');
+			const { getAuth, onAuthStateChanged } = await import('firebase/auth');
+
+			const app = getApps().length === 0
+				? initializeApp({
+						apiKey: PUBLIC_FIREBASE_API_KEY,
+						authDomain: PUBLIC_FIREBASE_AUTH_DOMAIN,
+						projectId: PUBLIC_FIREBASE_PROJECT_ID,
+						storageBucket: PUBLIC_FIREBASE_STORAGE_BUCKET,
+						messagingSenderId: PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+						appId: PUBLIC_FIREBASE_APP_ID
+					})
+				: getApps()[0];
+
+			auth = getAuth(app);
+			initialized = true;
+
+			onAuthStateChanged(auth, (firebaseUser: FirebaseUser | null) => {
+				if (firebaseUser) {
+					const user: User = {
+						uid: firebaseUser.uid,
+						email: firebaseUser.email || '',
+						displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Student',
+						photoURL: firebaseUser.photoURL || undefined,
+						plan: 'free'
+					};
+					currentUser.set(user);
+				} else {
+					currentUser.set(null);
+				}
+				authLoading.set(false);
+			});
+
+			return auth;
+		} catch (err) {
+			console.error('[CollegeCBT] Firebase init error:', err);
+			authLoading.set(false);
+			initialized = true;
+			return null;
+		}
+	})();
+
+	return initPromise;
+}
+
+export async function initAuth(): Promise<void> {
+	// Only runs on client side
+	if (typeof window === 'undefined') return;
+	await getFirebase();
+}
+
+export async function signUpWithEmail(
+	email: string,
+	password: string,
+	displayName: string
+): Promise<{ success: boolean; error?: string }> {
+	try {
+		const authInstance = await getFirebase();
+		if (!authInstance) {
+			// Demo mode: simulate success
+			const user: User = { uid: `demo-${Date.now()}`, email, displayName, plan: 'free' };
+			currentUser.set(user);
+			showToast('✅ Account Created!', 'Welcome to CollegeCBT! (Demo mode)', 'success');
+			return { success: true };
+		}
+
+		const { createUserWithEmailAndPassword, updateProfile } = await import('firebase/auth');
+		const result = await createUserWithEmailAndPassword(authInstance, email, password);
+		await updateProfile(result.user, { displayName });
+
+		showToast('✅ Account Created!', 'Welcome to CollegeCBT!', 'success');
+		return { success: true };
+	} catch (err: unknown) {
+		const error = err as { code?: string };
+		let message = 'Sign up failed. Please try again.';
+		if (error.code === 'auth/email-already-in-use') message = 'This email is already registered.';
+		if (error.code === 'auth/weak-password') message = 'Password must be at least 6 characters.';
+		if (error.code === 'auth/invalid-email') message = 'Please enter a valid email address.';
+		return { success: false, error: message };
+	}
+}
+
+export async function signInWithEmail(
+	email: string,
+	password: string
+): Promise<{ success: boolean; error?: string }> {
+	try {
+		const authInstance = await getFirebase();
+		if (!authInstance) {
+			// Demo mode: simulate login
+			const user: User = {
+				uid: `demo-${Date.now()}`, email,
+				displayName: email.split('@')[0], plan: 'free'
+			};
+			currentUser.set(user);
+			showToast('🎓 Welcome back!', 'Login successful (Demo mode).', 'success');
+			return { success: true };
+		}
+
+		const { signInWithEmailAndPassword } = await import('firebase/auth');
+		await signInWithEmailAndPassword(authInstance, email, password);
+		showToast('🎓 Welcome back!', 'Login successful.', 'success');
+		return { success: true };
+	} catch (err: unknown) {
+		const error = err as { code?: string };
+		let message = 'Sign in failed. Please check your details.';
+		if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+			message = 'Invalid email or password.';
+		}
+		if (error.code === 'auth/too-many-requests') {
+			message = 'Too many attempts. Please wait a moment and try again.';
+		}
+		return { success: false, error: message };
+	}
+}
+
+export async function signOut(): Promise<void> {
+	try {
+		const authInstance = await getFirebase();
+		if (!authInstance) {
+			// Demo mode: clear store
+			currentUser.set(null);
+			showToast('👋 Signed out', 'See you next time!', 'info');
+			return;
+		}
+		const { signOut: firebaseSignOut } = await import('firebase/auth');
+		await firebaseSignOut(authInstance);
+		currentUser.set(null);
+		showToast('👋 Signed out', 'See you next time!', 'info');
+	} catch (err) {
+		console.error('[CollegeCBT] Sign out error:', err);
+	}
+}

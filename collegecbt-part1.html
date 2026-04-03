@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CollegeCBT — Nigeria's #1 AI Exam Prep Platform | Results as a Service</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--bg:#0d0820;--bg2:#120e2e;--violet:#7c3aed;--vl:#a78bfa;--lime:#84cc16;--amber:#f59e0b;--rose:#e11d48;--glass:rgba(255,255,255,0.05);--gb:rgba(255,255,255,0.10);--tx:#ffffff;--ts:#94a3b8;--card:#1a1535;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--tx);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--violet);border-radius:3px;}
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(80px);animation:od 12s ease-in-out infinite alternate;}
+.o1{width:500px;height:500px;background:rgba(124,58,237,0.18);top:-100px;left:-100px;}
+.o2{width:400px;height:400px;background:rgba(132,204,22,0.08);top:40%;right:-80px;animation-delay:-4s;}
+.o3{width:350px;height:350px;background:rgba(245,158,11,0.08);bottom:-80px;left:30%;animation-delay:-8s;}
+.o4{width:300px;height:300px;background:rgba(225,29,72,0.07);top:20%;left:50%;animation-delay:-2s;}
+@keyframes od{0%{transform:translate(0,0);}100%{transform:translate(40px,30px) scale(1.1);}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:60px 60px;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 1rem;border-bottom:1px solid var(--gb);backdrop-filter:blur(20px);background:rgba(13,8,32,0.85);transition:background 0.3s;}
+.ni{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:68px;}
+.logo{font-family:'DM Serif Display',serif;font-size:1.5rem;letter-spacing:-0.02em;background:linear-gradient(135deg,#fff 40%,var(--vl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.logo span{-webkit-text-fill-color:var(--lime);}
+.nl{display:flex;align-items:center;gap:0.25rem;}
+.nk{padding:0.5rem 0.85rem;border-radius:8px;color:var(--ts);font-size:0.875rem;font-weight:500;text-decoration:none;transition:all 0.2s;white-space:nowrap;}
+.nk:hover{color:var(--tx);background:var(--glass);}
+.na{display:flex;gap:0.5rem;align-items:center;}
+.bg{padding:0.5rem 1rem;border-radius:10px;border:1px solid var(--gb);background:transparent;color:var(--tx);font-size:0.875rem;font-weight:500;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.bg:hover{background:var(--glass);border-color:var(--violet);}
+.bp{padding:0.5rem 1.25rem;border-radius:10px;background:var(--violet);border:1px solid rgba(124,58,237,0.5);color:#fff;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;box-shadow:0 0 20px rgba(124,58,237,0.3);}
+.bp:hover{background:#6d28d9;box-shadow:0 0 30px rgba(124,58,237,0.5);}
+.hbg{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;border-radius:8px;background:var(--glass);border:1px solid var(--gb);}
+.hbg span{display:block;width:22px;height:2px;background:var(--tx);border-radius:2px;transition:all 0.3s;}
+.hbg.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+.hbg.open span:nth-child(2){opacity:0;}
+.hbg.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+.mnav{display:none;position:fixed;top:68px;left:0;right:0;z-index:99;background:rgba(13,8,32,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--gb);padding:1rem;flex-direction:column;gap:0.5rem;}
+.mnav.open{display:flex;}
+.mnav .nk{display:block;padding:0.75rem 1rem;font-size:1rem;}
+.mnav .na{flex-direction:column;gap:0.5rem;padding-top:0.5rem;}
+.mnav .bg,.mnav .bp{width:100%;padding:0.75rem;text-align:center;}
+section{position:relative;z-index:1;}
+.hero{min-height:100vh;display:flex;align-items:center;padding:100px 1rem 4rem;}
+.hi{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.hbadge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;border-radius:100px;border:1px solid rgba(132,204,22,0.3);background:rgba(132,204,22,0.08);color:var(--lime);font-size:0.8rem;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:1.5rem;}
+.hbadge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--lime);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.htitle{font-family:'DM Serif Display',serif;font-size:clamp(2.5rem,5vw,4rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.5rem;}
+.l1{display:block;color:#fff;}
+.l2{display:block;background:linear-gradient(135deg,var(--vl),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.l3{display:block;color:#fff;}
+.hdesc{color:var(--ts);font-size:1.05rem;line-height:1.7;margin-bottom:2rem;max-width:520px;}
+.hacts{display:flex;gap:0.75rem;flex-wrap:wrap;}
+.blg{padding:0.875rem 2rem;border-radius:12px;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.25s;font-family:'DM Sans',sans-serif;}
+.bv{background:var(--violet);color:#fff;border:1px solid rgba(124,58,237,0.5);box-shadow:0 0 30px rgba(124,58,237,0.35);}
+.bv:hover{background:#6d28d9;box-shadow:0 0 50px rgba(124,58,237,0.55);transform:translateY(-2px);}
+.bo{background:transparent;color:#fff;border:1px solid var(--gb);}
+.bo:hover{background:var(--glass);border-color:var(--violet);transform:translateY(-2px);}
+.hstats{display:flex;gap:2rem;margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--gb);flex-wrap:wrap;}
+.si{text-align:center;}
+.sn{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--lime);line-height:1;}
+.sl{font-size:0.75rem;color:var(--ts);margin-top:0.25rem;}
+.dcard{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--gb);border-radius:20px;padding:1.5rem;position:relative;overflow:hidden;}
+.dcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--violet),var(--lime));}
+.dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--gb);}
+.dbadge{display:inline-flex;align-items:center;gap:0.4rem;padding:0.3rem 0.75rem;border-radius:100px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);color:var(--vl);font-size:0.75rem;font-weight:600;}
+.dtimer{font-family:'JetBrains Mono',monospace;font-size:0.9rem;color:var(--amber);background:rgba(245,158,11,0.1);padding:0.3rem 0.75rem;border-radius:8px;border:1px solid rgba(245,158,11,0.2);}
+.dq{font-size:0.95rem;color:#e2e8f0;line-height:1.6;margin-bottom:1.25rem;font-weight:500;}
+.dopts{display:flex;flex-direction:column;gap:0.5rem;}
+.dopt{padding:0.65rem 1rem;border-radius:10px;font-size:0.875rem;cursor:pointer;border:1px solid var(--gb);background:rgba(255,255,255,0.03);transition:all 0.2s;color:var(--ts);display:flex;align-items:center;gap:0.5rem;}
+.dopt:hover{border-color:var(--violet);color:#fff;background:rgba(124,58,237,0.1);}
+.dopt.correct{border-color:var(--lime)!important;background:rgba(132,204,22,0.1)!important;color:var(--lime)!important;}
+.dopt.wrong{border-color:var(--rose)!important;background:rgba(225,29,72,0.1)!important;color:var(--rose)!important;}
+.ok{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;border:1px solid currentColor;}
+.dexp{margin-top:1rem;padding:0.75rem;border-radius:10px;background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.2);font-size:0.8rem;color:#a3e635;line-height:1.5;display:none;}
+.fb{position:absolute;background:var(--card);border:1px solid var(--gb);border-radius:12px;padding:0.5rem 0.75rem;font-size:0.75rem;animation:fl 3s ease-in-out infinite;white-space:nowrap;}
+.fb1{top:-15px;right:20px;color:var(--lime);}
+.fb2{bottom:-15px;left:20px;color:var(--amber);animation-delay:-1.5s;}
+@keyframes fl{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.sec{padding:5rem 1rem;}
+.si2{max-width:1280px;margin:0 auto;}
+.slabel{display:inline-flex;align-items:center;gap:0.5rem;color:var(--vl);font-size:0.8rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;}
+.stitle{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4vw,3rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1rem;}
+.sdesc{color:var(--ts);font-size:1.05rem;max-width:600px;line-height:1.7;}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.pc{padding:1.75rem;border-radius:16px;background:var(--glass);border:1px solid var(--gb);position:relative;overflow:hidden;}
+.pc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--rose),transparent);}
+.pi{font-size:2rem;margin-bottom:1rem;}
+.pt{font-weight:700;font-size:1.05rem;margin-bottom:0.5rem;}
+.pd{color:var(--ts);font-size:0.875rem;line-height:1.6;}
+.rbanner{margin-top:3rem;padding:2rem;border-radius:20px;background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(132,204,22,0.08));border:1px solid rgba(124,58,237,0.25);display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
+.ri{font-size:3rem;flex-shrink:0;}
+.rt h3{font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem;}
+.rt p{color:var(--ts);font-size:0.925rem;line-height:1.7;}
+.rl{color:var(--lime);font-weight:600;}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.fc{padding:2rem;border-radius:16px;background:var(--glass);border:1px solid var(--gb);position:relative;overflow:hidden;cursor:default;transition:all 0.3s;}
+.fc:hover{transform:translateY(-4px);border-color:var(--violet);box-shadow:0 20px 60px rgba(124,58,237,0.15);}
+.fc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac,var(--violet));opacity:0;transition:opacity 0.3s;}
+.fc:hover::before{opacity:1;}
+.ficon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:1.25rem;background:var(--ib,rgba(124,58,237,0.15));border:1px solid var(--ibr,rgba(124,58,237,0.25));}
+.ftitle{font-weight:700;font-size:1.05rem;margin-bottom:0.5rem;}
+.fdesc{color:var(--ts);font-size:0.875rem;line-height:1.65;}
+.ftag{display:inline-block;margin-top:1rem;padding:0.25rem 0.65rem;border-radius:100px;font-size:0.72rem;font-weight:600;letter-spacing:0.05em;}
+.hiw{padding:5rem 1rem;background:rgba(255,255,255,0.01);}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-top:3rem;position:relative;}
+.steps::before{content:'';position:absolute;top:32px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--violet),var(--lime),transparent);z-index:0;}
+.step{position:relative;z-index:1;text-align:center;padding:2rem 1.25rem;border-radius:16px;background:var(--card);border:1px solid var(--gb);transition:all 0.3s;}
+.step:hover{border-color:var(--violet);transform:translateY(-4px);}
+.snum{width:64px;height:64px;border-radius:16px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.8rem;background:linear-gradient(135deg,var(--violet),#a855f7);color:#fff;box-shadow:0 8px 24px rgba(124,58,237,0.35);}
+.stept{font-weight:700;font-size:1rem;margin-bottom:0.5rem;}
+.stepd{color:var(--ts);font-size:0.85rem;line-height:1.6;}
+.curr{padding:5rem 1rem;}
+.itabs{display:flex;gap:0.5rem;margin-bottom:2rem;border:1px solid var(--gb);border-radius:14px;padding:0.4rem;background:rgba(0,0,0,0.2);overflow-x:auto;}
+.itab{flex:1;min-width:fit-content;padding:0.65rem 1.25rem;border-radius:10px;border:none;background:transparent;color:var(--ts);font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.itab.active{background:var(--violet);color:#fff;box-shadow:0 4px 16px rgba(124,58,237,0.35);}
+.itab:hover:not(.active){color:#fff;background:var(--glass);}
+.ipanel{display:none;}
+.ipanel.active{display:block;}
+.ltabs{display:flex;gap:0.5rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.ltab{padding:0.4rem 1rem;border-radius:100px;border:1px solid var(--gb);background:transparent;color:var(--ts);font-size:0.8rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.ltab.active{background:rgba(132,204,22,0.15);border-color:var(--lime);color:var(--lime);}
+.ltab:hover:not(.active){color:#fff;border-color:rgba(255,255,255,0.3);}
+.lpanel{display:none;}
+.lpanel.active{display:block;}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
+.ccard{padding:1.25rem;border-radius:12px;background:var(--glass);border:1px solid var(--gb);cursor:pointer;transition:all 0.25s;position:relative;}
+.ccard:hover,.ccard.sel{border-color:var(--violet);background:rgba(124,58,237,0.12);transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,0.15);}
+.ccard.sel::before{content:'✓';position:absolute;top:8px;right:8px;width:20px;height:20px;border-radius:50%;background:var(--violet);color:#fff;font-size:0.7rem;line-height:20px;text-align:center;}
+.cci{font-size:1.5rem;margin-bottom:0.5rem;}
+.ccn{font-weight:600;font-size:0.875rem;color:#fff;margin-bottom:0.25rem;}
+.ccm{font-size:0.75rem;color:var(--ts);}
+.ctabar{display:none;margin-top:1.5rem;padding:1.25rem 1.5rem;border-radius:14px;background:linear-gradient(135deg,rgba(124,58,237,0.2),rgba(132,204,22,0.1));border:1px solid rgba(124,58,237,0.3);flex-direction:column;gap:1rem;}
+.ctabar.vis{display:flex;}
+.ctai{font-size:0.9rem;color:#e2e8f0;}
+.ctai strong{color:var(--vl);}
+.ctabs{display:flex;gap:0.75rem;flex-wrap:wrap;}
+.bctav{padding:0.65rem 1.25rem;border-radius:10px;background:var(--violet);color:#fff;border:none;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.bctav:hover{background:#6d28d9;}
+.bctao{padding:0.65rem 1.25rem;border-radius:10px;background:transparent;color:var(--lime);border:1px solid rgba(132,204,22,0.4);font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.bctao:hover{background:rgba(132,204,22,0.1);}
+.ih{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding:1.25rem;background:var(--glass);border-radius:14px;border:1px solid var(--gb);flex-wrap:wrap;}
+.ist{text-align:center;flex:1;min-width:80px;}
+.isn{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--vl);}
+.isl{font-size:0.7rem;color:var(--ts);}
+.pnav{padding:1.5rem 1rem;background:rgba(0,0,0,0.4);border-top:1px solid var(--gb);position:relative;z-index:1;}
+.pni{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.pnt{font-size:0.875rem;color:var(--ts);}
+.pls{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.pl{padding:0.5rem 1rem;border-radius:8px;font-size:0.8rem;font-weight:600;text-decoration:none;border:1px solid var(--gb);color:var(--ts);transition:all 0.2s;}
+.pl:hover,.pl.cur{background:var(--violet);border-color:var(--violet);color:#fff;}
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:200;padding:1rem 1.5rem;border-radius:14px;background:var(--card);border:1px solid var(--gb);box-shadow:0 20px 60px rgba(0,0,0,0.5);transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.tt{font-weight:700;font-size:0.9rem;margin-bottom:0.25rem;}
+.tm{font-size:0.8rem;color:var(--ts);}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:300;align-items:center;justify-content:center;padding:1rem;}
+.overlay.open{display:flex;}
+.modal{background:#1a1535;border:1px solid var(--gb);border-radius:20px;padding:2rem;width:100%;max-width:480px;position:relative;max-height:90vh;overflow-y:auto;}
+.mclose{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--ts);font-size:1.5rem;cursor:pointer;line-height:1;}
+.mclose:hover{color:#fff;}
+.mt{font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.25rem;}
+.ms{color:var(--ts);font-size:0.875rem;margin-bottom:1.5rem;}
+.mform{display:flex;flex-direction:column;gap:1rem;}
+.minput{padding:0.75rem 1rem;border-radius:10px;border:1px solid var(--gb);background:rgba(0,0,0,0.2);color:#fff;font-size:0.875rem;font-family:'DM Sans',sans-serif;width:100%;}
+.minput:focus{outline:none;border-color:var(--violet);}
+.msub{padding:0.875rem;border-radius:10px;background:var(--violet);color:#fff;border:none;font-size:1rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.2s;width:100%;}
+.msub:hover{background:#6d28d9;}
+.mlink{text-align:center;margin-top:1rem;color:var(--ts);font-size:0.8rem;}
+.mlink a{color:var(--vl);text-decoration:none;}
+@media(max-width:1024px){.fgrid{grid-template-columns:repeat(2,1fr);}.pgrid{grid-template-columns:repeat(2,1fr);}.steps{grid-template-columns:repeat(2,1fr);}.steps::before{display:none;}.hi{grid-template-columns:1fr;text-align:center;}.hdesc{margin:0 auto 2rem;}.hacts{justify-content:center;}.hstats{justify-content:center;}}
+@media(max-width:768px){.nl,.na{display:none;}.hbg{display:flex;}.fgrid{grid-template-columns:1fr;}.pgrid{grid-template-columns:1fr;}.steps{grid-template-columns:1fr;}.hi{gap:2rem;}.itabs{flex-direction:column;}}
+@media(max-width:480px){.htitle{font-size:2rem;}.rbanner{flex-direction:column;text-align:center;}.hstats{flex-wrap:wrap;gap:1rem;}}
+</style>
+</head>
+<body>
+<div class="bg-mesh"><div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div class="orb o4"></div></div>
+<div class="grid-bg"></div>
+<nav id="mainNav">
+  <div class="ni">
+    <a href="#" class="logo">College<span>CBT</span></a>
+    <div class="nl">
+      <a href="#features" class="nk">Features</a>
+      <a href="#curriculum" class="nk">Curriculum</a>
+      <a href="collegecbt-part2.html" class="nk">Exam Lab</a>
+      <a href="collegecbt-part2.html#mock" class="nk">Mock Exam</a>
+      <a href="collegecbt-part3.html#pricing" class="nk">Pricing</a>
+      <a href="collegecbt-part3.html#dashboard" class="nk">Dashboard</a>
+    </div>
+    <div class="na">
+      <button class="bg" onclick="openModal('login')">Sign In</button>
+      <button class="bp" onclick="openModal('signup')">Get Started →</button>
+    </div>
+    <div class="hbg" id="hbg" onclick="toggleNav()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+<div class="mnav" id="mnav">
+  <a href="#features" class="nk" onclick="closeNav()">Features</a>
+  <a href="#curriculum" class="nk" onclick="closeNav()">Curriculum</a>
+  <a href="collegecbt-part2.html" class="nk">Exam Lab</a>
+  <a href="collegecbt-part2.html#mock" class="nk">Mock Exam</a>
+  <a href="collegecbt-part3.html#pricing" class="nk">Pricing</a>
+  <a href="collegecbt-part3.html#dashboard" class="nk">Dashboard</a>
+  <div class="na"><button class="bg" onclick="openModal('login')">Sign In</button><button class="bp" onclick="openModal('signup')">Get Started →</button></div>
+</div>
+<section class="hero" id="home">
+  <div class="hi">
+    <div>
+      <div class="hbadge"><span>🇳🇬</span> Nigeria's #1 AI Exam Prep Platform</div>
+      <h1 class="htitle">
+        <span class="l1">Pass Any Exam.</span>
+        <span class="l2">Guaranteed by AI.</span>
+        <span class="l3">Score 75%+.</span>
+      </h1>
+      <p class="hdesc">CollegeCBT is a Results-as-a-Service platform using Claude AI to generate unlimited, contextual exam questions for every course in Nigerian universities, polytechnics, and colleges of education — with full explanations and WAEC-style grading.</p>
+      <div class="hacts">
+        <button class="blg bv" onclick="openModal('signup')">Start Free Today →</button>
+        <button class="blg bo" onclick="document.getElementById('democard').scrollIntoView({behavior:'smooth'})">▶ See Live Demo</button>
+      </div>
+      <div class="hstats">
+        <div class="si"><div class="sn" data-target="309">0</div><div class="sl">Accredited Universities</div></div>
+        <div class="si"><div class="sn">∞</div><div class="sl">AI-Generated Questions</div></div>
+        <div class="si"><div class="sn" data-target="50">0</div><div class="sl">k+ Students Served</div></div>
+        <div class="si"><div class="sn" data-target="75">0</div><div class="sl">% Score Guarantee</div></div>
+      </div>
+    </div>
+    <div style="position:relative;padding:20px 0;" id="democard">
+      <div class="fb fb1">🏆 Grade: A1 — 92%</div>
+      <div class="dcard">
+        <div class="dh">
+          <div class="dbadge">🤖 AI Question — 300L Computer Science</div>
+          <div class="dtimer" id="demoTimer">01:30</div>
+        </div>
+        <p class="dq">Which of the following accurately describes the time complexity of binary search on a sorted array of <em>n</em> elements?</p>
+        <div class="dopts" id="demoOpts">
+          <div class="dopt" onclick="demoAns(this,'wrong')"><span class="ok">A</span>O(n) — Linear time</div>
+          <div class="dopt" onclick="demoAns(this,'correct')"><span class="ok">B</span>O(log n) — Logarithmic time</div>
+          <div class="dopt" onclick="demoAns(this,'wrong')"><span class="ok">C</span>O(n²) — Quadratic time</div>
+          <div class="dopt" onclick="demoAns(this,'wrong')"><span class="ok">D</span>O(1) — Constant time</div>
+        </div>
+        <div class="dexp" id="demoExp">✅ <strong>B is correct.</strong> Binary search halves the search space each step — max steps = log₂n, hence O(log n).<br/>❌ <strong>A</strong> describes linear search. ❌ <strong>C</strong> describes bubble sort (nested loops). ❌ <strong>D</strong> means no scaling with input — impossible for search.</div>
+      </div>
+      <div class="fb fb2">🔥 12-Day Streak Active</div>
+    </div>
+  </div>
+</section>
+<section class="sec" id="problem">
+  <div class="si2">
+    <div class="slabel">⚡ The Problem</div>
+    <h2 class="stitle">Why Nigerian Students Struggle in Exams</h2>
+    <p class="sdesc">The system is broken. Students have syllabi but no practice questions. They memorise without understanding.</p>
+    <div class="pgrid">
+      <div class="pc"><div class="pi">📚</div><div class="pt">No Contextual Practice Questions</div><div class="pd">Past question books are outdated, incomplete, and expensive. Students have no way to practice on-demand for their specific course and level.</div></div>
+      <div class="pc"><div class="pi">🤯</div><div class="pt">No Explanations — Just Answers</div><div class="pd">Even when students find questions, they get bare answers with no explanation of <em>why</em> the correct choice is right or why each wrong option fails.</div></div>
+      <div class="pc"><div class="pi">📉</div><div class="pt">No Real Performance Feedback</div><div class="pd">Students don't know where they stand. No grade predictions, no readiness scores, no insight into weak topics before the real exam.</div></div>
+    </div>
+    <div class="rbanner">
+      <div class="ri">🎯</div>
+      <div class="rt">
+        <h3>We Don't Sell Software. We Deliver <span class="rl">Results.</span></h3>
+        <p>CollegeCBT operates as a <strong>Results-as-a-Service (RaaS)</strong> platform. We measure success by one metric only: <span class="rl">your exam score</span>. Our AI tracks your performance trajectory, predicts your readiness, and keeps generating questions until you hit 75% — the national pass threshold.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="sec" id="features">
+  <div class="si2">
+    <div class="slabel">✨ Platform Features</div>
+    <h2 class="stitle">Everything You Need to Score Higher</h2>
+    <p class="sdesc">Six enterprise-grade capabilities working together to guarantee your exam result — not just prepare you for it.</p>
+    <div class="fgrid">
+      <div class="fc" style="--ac:var(--violet);--ib:rgba(124,58,237,0.15);--ibr:rgba(124,58,237,0.3);"><div class="ficon">🤖</div><div class="ftitle">AI Question Bank</div><div class="fdesc">Unlimited, fresh, randomized questions generated on-demand by Claude AI for any topic, course, or level across all Nigerian higher institutions.</div><div class="ftag" style="background:rgba(124,58,237,0.15);color:var(--vl);">Powered by Claude</div></div>
+      <div class="fc" style="--ac:var(--lime);--ib:rgba(132,204,22,0.12);--ibr:rgba(132,204,22,0.25);"><div class="ficon">💡</div><div class="ftitle">Full Explanations</div><div class="fdesc">Every MCQ shows: why the correct answer is right + the specific misconception behind each wrong distractor. You understand, not just memorise.</div><div class="ftag" style="background:rgba(132,204,22,0.12);color:var(--lime);">Deep Learning</div></div>
+      <div class="fc" style="--ac:var(--amber);--ib:rgba(245,158,11,0.12);--ibr:rgba(245,158,11,0.25);"><div class="ficon">⏱️</div><div class="ftitle">Mock Exam Engine</div><div class="fdesc">Timed countdown (90s/question), auto-submit, WAEC-style grading (A1–F9). Simulates real exam pressure so you perform at your peak.</div><div class="ftag" style="background:rgba(245,158,11,0.12);color:var(--amber);">A1–F9 Grading</div></div>
+      <div class="fc" style="--ac:#06b6d4;--ib:rgba(6,182,212,0.12);--ibr:rgba(6,182,212,0.25);"><div class="ficon">📝</div><div class="ftitle">Theory Questions</div><div class="fdesc">Model answers with examiner notes, key points with marks allocation, and mark schemes for essay, short-answer, and calculation questions.</div><div class="ftag" style="background:rgba(6,182,212,0.1);color:#22d3ee;">Mark Schemes</div></div>
+      <div class="fc" style="--ac:#f43f5e;--ib:rgba(244,63,94,0.12);--ibr:rgba(244,63,94,0.25);"><div class="ficon">📊</div><div class="ftitle">Results Intelligence</div><div class="fdesc">AI Readiness Score (0–100), grade prediction, topic-level heatmaps, national benchmarking, and downloadable performance certificates.</div><div class="ftag" style="background:rgba(244,63,94,0.1);color:#fb7185;">RaaS Core</div></div>
+      <div class="fc" style="--ac:#a855f7;--ib:rgba(168,85,247,0.12);--ibr:rgba(168,85,247,0.25);"><div class="ficon">🏛️</div><div class="ftitle">Comprehensive Curriculum</div><div class="fdesc">Full course catalogue for all 309+ universities, 78+ polytechnics, 163+ COEs and IEIs — NUC/NBTE/NCCE aligned, organised by institution, level & faculty.</div><div class="ftag" style="background:rgba(168,85,247,0.1);color:#c084fc;">309+ Institutions</div></div>
+    </div>
+  </div>
+</section>
+<section class="hiw" id="how">
+  <div class="si2">
+    <div class="slabel">🔄 How It Works</div>
+    <h2 class="stitle">From Zero to 75% in 4 Steps</h2>
+    <div class="steps">
+      <div class="step"><div class="snum">1</div><div class="stept">Choose Institution & Course</div><div class="stepd">Select your university, polytechnic, or COE. Pick faculty, department, course, and level (100L–600L, ND, HND, NCE, PG).</div></div>
+      <div class="step"><div class="snum">2</div><div class="stept">AI Generates Contextual Questions</div><div class="stepd">Claude AI creates unlimited, fresh questions tailored to your specific course, topic, and level — accurate and NUC/NBTE-aligned.</div></div>
+      <div class="step"><div class="snum">3</div><div class="stept">Practice with Full Explanations</div><div class="stepd">Get instant feedback — correct answers with reasoning, wrong answers with misconception analysis. Learn by understanding.</div></div>
+      <div class="step"><div class="snum">4</div><div class="stept">Mock Exam → Get Your Grade</div><div class="stepd">Simulate the real exam under timed conditions. Get your WAEC grade (A1–F9), performance analysis, and readiness score.</div></div>
+    </div>
+  </div>
+</section>
+<section class="curr" id="curriculum">
+  <div class="si2">
+    <div class="slabel">📚 Curriculum Browser</div>
+    <h2 class="stitle">Every Institution. Every Course. Every Level.</h2>
+    <p class="sdesc">Browse the complete catalogue of Nigerian higher education courses. Click any course to begin practising immediately.</p>
+    <div class="itabs" style="margin-top:2rem;">
+      <button class="itab active" onclick="swInst('univ',this)">🎓 Universities (NUC)</button>
+      <button class="itab" onclick="swInst('poly',this)">⚙️ Polytechnics (NBTE)</button>
+      <button class="itab" onclick="swInst('coe',this)">📖 Colleges of Education</button>
+      <button class="itab" onclick="swInst('iei',this)">🔬 IEIs & Technical</button>
+    </div>
+    <div class="ipanel active" id="inst-univ">
+      <div class="ih">
+        <div class="ist"><div class="isn">309+</div><div class="isl">Universities</div></div>
+        <div class="ist"><div class="isn">74</div><div class="isl">Federal</div></div>
+        <div class="ist"><div class="isn">67</div><div class="isl">State</div></div>
+        <div class="ist"><div class="isn">168</div><div class="isl">Private</div></div>
+        <div style="flex:3;color:var(--ts);font-size:0.85rem;">Regulated by <strong style="color:#fff;">NUC</strong>. Programs follow CCMAS. Undergraduate: 100L–600L.</div>
+      </div>
+      <div class="ltabs">
+        <button class="ltab active" onclick="swLvl('univ','100',this)">100 Level</button>
+        <button class="ltab" onclick="swLvl('univ','200',this)">200 Level</button>
+        <button class="ltab" onclick="swLvl('univ','300',this)">300 Level</button>
+        <button class="ltab" onclick="swLvl('univ','400',this)">400 Level</button>
+        <button class="ltab" onclick="swLvl('univ','500',this)">500/600 Level</button>
+        <button class="ltab" onclick="swLvl('univ','pg',this)">Postgraduate</button>
+      </div>
+      <div class="lpanel active" id="univ-100"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'Intro to Computer Science','University','100L')"><div class="cci">💻</div><div class="ccn">Introduction to Computer Science</div><div class="ccm">Sciences · All Universities</div></div>
+        <div class="ccard" onclick="selC(this,'General Mathematics I','University','100L')"><div class="cci">📐</div><div class="ccn">General Mathematics I</div><div class="ccm">Sciences · All Faculties</div></div>
+        <div class="ccard" onclick="selC(this,'General Physics I','University','100L')"><div class="cci">⚛️</div><div class="ccn">General Physics I</div><div class="ccm">Sciences & Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'General Chemistry I','University','100L')"><div class="cci">🧪</div><div class="ccn">General Chemistry I</div><div class="ccm">Sciences · Health Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Introduction to Economics','University','100L')"><div class="cci">📈</div><div class="ccn">Introduction to Economics</div><div class="ccm">Social Sciences · Arts</div></div>
+        <div class="ccard" onclick="selC(this,'Use of English & Communication','University','100L')"><div class="cci">📝</div><div class="ccn">Use of English & Communication</div><div class="ccm">All Faculties</div></div>
+        <div class="ccard" onclick="selC(this,'Introduction to Logic & Philosophy','University','100L')"><div class="cci">🧠</div><div class="ccn">Introduction to Logic & Philosophy</div><div class="ccm">Arts · Social Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Introduction to Political Science','University','100L')"><div class="cci">🏛️</div><div class="ccn">Introduction to Political Science</div><div class="ccm">Social Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Biology for Life Sciences','University','100L')"><div class="cci">🦠</div><div class="ccn">Biology for Life Sciences</div><div class="ccm">Health Sciences · Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Engineering Drawing & Design','University','100L')"><div class="cci">📏</div><div class="ccn">Engineering Drawing & Design</div><div class="ccm">Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Introduction to Law','University','100L')"><div class="cci">⚖️</div><div class="ccn">Introduction to Law</div><div class="ccm">Faculty of Law</div></div>
+        <div class="ccard" onclick="selC(this,'Sociology & Anthropology','University','100L')"><div class="cci">👥</div><div class="ccn">Sociology & Anthropology</div><div class="ccm">Social Sciences</div></div>
+      </div></div>
+      <div class="lpanel" id="univ-200"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'Data Structures & Algorithms','University','200L')"><div class="cci">🌲</div><div class="ccn">Data Structures & Algorithms</div><div class="ccm">Computer Science</div></div>
+        <div class="ccard" onclick="selC(this,'Object-Oriented Programming','University','200L')"><div class="cci">🔧</div><div class="ccn">Object-Oriented Programming</div><div class="ccm">CS · Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Engineering Mechanics','University','200L')"><div class="cci">🏗️</div><div class="ccn">Engineering Mechanics</div><div class="ccm">Civil · Mechanical Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Financial Accounting I','University','200L')"><div class="cci">💰</div><div class="ccn">Financial Accounting I</div><div class="ccm">Business Administration</div></div>
+        <div class="ccard" onclick="selC(this,'Law of Contract','University','200L')"><div class="cci">📜</div><div class="ccn">Law of Contract</div><div class="ccm">Faculty of Law</div></div>
+        <div class="ccard" onclick="selC(this,'Cell Biology & Genetics','University','200L')"><div class="cci">🧬</div><div class="ccn">Cell Biology & Genetics</div><div class="ccm">Biological Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Calculus & Analytical Geometry','University','200L')"><div class="cci">∫</div><div class="ccn">Calculus & Analytical Geometry</div><div class="ccm">Sciences · Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Human Physiology I','University','200L')"><div class="cci">🫀</div><div class="ccn">Human Physiology I</div><div class="ccm">Medicine · Nursing · Pharmacy</div></div>
+        <div class="ccard" onclick="selC(this,'Microeconomics','University','200L')"><div class="cci">📊</div><div class="ccn">Microeconomics</div><div class="ccm">Economics · Business</div></div>
+        <div class="ccard" onclick="selC(this,'Introduction to Mass Communication','University','200L')"><div class="cci">📡</div><div class="ccn">Intro to Mass Communication</div><div class="ccm">Arts & Social Sciences</div></div>
+      </div></div>
+      <div class="lpanel" id="univ-300"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'Database Management Systems','University','300L')"><div class="cci">🗄️</div><div class="ccn">Database Management Systems</div><div class="ccm">Computer Science</div></div>
+        <div class="ccard" onclick="selC(this,'Computer Networks','University','300L')"><div class="cci">🌐</div><div class="ccn">Computer Networks</div><div class="ccm">Computer Science · IT</div></div>
+        <div class="ccard" onclick="selC(this,'Electrical Circuit Theory','University','300L')"><div class="cci">⚡</div><div class="ccn">Electrical Circuit Theory</div><div class="ccm">Electrical Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Human Anatomy','University','300L')"><div class="cci">🦴</div><div class="ccn">Human Anatomy</div><div class="ccm">Medicine · Nursing</div></div>
+        <div class="ccard" onclick="selC(this,'Organic Chemistry','University','300L')"><div class="cci">🧪</div><div class="ccn">Organic Chemistry</div><div class="ccm">Chemistry · Pharmacy</div></div>
+        <div class="ccard" onclick="selC(this,'Constitutional Law','University','300L')"><div class="cci">⚖️</div><div class="ccn">Constitutional Law</div><div class="ccm">Faculty of Law</div></div>
+        <div class="ccard" onclick="selC(this,'Fluid Mechanics','University','300L')"><div class="cci">💧</div><div class="ccn">Fluid Mechanics</div><div class="ccm">Mechanical · Civil Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Biochemistry','University','300L')"><div class="cci">🔬</div><div class="ccn">Biochemistry</div><div class="ccm">Sciences · Health Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Macroeconomics','University','300L')"><div class="cci">🌍</div><div class="ccn">Macroeconomics</div><div class="ccm">Economics · Social Sciences</div></div>
+      </div></div>
+      <div class="lpanel" id="univ-400"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'Artificial Intelligence & ML','University','400L')"><div class="cci">🤖</div><div class="ccn">Artificial Intelligence & ML</div><div class="ccm">Computer Science</div></div>
+        <div class="ccard" onclick="selC(this,'Software Engineering','University','400L')"><div class="cci">⚙️</div><div class="ccn">Software Engineering</div><div class="ccm">Computer Science · IT</div></div>
+        <div class="ccard" onclick="selC(this,'Structural Analysis','University','400L')"><div class="cci">🏗️</div><div class="ccn">Structural Analysis</div><div class="ccm">Civil Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Pharmacology','University','400L')"><div class="cci">💊</div><div class="ccn">Pharmacology</div><div class="ccm">Pharmacy · Medicine</div></div>
+        <div class="ccard" onclick="selC(this,'Econometrics','University','400L')"><div class="cci">📉</div><div class="ccn">Econometrics</div><div class="ccm">Economics</div></div>
+        <div class="ccard" onclick="selC(this,'Criminal Law & Procedure','University','400L')"><div class="cci">🔨</div><div class="ccn">Criminal Law & Procedure</div><div class="ccm">Faculty of Law</div></div>
+        <div class="ccard" onclick="selC(this,'Operations Research','University','400L')"><div class="cci">📋</div><div class="ccn">Operations Research</div><div class="ccm">Engineering · Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Petroleum Engineering','University','400L')"><div class="cci">🛢️</div><div class="ccn">Petroleum Engineering</div><div class="ccm">Engineering</div></div>
+      </div></div>
+      <div class="lpanel" id="univ-500"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'Advanced Cyber Security','University','500L')"><div class="cci">🔐</div><div class="ccn">Advanced Cyber Security</div><div class="ccm">Computer Science</div></div>
+        <div class="ccard" onclick="selC(this,'Surgery & Clinical Medicine','University','500L')"><div class="cci">🏥</div><div class="ccn">Surgery & Clinical Medicine</div><div class="ccm">Medicine & Surgery</div></div>
+        <div class="ccard" onclick="selC(this,'Clinical Pharmacy','University','500L')"><div class="cci">💉</div><div class="ccn">Clinical Pharmacy</div><div class="ccm">Pharmacy</div></div>
+        <div class="ccard" onclick="selC(this,'Advanced Structural Design','University','500L')"><div class="cci">🏢</div><div class="ccn">Advanced Structural Design</div><div class="ccm">Civil Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Internal Medicine & Pathology','University','600L')"><div class="cci">🩺</div><div class="ccn">Internal Medicine & Pathology</div><div class="ccm">Medicine & Surgery (600L)</div></div>
+        <div class="ccard" onclick="selC(this,'Legal Drafting & Practice','University','500L')"><div class="cci">📃</div><div class="ccn">Legal Drafting & Practice</div><div class="ccm">Faculty of Law (500L)</div></div>
+      </div></div>
+      <div class="lpanel" id="univ-pg"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'MBA Strategic Management','University','Postgraduate')"><div class="cci">💼</div><div class="ccn">MBA Strategic Management</div><div class="ccm">Business School</div></div>
+        <div class="ccard" onclick="selC(this,'M.Sc. Research Methodology','University','Postgraduate')"><div class="cci">🔭</div><div class="ccn">M.Sc. Research Methodology</div><div class="ccm">All Postgraduate Programs</div></div>
+        <div class="ccard" onclick="selC(this,'MPA Public Administration','University','Postgraduate')"><div class="cci">🏛️</div><div class="ccn">MPA Public Administration</div><div class="ccm">Social Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'M.Sc. Computer Science','University','Postgraduate')"><div class="cci">💻</div><div class="ccn">M.Sc. Computer Science</div><div class="ccm">Sciences & Technology</div></div>
+        <div class="ccard" onclick="selC(this,'LLM Commercial Law','University','Postgraduate')"><div class="cci">⚖️</div><div class="ccn">LLM Commercial Law</div><div class="ccm">Faculty of Law</div></div>
+        <div class="ccard" onclick="selC(this,'Ph.D. Research Design','University','Postgraduate')"><div class="cci">🎓</div><div class="ccn">Ph.D. Research Design</div><div class="ccm">Doctoral Programs</div></div>
+      </div></div>
+      <div class="ctabar" id="univ-cta"><div class="ctai">Selected: <strong id="univ-cn">—</strong> &nbsp;|&nbsp; Level: <strong id="univ-cl">—</strong></div><div class="ctabs"><button class="bctav" onclick="goLab()">🤖 Open in Exam Lab</button><button class="bctao" onclick="goMock()">⏱️ Start Mock Exam</button></div></div>
+    </div>
+    <div class="ipanel" id="inst-poly">
+      <div class="ih">
+        <div class="ist"><div class="isn">78+</div><div class="isl">Polytechnics</div></div>
+        <div class="ist"><div class="isn">22</div><div class="isl">Federal</div></div>
+        <div class="ist"><div class="isn">38</div><div class="isl">State</div></div>
+        <div class="ist"><div class="isn">18</div><div class="isl">Private</div></div>
+        <div style="flex:3;color:var(--ts);font-size:0.85rem;">Regulated by <strong style="color:#fff;">NBTE</strong>. PRE-ND → ND (2yr) → HND (2yr) → Post-HND → NID. Key: Yaba Tech, Kaduna Poly, Auchi Poly.</div>
+      </div>
+      <div class="ltabs">
+        <button class="ltab active" onclick="swLvl('poly','nd',this)">PRE-ND / ND</button>
+        <button class="ltab" onclick="swLvl('poly','hnd',this)">HND</button>
+        <button class="ltab" onclick="swLvl('poly','phnd',this)">Post-HND / NID</button>
+      </div>
+      <div class="lpanel active" id="poly-nd"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'Computer Science (ND)','Polytechnic','ND')"><div class="cci">💻</div><div class="ccn">Computer Science</div><div class="ccm">ND · Science/IT</div></div>
+        <div class="ccard" onclick="selC(this,'Accountancy (ND)','Polytechnic','ND')"><div class="cci">📒</div><div class="ccn">Accountancy</div><div class="ccm">ND · Business/Finance</div></div>
+        <div class="ccard" onclick="selC(this,'Electrical Engineering (ND)','Polytechnic','ND')"><div class="cci">⚡</div><div class="ccn">Electrical Engineering</div><div class="ccm">ND · Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Marketing (ND)','Polytechnic','ND')"><div class="cci">📣</div><div class="ccn">Marketing</div><div class="ccm">ND · Business</div></div>
+        <div class="ccard" onclick="selC(this,'Architectural Technology (ND)','Polytechnic','ND')"><div class="cci">🏠</div><div class="ccn">Architectural Technology</div><div class="ccm">ND · Environmental</div></div>
+        <div class="ccard" onclick="selC(this,'Agricultural Extension (ND)','Polytechnic','ND')"><div class="cci">🌾</div><div class="ccn">Agricultural Extension</div><div class="ccm">ND · Agriculture</div></div>
+        <div class="ccard" onclick="selC(this,'Civil Engineering (ND)','Polytechnic','ND')"><div class="cci">🏗️</div><div class="ccn">Civil Engineering</div><div class="ccm">ND · Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Business Administration (ND)','Polytechnic','ND')"><div class="cci">💼</div><div class="ccn">Business Administration</div><div class="ccm">ND · Business</div></div>
+      </div></div>
+      <div class="lpanel" id="poly-hnd"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'Computer Science (HND)','Polytechnic','HND')"><div class="cci">💻</div><div class="ccn">Computer Science</div><div class="ccm">HND · Science/IT</div></div>
+        <div class="ccard" onclick="selC(this,'Accountancy (HND)','Polytechnic','HND')"><div class="cci">📒</div><div class="ccn">Accountancy</div><div class="ccm">HND · Business</div></div>
+        <div class="ccard" onclick="selC(this,'Civil Engineering (HND)','Polytechnic','HND')"><div class="cci">🏗️</div><div class="ccn">Civil Engineering</div><div class="ccm">HND · Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Mechanical Engineering (HND)','Polytechnic','HND')"><div class="cci">⚙️</div><div class="ccn">Mechanical Engineering</div><div class="ccm">HND · Engineering</div></div>
+        <div class="ccard" onclick="selC(this,'Banking & Finance (HND)','Polytechnic','HND')"><div class="cci">🏦</div><div class="ccn">Banking & Finance</div><div class="ccm">HND · Business</div></div>
+        <div class="ccard" onclick="selC(this,'Quantity Surveying (HND)','Polytechnic','HND')"><div class="cci">📐</div><div class="ccn">Quantity Surveying</div><div class="ccm">HND · Environmental</div></div>
+      </div></div>
+      <div class="lpanel" id="poly-phnd"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'Business Management (Post-HND)','Polytechnic','Post-HND')"><div class="cci">💼</div><div class="ccn">Business Management</div><div class="ccm">Post-HND</div></div>
+        <div class="ccard" onclick="selC(this,'Information Technology (Post-HND)','Polytechnic','Post-HND')"><div class="cci">🖥️</div><div class="ccn">Information Technology</div><div class="ccm">Post-HND</div></div>
+        <div class="ccard" onclick="selC(this,'ICT & Networking (NID)','Polytechnic','NID')"><div class="cci">🌐</div><div class="ccn">ICT & Networking</div><div class="ccm">NID · IEI</div></div>
+        <div class="ccard" onclick="selC(this,'Multimedia Technology (NID)','Polytechnic','NID')"><div class="cci">🎬</div><div class="ccn">Multimedia Technology</div><div class="ccm">NID</div></div>
+      </div></div>
+      <div class="ctabar" id="poly-cta"><div class="ctai">Selected: <strong id="poly-cn">—</strong> &nbsp;|&nbsp; Level: <strong id="poly-cl">—</strong></div><div class="ctabs"><button class="bctav" onclick="goLab()">🤖 Open in Exam Lab</button><button class="bctao" onclick="goMock()">⏱️ Start Mock Exam</button></div></div>
+    </div>
+    <div class="ipanel" id="inst-coe">
+      <div class="ih"><div class="ist"><div class="isn">163+</div><div class="isl">COEs</div></div><div class="ist"><div class="isn">21</div><div class="isl">Federal</div></div><div class="ist"><div class="isn">50</div><div class="isl">State</div></div><div class="ist"><div class="isn">92</div><div class="isl">Private</div></div><div style="flex:3;color:var(--ts);font-size:0.85rem;">Regulated by <strong style="color:#fff;">NCCE</strong>. Award NCE — minimum teaching qualification. Many affiliated with universities for B.Ed.</div></div>
+      <div class="ltabs">
+        <button class="ltab active" onclick="swLvl('coe','nce',this)">NCE Programs</button>
+        <button class="ltab" onclick="swLvl('coe','bed',this)">B.Ed. (Affiliated)</button>
+      </div>
+      <div class="lpanel active" id="coe-nce"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'General Education Studies','COE','NCE')"><div class="cci">📚</div><div class="ccn">General Education Studies</div><div class="ccm">NCE · All COEs</div></div>
+        <div class="ccard" onclick="selC(this,'Mathematics Education','COE','NCE')"><div class="cci">📐</div><div class="ccn">Mathematics Education</div><div class="ccm">NCE · Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'English Language Education','COE','NCE')"><div class="cci">✍️</div><div class="ccn">English Language Education</div><div class="ccm">NCE · Arts</div></div>
+        <div class="ccard" onclick="selC(this,'Early Childhood & Care Education','COE','NCE')"><div class="cci">👶</div><div class="ccn">Early Childhood & Care Education</div><div class="ccm">NCE · Education</div></div>
+        <div class="ccard" onclick="selC(this,'Vocational & Technical Education','COE','NCE')"><div class="cci">🔨</div><div class="ccn">Vocational & Technical Education</div><div class="ccm">NCE · Technical</div></div>
+        <div class="ccard" onclick="selC(this,'Integrated Science Education','COE','NCE')"><div class="cci">🔬</div><div class="ccn">Integrated Science Education</div><div class="ccm">NCE · Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Social Studies Education','COE','NCE')"><div class="cci">🌍</div><div class="ccn">Social Studies Education</div><div class="ccm">NCE · Social Sciences</div></div>
+        <div class="ccard" onclick="selC(this,'Primary Education Studies','COE','NCE')"><div class="cci">🏫</div><div class="ccn">Primary Education Studies</div><div class="ccm">NCE · Education</div></div>
+      </div></div>
+      <div class="lpanel" id="coe-bed"><div class="cgrid">
+        <div class="ccard" onclick="selC(this,'B.Ed. Primary Education','COE','B.Ed.')"><div class="cci">🏫</div><div class="ccn">B.Ed. Primary Education</div><div class="ccm">B.Ed. Affiliated</div></div>
+        <div class="ccard" onclick="selC(this,'B.Ed. Educational Management','COE','B.Ed.')"><div class="cci">🏛️</div><div class="ccn">B.Ed. Educational Management</div><div class="ccm">B.Ed. Affiliated</div></div>
+        <div class="ccard" onclick="selC(this,'B.Ed. Special Education','COE','B.Ed.')"><div class="cci">♿</div><div class="ccn">B.Ed. Special Education</div><div class="ccm">B.Ed. Affiliated</div></div>
+        <div class="ccard" onclick="selC(this,'B.Ed. Science Education','COE','B.Ed.')"><div class="cci">⚗️</div><div class="ccn">B.Ed. Science Education</div><div class="ccm">B.Ed. Affiliated</div></div>
+      </div></div>
+      <div class="ctabar" id="coe-cta"><div class="ctai">Selected: <strong id="coe-cn">—</strong> &nbsp;|&nbsp; Level: <strong id="coe-cl">—</strong></div><div class="ctabs"><button class="bctav" onclick="goLab()">🤖 Open in Exam Lab</button><button class="bctao" onclick="goMock()">⏱️ Start Mock Exam</button></div></div>
+    </div>
+    <div class="ipanel" id="inst-iei">
+      <div class="ih"><div style="color:var(--ts);font-size:0.85rem;"><strong style="color:#fff;">IEIs & Technical Colleges</strong> offer the National Innovation Diploma (NID) and foundational vocational certificates in niche, industry-specific disciplines.</div></div>
+      <div class="cgrid">
+        <div class="ccard" onclick="selC(this,'ICT & Computer Networking (NID)','IEI','NID')"><div class="cci">🌐</div><div class="ccn">ICT & Computer Networking</div><div class="ccm">NID · NIIT/Afrihub</div></div>
+        <div class="ccard" onclick="selC(this,'Oil & Gas Technology (NID)','IEI','NID')"><div class="cci">🛢️</div><div class="ccn">Oil & Gas Technology</div><div class="ccm">NID · Laser Petroleum</div></div>
+        <div class="ccard" onclick="selC(this,'Film Production & Media (NID)','IEI','NID')"><div class="cci">🎬</div><div class="ccn">Film Production & Media</div><div class="ccm">NID · PEFTI</div></div>
+        <div class="ccard" onclick="selC(this,'Auto-Mechanics','IEI','Technical')"><div class="cci">🔧</div><div class="ccn">Auto-Mechanics</div><div class="ccm">Technical College</div></div>
+        <div class="ccard" onclick="selC(this,'Electrical Installation','IEI','Technical')"><div class="cci">💡</div><div class="ccn">Electrical Installation</div><div class="ccm">Technical College</div></div>
+        <div class="ccard" onclick="selC(this,'Marine Engineering (NID)','IEI','NID')"><div class="cci">⚓</div><div class="ccn">Marine Engineering</div><div class="ccm">NID · Maritime Academy</div></div>
+        <div class="ccard" onclick="selC(this,'Aircraft Engineering Technology','IEI','NID')"><div class="cci">✈️</div><div class="ccn">Aircraft Engineering Technology</div><div class="ccm">NID · Air Force Institute</div></div>
+        <div class="ccard" onclick="selC(this,'Carpentry & Joinery','IEI','Technical')"><div class="cci">🪚</div><div class="ccn">Carpentry & Joinery</div><div class="ccm">Technical College</div></div>
+      </div>
+      <div class="ctabar" id="iei-cta"><div class="ctai">Selected: <strong id="iei-cn">—</strong> &nbsp;|&nbsp; Level: <strong id="iei-cl">—</strong></div><div class="ctabs"><button class="bctav" onclick="goLab()">🤖 Open in Exam Lab</button><button class="bctao" onclick="goMock()">⏱️ Start Mock Exam</button></div></div>
+    </div>
+  </div>
+</section>
+<div class="pnav"><div class="pni"><div class="pnt">CollegeCBT — 3-Part Application</div><div class="pls"><a href="#" class="pl cur">Part 1: Landing & Curriculum</a><a href="collegecbt-part2.html" class="pl">Part 2: Exam Lab & Mock Exam</a><a href="collegecbt-part3.html" class="pl">Part 3: Dashboard, Auth & Pricing</a></div></div></div>
+<div class="overlay" id="ov-login"><div class="modal"><button class="mclose" onclick="closeModal('login')">×</button><div class="mt">Welcome Back</div><div class="ms">Sign in to your CollegeCBT account</div><div class="mform"><input type="email" class="minput" placeholder="Email address"/><input type="password" class="minput" placeholder="Password"/><button class="msub" onclick="showToast('🎓 Login Successful!','Welcome back to CollegeCBT.')">Sign In</button></div><div class="mlink">No account? <a href="#" onclick="closeModal('login');openModal('signup')">Sign up free</a></div></div></div>
+<div class="overlay" id="ov-signup"><div class="modal"><button class="mclose" onclick="closeModal('signup')">×</button><div class="mt">Create Your Account</div><div class="ms">Step 1 of 3 — Personal Details. <a href="collegecbt-part3.html#auth" style="color:var(--vl);">Full form in Part 3</a></div><div class="mform"><input type="text" class="minput" placeholder="Full Name"/><input type="email" class="minput" placeholder="Email Address"/><input type="tel" class="minput" placeholder="Phone Number (080x...)"/><input type="password" class="minput" placeholder="Create Password"/><button class="msub" onclick="showToast('✅ Account Created!','Welcome to CollegeCBT!');closeModal('signup')">Continue to Step 2 →</button></div><div class="mlink">Already have an account? <a href="#" onclick="closeModal('signup');openModal('login')">Sign in</a></div></div></div>
+<div class="toast" id="toast"><div class="tt" id="ttitle"></div><div class="tm" id="tmsg"></div></div>
+<script>
+let selCourse='',selInst='',selLevel='',activeInst='univ';
+window.addEventListener('scroll',()=>{document.getElementById('mainNav').style.background=window.scrollY>50?'rgba(13,8,32,0.98)':'rgba(13,8,32,0.85)';});
+function toggleNav(){document.getElementById('hbg').classList.toggle('open');document.getElementById('mnav').classList.toggle('open');}
+function closeNav(){document.getElementById('hbg').classList.remove('open');document.getElementById('mnav').classList.remove('open');}
+function openModal(id){document.getElementById('ov-'+id).classList.add('open');closeNav();}
+function closeModal(id){document.getElementById('ov-'+id).classList.remove('open');}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');}));
+function demoAns(el,type){document.querySelectorAll('.dopt').forEach(o=>o.style.pointerEvents='none');el.classList.add(type);document.getElementById('demoExp').style.display='block';showToast(type==='correct'?'✅ Correct!':'❌ Not quite',type==='correct'?'See the explanation below.':'Review the explanation to understand.');}
+function swInst(id,btn){document.querySelectorAll('.itab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.ipanel').forEach(p=>p.classList.remove('active'));document.getElementById('inst-'+id).classList.add('active');activeInst=id;}
+function swLvl(inst,lvl,btn){const panel=document.getElementById('inst-'+inst);panel.querySelectorAll('.ltab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');panel.querySelectorAll('.lpanel').forEach(p=>p.classList.remove('active'));const lp=document.getElementById(inst+'-'+lvl);if(lp)lp.classList.add('active');}
+function selC(el,course,inst,level){const panel=el.closest('.ipanel');panel.querySelectorAll('.ccard').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selCourse=course;selInst=inst;selLevel=level;const iid=panel.id.replace('inst-','');document.querySelectorAll('.ctabar').forEach(b=>b.classList.remove('vis'));const cta=document.getElementById(iid+'-cta');if(cta){cta.classList.add('vis');const cn=cta.querySelector('[id$="-cn"]');const cl=cta.querySelector('[id$="-cl"]');if(cn)cn.textContent=course;if(cl)cl.textContent=level+' · '+inst;}showToast('📚 Course Selected',course+' ('+level+')');}
+function goLab(){if(!selCourse){showToast('⚠️ Select a Course','Click on any course card first.');return;}window.location.href='collegecbt-part2.html?course='+encodeURIComponent(selCourse)+'&inst='+encodeURIComponent(selInst)+'&level='+encodeURIComponent(selLevel);}
+function goMock(){if(!selCourse){showToast('⚠️ Select a Course','Click on any course card first.');return;}window.location.href='collegecbt-part2.html?course='+encodeURIComponent(selCourse)+'&inst='+encodeURIComponent(selInst)+'&level='+encodeURIComponent(selLevel)+'&mode=mock#mock';}
+function showToast(title,msg){const t=document.getElementById('toast');document.getElementById('ttitle').textContent=title;document.getElementById('tmsg').textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+function animCounters(){document.querySelectorAll('[data-target]').forEach(el=>{const tgt=parseInt(el.dataset.target);let cur=0;const step=Math.ceil(tgt/60);const tmr=setInterval(()=>{cur=Math.min(cur+step,tgt);el.textContent=tgt>=50&&el.nextSibling?.textContent?.includes('k')?cur+'k+':tgt===75?cur+'%':cur+'+';if(cur>=tgt)clearInterval(tmr);},30);});}
+const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){animCounters();obs.disconnect();}},{threshold:0.3});
+const hero=document.querySelector('.hero');if(hero)obs.observe(hero);
+let demoSec=90;const dti=setInterval(()=>{demoSec--;if(demoSec<0){clearInterval(dti);return;}const m=Math.floor(demoSec/60),s=(demoSec%60).toString().padStart(2,'0');const el=document.getElementById('demoTimer');if(el)el.textContent=m+':'+s;},1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,2449 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DealxExam — AI Academic Advisor · Results as a Service</title>
+<meta name="description" content="Nigeria's #1 AI-powered undergraduate exam preparation platform. Guaranteed results before the real exam. Universities, Polytechnics, Colleges of Education."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={theme:{extend:{
+  colors:{
+    forest:{'DEFAULT':'#064E3B','50':'#ECFDF5','100':'#D1FAE5','200':'#A7F3D0','500':'#10B981','600':'#059669','700':'#047857','800':'#065F46','900':'#064E3B','950':'#022c22'},
+    lime:{'DEFAULT':'#A3E635','light':'#BEF264','dark':'#84CC16','glow':'rgba(163,230,53,0.25)'},
+    amber:{'DEFAULT':'#F59E0B','light':'#FCD34D','dark':'#D97706','glow':'rgba(245,158,11,0.25)'},
+    crimson:{'DEFAULT':'#DC2626','light':'#F87171'},
+    ink:{'DEFAULT':'#030712','surface':'#0F172A','card':'rgba(15,23,42,0.8)'},
+  },
+  fontFamily:{
+    display:['Bricolage Grotesque','sans-serif'],
+    body:['DM Sans','sans-serif'],
+  }
+}}}
+</script>
+<style>
+:root{
+  --forest:#064E3B;--lime:#A3E635;--amber:#F59E0B;--crimson:#DC2626;
+  --ink:#030712;--surface:#0F172A;--card:rgba(15,23,42,0.82);
+  --lime-glow:rgba(163,230,53,0.2);--forest-glow:rgba(6,78,59,0.4);
+  --r12:12px;--r14:14px;--r16:16px;--r20:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{font-family:'DM Sans',sans-serif;scroll-behavior:smooth;}
+body{background:#030712;color:#E2E8F0;overflow-x:hidden;line-height:1.6;}
+
+/* ── BG & ATMOSPHERE ── */
+.page-bg{
+  background:
+    radial-gradient(ellipse 80% 50% at 5% 0%,rgba(6,78,59,0.45) 0%,transparent 55%),
+    radial-gradient(ellipse 50% 40% at 95% 85%,rgba(163,230,53,0.07) 0%,transparent 55%),
+    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(6,78,59,0.12) 0%,transparent 70%),
+    #030712;
+}
+.mesh-bg{
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 10%,rgba(245,158,11,0.07) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 80%,rgba(6,78,59,0.3) 0%,transparent 60%),
+    #030712;
+}
+.grid-pattern{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(163,230,53,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(163,230,53,0.03) 1px,transparent 1px);
+  background-size:64px 64px;pointer-events:none;
+}
+.noise-overlay{position:absolute;inset:0;opacity:.03;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ── GLASS ── */
+.glass{background:rgba(3,7,18,0.75);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.07);}
+.glass-card{background:rgba(15,23,42,0.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r14);}
+.glass-nav{background:rgba(3,7,18,0.92);backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);border-bottom:1px solid rgba(255,255,255,0.06);}
+.glass-lime{background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.2);border-radius:var(--r14);}
+.glass-forest{background:rgba(6,78,59,0.25);border:1px solid rgba(6,78,59,0.5);border-radius:var(--r14);}
+
+/* ── NAV ── */
+.nav-link{font-weight:500;color:rgba(226,232,240,0.6);transition:color .2s;font-size:.875rem;letter-spacing:-.01em;}
+.nav-link:hover{color:#A3E635;}
+.nav-link.active{color:#A3E635;}
+
+/* ── BUTTONS ── */
+.btn-lime{
+  background:linear-gradient(135deg,#A3E635,#84CC16);
+  color:#030712;font-weight:700;border-radius:var(--r12);
+  transition:all .25s;box-shadow:0 4px 24px rgba(163,230,53,0.3);
+  font-family:'Bricolage Grotesque',sans-serif;letter-spacing:-.01em;
+}
+.btn-lime:hover{box-shadow:0 8px 36px rgba(163,230,53,0.5);transform:translateY(-2px);}
+.btn-forest{
+  background:linear-gradient(135deg,#065F46,#064E3B);
+  color:#A3E635;font-weight:700;border-radius:var(--r12);
+  transition:all .25s;box-shadow:0 4px 24px rgba(6,78,59,0.5);
+  border:1px solid rgba(163,230,53,0.2);
+}
+.btn-forest:hover{box-shadow:0 8px 36px rgba(6,78,59,0.7);transform:translateY(-2px);}
+.btn-amber{background:linear-gradient(135deg,#F59E0B,#D97706);color:#030712;font-weight:700;border-radius:var(--r12);transition:all .25s;box-shadow:0 4px 24px rgba(245,158,11,0.3);}
+.btn-amber:hover{box-shadow:0 8px 36px rgba(245,158,11,0.5);transform:translateY(-2px);}
+.btn-outline-lime{border:1.5px solid rgba(163,230,53,0.4);color:#A3E635;font-weight:600;border-radius:var(--r12);transition:all .25s;background:transparent;}
+.btn-outline-lime:hover{background:rgba(163,230,53,0.08);border-color:#A3E635;transform:translateY(-2px);}
+.btn-ghost{border:1px solid rgba(255,255,255,0.1);color:rgba(226,232,240,0.65);border-radius:var(--r12);transition:all .2s;}
+.btn-ghost:hover{border-color:rgba(163,230,53,0.35);color:#A3E635;}
+
+/* ── CARDS ── */
+.feature-card{
+  background:rgba(15,23,42,0.55);border:1px solid rgba(255,255,255,0.07);
+  border-radius:var(--r14);transition:all .3s;
+}
+.feature-card:hover{border-color:rgba(163,230,53,0.2);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,0.5),0 0 0 1px rgba(163,230,53,0.08);}
+.exam-card{background:rgba(15,23,42,0.7);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r12);transition:all .3s;cursor:pointer;}
+.exam-card:hover{border-color:rgba(163,230,53,0.3);box-shadow:0 12px 40px rgba(0,0,0,0.4);}
+.exam-card.selected{border-color:#A3E635;background:rgba(163,230,53,0.06);box-shadow:0 0 0 1px rgba(163,230,53,0.25);}
+
+/* ── MCQ OPTIONS ── */
+.opt-btn{
+  border:1.5px solid rgba(255,255,255,0.1);border-radius:var(--r12);
+  transition:all .2s;cursor:pointer;background:rgba(15,23,42,0.5);
+  text-align:left;width:100%;padding:14px 16px;font-family:'DM Sans',sans-serif;
+  color:rgba(226,232,240,0.8);font-size:.9rem;
+}
+.opt-btn:hover:not(:disabled){border-color:rgba(163,230,53,0.45);background:rgba(163,230,53,0.06);}
+.opt-btn.correct{border-color:#10B981!important;background:rgba(16,185,129,0.1)!important;color:#6EE7B7!important;}
+.opt-btn.wrong{border-color:#DC2626!important;background:rgba(220,38,38,0.1)!important;color:#FCA5A5!important;}
+.opt-btn.dimmed{opacity:.4;}
+.opt-btn:disabled{cursor:not-allowed;}
+
+/* ── PROGRESS BARS ── */
+.prog{height:6px;border-radius:99px;background:rgba(255,255,255,0.06);overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.prog-lime{background:linear-gradient(90deg,#064E3B,#A3E635);}
+.prog-amber{background:linear-gradient(90deg,#D97706,#F59E0B);}
+.prog-crimson{background:linear-gradient(90deg,#991B1B,#DC2626);}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:.7rem;font-weight:600;font-family:'DM Sans',sans-serif;}
+.badge-lime{background:rgba(163,230,53,0.1);color:#BEF264;border:1px solid rgba(163,230,53,0.25);}
+.badge-forest{background:rgba(6,78,59,0.4);color:#6EE7B7;border:1px solid rgba(16,185,129,0.3);}
+.badge-amber{background:rgba(245,158,11,0.1);color:#FCD34D;border:1px solid rgba(245,158,11,0.25);}
+.badge-crimson{background:rgba(220,38,38,0.1);color:#FCA5A5;border:1px solid rgba(220,38,38,0.25);}
+.badge-violet{background:rgba(139,92,246,0.12);color:#A78BFA;border:1px solid rgba(139,92,246,0.25);}
+.badge-gray{background:rgba(255,255,255,0.07);color:rgba(226,232,240,0.55);border:1px solid rgba(255,255,255,0.1);}
+
+/* ── SECTION BADGE ── */
+.sec-badge{
+  background:rgba(163,230,53,0.08);border:1px solid rgba(163,230,53,0.2);
+  color:#A3E635;border-radius:99px;font-size:.72rem;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;display:inline-block;
+  padding:5px 16px;margin-bottom:16px;font-family:'DM Sans',sans-serif;
+}
+
+/* ── TABS ── */
+.tab-pill{padding:8px 18px;border-radius:10px;font-size:.82rem;font-weight:600;color:rgba(226,232,240,0.45);transition:all .2s;cursor:pointer;border:1px solid transparent;}
+.tab-pill.active{background:rgba(163,230,53,0.1);color:#A3E635;border-color:rgba(163,230,53,0.25);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+.lvl-tab{padding:7px 16px;border-radius:9px;font-size:.78rem;font-weight:600;color:rgba(226,232,240,0.4);transition:all .2s;cursor:pointer;white-space:nowrap;border:1px solid transparent;}
+.lvl-tab.active{background:rgba(245,158,11,0.1);color:#FCD34D;border-color:rgba(245,158,11,0.25);}
+
+/* ── EXPLANATION BOX ── */
+.exp-correct{background:rgba(16,185,129,0.07);border:1px solid rgba(16,185,129,0.2);border-radius:var(--r12);}
+.exp-wrong{background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.18);border-radius:var(--r12);}
+.exp-theory{background:rgba(163,230,53,0.05);border:1px solid rgba(163,230,53,0.18);border-radius:var(--r12);}
+
+/* ── GRADE BADGES ── */
+.grade-a1{background:linear-gradient(135deg,#10B981,#059669);color:#fff;}
+.grade-b2{background:linear-gradient(135deg,#A3E635,#84CC16);color:#030712;}
+.grade-b3{background:linear-gradient(135deg,#BEF264,#A3E635);color:#030712;}
+.grade-c4{background:linear-gradient(135deg,#8B5CF6,#7C3AED);color:#fff;}
+.grade-c5{background:linear-gradient(135deg,#A78BFA,#8B5CF6);color:#fff;}
+.grade-c6{background:linear-gradient(135deg,#F59E0B,#D97706);color:#030712;}
+.grade-d7{background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;}
+.grade-e8{background:linear-gradient(135deg,#EF4444,#DC2626);color:#fff;}
+.grade-f9{background:linear-gradient(135deg,#F43F5E,#BE123C);color:#fff;}
+
+/* ── RESULTS METER ── */
+.results-meter-track{
+  width:100%;height:16px;border-radius:99px;
+  background:rgba(255,255,255,0.06);
+  overflow:hidden;position:relative;
+}
+.results-meter-fill{
+  height:100%;border-radius:99px;
+  background:linear-gradient(90deg,#DC2626 0%,#F59E0B 40%,#A3E635 75%,#10B981 100%);
+  background-size:400% 100%;
+  transition:width 1s cubic-bezier(.4,0,.2,1);
+}
+.results-meter-needle{
+  position:absolute;top:-3px;width:3px;height:22px;
+  background:#fff;border-radius:99px;
+  transition:left 1s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 8px rgba(255,255,255,0.8);
+}
+.raas-score-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;}
+.raas-score-ring svg{transform:rotate(-90deg);}
+
+/* ── TIMER RING ── */
+#mock-timer-text{font-size:1.4rem;font-weight:800;font-family:'Bricolage Grotesque',sans-serif;}
+
+/* ── ORBS ── */
+.orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.15;pointer-events:none;}
+.orb-forest{background:#064E3B;}
+.orb-lime{background:#A3E635;}
+.orb-amber{background:#F59E0B;}
+@keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+.orb{animation:breathe 14s ease-in-out infinite alternate;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:#030712;}
+::-webkit-scrollbar-thumb{background:#064E3B;border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#A3E635;}
+
+/* ── SHIMMER ── */
+@keyframes shimmer{from{background-position:-200% center;}to{background-position:200% center;}}
+.shimmer-lime{
+  background:linear-gradient(90deg,#A3E635 0%,#fff 40%,#A3E635 80%);
+  background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 4s linear infinite;
+}
+
+/* ── FADE ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.fu{animation:fadeUp .65s cubic-bezier(.4,0,.2,1) forwards;}
+.d1{animation-delay:.05s;opacity:0;}.d2{animation-delay:.15s;opacity:0;}.d3{animation-delay:.25s;opacity:0;}.d4{animation-delay:.35s;opacity:0;}.d5{animation-delay:.45s;opacity:0;}
+
+/* ── SPINNER ── */
+@keyframes spin{to{transform:rotate(360deg);}}
+.spinner{width:26px;height:26px;border:3px solid rgba(163,230,53,0.15);border-top-color:#A3E635;border-radius:50%;animation:spin .75s linear infinite;}
+
+/* ── PULSE ── */
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.pulse-dot{animation:pulse 2s ease-in-out infinite;}
+
+/* ── ACCORDION ── */
+.acc-content{max-height:0;overflow:hidden;transition:max-height .45s ease;}
+.acc-item.open .acc-content{max-height:1000px;}
+.acc-item.open .acc-arrow{transform:rotate(180deg);}
+.acc-arrow{transition:transform .3s;}
+
+/* ── FORM INPUTS ── */
+select,input,textarea{
+  background:rgba(15,23,42,0.65);border:1px solid rgba(255,255,255,0.1);
+  color:#E2E8F0;border-radius:var(--r12);font-family:'DM Sans',sans-serif;
+  transition:border-color .2s;
+}
+select:focus,input:focus,textarea:focus{outline:none;border-color:rgba(163,230,53,0.4);box-shadow:0 0 0 3px rgba(163,230,53,0.06);}
+option{background:#0F172A;}
+input::placeholder,textarea::placeholder{color:rgba(226,232,240,0.3);}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .hide-sm{display:none!important;}
+  .hero-h1{font-size:2.2rem!important;line-height:1.15!important;}
+  .hero-sub{font-size:1rem!important;}
+}
+@media(max-width:480px){
+  .hero-h1{font-size:1.85rem!important;}
+}
+
+/* ── STEP CONNECTOR ── */
+.step-line{position:absolute;left:21px;top:44px;bottom:-20px;width:2px;background:linear-gradient(to bottom,rgba(163,230,53,0.3),transparent);}
+
+/* ── STAT COUNTER ── */
+.stat-num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;background:linear-gradient(135deg,#A3E635,#BEF264);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+
+/* ── RAAS CARD ── */
+.raas-card{
+  background:linear-gradient(135deg,rgba(6,78,59,0.25),rgba(15,23,42,0.8));
+  border:1px solid rgba(163,230,53,0.15);border-radius:var(--r16);
+  transition:all .3s;
+}
+.raas-card:hover{border-color:rgba(163,230,53,0.35);transform:translateY(-4px);box-shadow:0 20px 60px rgba(6,78,59,0.3);}
+
+/* ── PLAN CARD ── */
+.plan-card{border-radius:var(--r16);transition:all .3s;}
+.plan-card.featured{
+  background:linear-gradient(135deg,rgba(6,78,59,0.4),rgba(15,23,42,0.9));
+  border:1px solid rgba(163,230,53,0.3);
+  box-shadow:0 0 0 1px rgba(163,230,53,0.12),0 24px 60px rgba(6,78,59,0.25);
+}
+
+/* ── DASHBOARD PREVIEW ── */
+.dash-stat{background:rgba(6,78,59,0.2);border:1px solid rgba(163,230,53,0.12);border-radius:var(--r12);}
+
+/* ── FLOATING BADGE ── */
+@keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-8px);}}
+.float-badge{animation:floatY 4s ease-in-out infinite;}
+.float-badge-2{animation:floatY 5s ease-in-out infinite;animation-delay:1.5s;}
+.float-badge-3{animation:floatY 3.5s ease-in-out infinite;animation-delay:.8s;}
+
+/* ── EXAM CARD ICON ── */
+.course-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;}
+
+/* ── MODAL ── */
+.modal-enter{animation:fadeIn .25s ease;}
+
+/* ── HOW IT WORKS STEP ── */
+.step-number{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(6,78,59,0.8),rgba(15,23,42,0.9));
+  border:2px solid rgba(163,230,53,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:1.1rem;
+  color:#A3E635;flex-shrink:0;position:relative;z-index:1;
+}
+</style>
+</head>
+<body class="font-body page-bg">
+
+<!-- ══════════════════════════════════════════════════════
+  STICKY GLASSMORPHISM NAVIGATION
+══════════════════════════════════════════════════════ -->
+<nav id="nav" class="fixed top-0 left-0 right-0 z-50 glass-nav transition-all duration-300">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="#home" class="flex items-center gap-2.5 group flex-shrink-0">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#064E3B,#065F46);border:1px solid rgba(163,230,53,0.3);box-shadow:0 0 20px rgba(6,78,59,0.5);">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
+            <path d="M12 3L2 9l10 6 10-6-10-6z" stroke="#A3E635" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M2 15l10 6 10-6" stroke="#A3E635" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
+          </svg>
+        </div>
+        <span class="font-display font-800 text-lg tracking-tight"><span class="text-white">Dealx</span><span style="color:#A3E635">Exam</span></span>
+        <span class="badge-lime badge text-xs hide-sm" style="font-size:.6rem;">RaaS</span>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <div class="hidden md:flex items-center gap-1">
+        <a href="#home" class="nav-link px-3 py-2 rounded-lg hover:bg-white/04 transition-all">Home</a>
+        <a href="#features" class="nav-link px-3 py-2 rounded-lg hover:bg-white/04 transition-all">Features</a>
+        <a href="#how-it-works" class="nav-link px-3 py-2 rounded-lg hover:bg-white/04 transition-all">How It Works</a>
+        <a href="#curriculum" class="nav-link px-3 py-2 rounded-lg hover:bg-white/04 transition-all">Curriculum</a>
+        <a href="#exam-lab" class="nav-link px-3 py-2 rounded-lg hover:bg-white/04 transition-all">Exam Lab</a>
+        <a href="#mock-exam" class="nav-link px-3 py-2 rounded-lg hover:bg-white/04 transition-all">Mock Exam</a>
+        <a href="#dashboard-preview" class="nav-link px-3 py-2 rounded-lg hover:bg-white/04 transition-all">Dashboard</a>
+        <a href="#pricing" class="nav-link px-3 py-2 rounded-lg hover:bg-white/04 transition-all">Pricing</a>
+      </div>
+
+      <!-- Desktop CTA -->
+      <div class="hidden md:flex items-center gap-3">
+        <button onclick="openModal('login-modal')" class="btn-ghost px-5 py-2.5 text-sm">Sign In</button>
+        <button onclick="openModal('signup-modal')" class="btn-lime px-5 py-2.5 text-sm">Get Started Free</button>
+      </div>
+
+      <!-- Hamburger -->
+      <button id="hbg" onclick="toggleNav()" class="md:hidden flex flex-col gap-1.5 p-2.5 rounded-xl hover:bg-white/05 transition-all" aria-label="Menu">
+        <span id="hb1" class="w-5 h-0.5 rounded-full transition-all duration-300" style="background:rgba(226,232,240,0.7);"></span>
+        <span id="hb2" class="w-5 h-0.5 rounded-full transition-all duration-300" style="background:rgba(226,232,240,0.7);"></span>
+        <span id="hb3" class="w-4 h-0.5 rounded-full transition-all duration-300" style="background:rgba(226,232,240,0.7);"></span>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mob-nav" style="max-height:0;opacity:0;overflow:hidden;transition:max-height .45s ease,opacity .3s ease;" class="md:hidden">
+      <div class="pb-5 pt-2 space-y-1 border-t border-white/05 mt-1">
+        <a href="#home" onclick="closeNav()" class="block px-4 py-2.5 text-sm text-white/65 hover:text-lime-DEFAULT hover:bg-white/04 rounded-xl transition-all">🏠 Home</a>
+        <a href="#features" onclick="closeNav()" class="block px-4 py-2.5 text-sm text-white/65 hover:text-lime-DEFAULT hover:bg-white/04 rounded-xl transition-all">⚡ Features</a>
+        <a href="#how-it-works" onclick="closeNav()" class="block px-4 py-2.5 text-sm text-white/65 hover:text-lime-DEFAULT hover:bg-white/04 rounded-xl transition-all">🗺️ How It Works</a>
+        <a href="#curriculum" onclick="closeNav()" class="block px-4 py-2.5 text-sm text-white/65 hover:text-lime-DEFAULT hover:bg-white/04 rounded-xl transition-all">📚 Curriculum</a>
+        <a href="#exam-lab" onclick="closeNav()" class="block px-4 py-2.5 text-sm text-white/65 hover:text-lime-DEFAULT hover:bg-white/04 rounded-xl transition-all">🧪 Exam Lab</a>
+        <a href="#mock-exam" onclick="closeNav()" class="block px-4 py-2.5 text-sm text-white/65 hover:text-lime-DEFAULT hover:bg-white/04 rounded-xl transition-all">⏱️ Mock Exam</a>
+        <a href="#dashboard-preview" onclick="closeNav()" class="block px-4 py-2.5 text-sm text-white/65 hover:text-lime-DEFAULT hover:bg-white/04 rounded-xl transition-all">📊 Dashboard</a>
+        <a href="#pricing" onclick="closeNav()" class="block px-4 py-2.5 text-sm text-white/65 hover:text-lime-DEFAULT hover:bg-white/04 rounded-xl transition-all">💳 Pricing</a>
+        <div class="flex gap-3 px-4 pt-3">
+          <button onclick="openModal('login-modal');closeNav()" class="btn-ghost flex-1 py-2.5 text-sm">Sign In</button>
+          <button onclick="openModal('signup-modal');closeNav()" class="btn-lime flex-1 py-2.5 text-sm">Get Started</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+  HERO SECTION
+══════════════════════════════════════════════════════ -->
+<section id="home" class="min-h-screen flex items-center relative overflow-hidden pt-16">
+  <div class="noise-overlay"></div>
+  <div class="grid-pattern"></div>
+  <div class="orb orb-forest" style="width:700px;height:700px;top:-20%;left:-10%;"></div>
+  <div class="orb orb-lime" style="width:350px;height:350px;bottom:10%;right:-5%;opacity:.08;"></div>
+  <div class="orb orb-amber" style="width:250px;height:250px;top:30%;right:20%;opacity:.06;"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative z-10 w-full">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <!-- Left: Copy -->
+      <div>
+        <div class="sec-badge fu d1">🎓 Results as a Service · Nigerian Higher Education</div>
+        <h1 class="font-display font-800 text-white mt-4 mb-5 hero-h1 fu d2" style="font-size:3.2rem;line-height:1.1;letter-spacing:-.03em;">
+          Your AI Academic Advisor —
+          <span class="shimmer-lime"> Guaranteed Results</span>
+          Before the Real Exam.
+        </h1>
+        <p class="text-white/55 leading-relaxed mb-8 fu d3 hero-sub" style="font-size:1.1rem;max-width:520px;">
+          DealxExam is the only RaaS platform built for Nigerian undergraduates. AI-powered practice questions, full explanations, mock exams with WAEC grading, and a live <strong class="text-lime-DEFAULT">Exam Readiness Score™</strong> that predicts your real result.
+        </p>
+
+        <!-- Stats Row -->
+        <div class="grid grid-cols-3 gap-4 mb-8 fu d3">
+          <div class="glass-card p-4 text-center">
+            <div class="stat-num text-2xl">309+</div>
+            <div class="text-white/40 text-xs mt-0.5">Accredited Institutions</div>
+          </div>
+          <div class="glass-card p-4 text-center">
+            <div class="stat-num text-2xl">∞</div>
+            <div class="text-white/40 text-xs mt-0.5">AI Questions</div>
+          </div>
+          <div class="glass-card p-4 text-center">
+            <div class="stat-num text-2xl">75%</div>
+            <div class="text-white/40 text-xs mt-0.5">Target Pass Rate</div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-4 fu d4">
+          <button onclick="openModal('signup-modal')" class="btn-lime px-8 py-3.5 text-base">
+            🚀 Start Free — Score 75%+
+          </button>
+          <a href="#exam-lab" class="btn-ghost px-6 py-3.5 text-sm flex items-center gap-2">
+            Try Exam Lab <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+
+        <!-- Institution Logos Row -->
+        <div class="flex items-center gap-3 mt-8 flex-wrap fu d5">
+          <span class="text-white/25 text-xs">Curriculum aligned to:</span>
+          <span class="badge badge-lime">NUC</span>
+          <span class="badge badge-amber">NBTE</span>
+          <span class="badge badge-forest">NCCE</span>
+          <span class="badge badge-violet">IEIs</span>
+        </div>
+      </div>
+
+      <!-- Right: Live Readiness Score Preview -->
+      <div class="relative fu d3">
+        <!-- Main Preview Card -->
+        <div class="glass-card p-6 relative z-10" style="border-color:rgba(163,230,53,0.15);">
+          <!-- Top Bar -->
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <div class="text-xs text-white/40 mb-0.5">Exam Readiness Score™</div>
+              <div class="font-display font-800 text-3xl" style="color:#A3E635;">78<span class="text-white/40 text-lg">/100</span></div>
+            </div>
+            <div class="text-center">
+              <div class="inline-block px-5 py-2 rounded-xl grade-b2 font-display font-800 text-xl">B2</div>
+              <div class="text-xs text-white/40 mt-1">WAEC Grade</div>
+            </div>
+          </div>
+
+          <!-- Results Meter -->
+          <div class="mb-5">
+            <div class="flex justify-between text-xs text-white/35 mb-2">
+              <span>Fail Zone</span><span class="text-lime-DEFAULT font-600">Pass Zone ✅</span>
+            </div>
+            <div class="results-meter-track">
+              <div class="results-meter-fill" id="hero-meter" style="width:78%;"></div>
+              <div class="results-meter-needle" style="left:74%;"></div>
+            </div>
+            <div class="flex justify-between text-xs text-white/30 mt-1.5">
+              <span>0</span><span class="text-amber-DEFAULT font-600">75% Target</span><span>100</span>
+            </div>
+          </div>
+
+          <!-- Topic Breakdown -->
+          <div class="space-y-2.5 mb-5">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-white/60">Data Structures</span>
+              <span style="color:#A3E635;font-weight:600;">88%</span>
+            </div>
+            <div class="prog"><div class="prog-fill prog-lime" style="width:88%;"></div></div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-white/60">Computer Networks</span>
+              <span style="color:#F59E0B;font-weight:600;">64%</span>
+            </div>
+            <div class="prog"><div class="prog-fill prog-amber" style="width:64%;"></div></div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-white/60">Database Systems</span>
+              <span style="color:#A3E635;font-weight:600;">82%</span>
+            </div>
+            <div class="prog"><div class="prog-fill prog-lime" style="width:82%;"></div></div>
+          </div>
+
+          <!-- AI Insight Card -->
+          <div class="p-3.5 rounded-xl" style="background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.15);">
+            <div class="flex items-start gap-2.5">
+              <span class="text-lg flex-shrink-0">🤖</span>
+              <div>
+                <div class="text-xs font-600 mb-1" style="color:#A3E635;">AI Study Insight</div>
+                <p class="text-white/55 text-xs leading-relaxed">Focus on Computer Networks — your weakest topic at 64%. 12 targeted questions will push you to 80%+ and lock in your A1 grade.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating Badges -->
+        <div class="float-badge absolute -top-4 -right-2 glass-card px-4 py-2 border-lime/20 flex items-center gap-2 hide-sm" style="border-color:rgba(163,230,53,0.25);">
+          <span class="text-lime-DEFAULT text-base">🔥</span>
+          <div><div class="text-xs font-700 text-white">14 Day Streak</div><div class="text-xs text-white/35">Keep it up!</div></div>
+        </div>
+        <div class="float-badge-2 absolute -bottom-4 -left-4 glass-card px-4 py-2 border-amber/20 flex items-center gap-2 hide-sm" style="border-color:rgba(245,158,11,0.25);">
+          <span class="text-amber-DEFAULT text-base">⏱️</span>
+          <div><div class="text-xs font-700 text-white">Mock Exam Ready</div><div class="text-xs text-white/35">90s/question</div></div>
+        </div>
+        <div class="float-badge-3 absolute top-1/2 -right-6 glass-card px-3 py-2 hide-sm" style="border-color:rgba(163,230,53,0.2);">
+          <div class="text-xs font-600" style="color:#A3E635;">ResultsGuard™</div>
+          <div class="text-xs text-white/40">Protected</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+  RAAS PILLARS — FEATURES
+══════════════════════════════════════════════════════ -->
+<section id="features" class="py-28 mesh-bg relative overflow-hidden">
+  <div class="orb orb-forest" style="width:500px;height:500px;top:5%;right:-10%;opacity:.12;"></div>
+  <div class="noise-overlay"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <div class="sec-badge">6 RaaS Pillars</div>
+      <h2 class="font-display font-800 text-white mt-2 mb-4" style="font-size:2.6rem;letter-spacing:-.03em;">Every Feature Engineered<br><span style="color:#A3E635;">to Guarantee Your Result.</span></h2>
+      <p class="text-white/50 max-w-2xl mx-auto">Not just exam prep software — a complete Results-as-a-Service system that predicts, tracks, and guarantees your academic performance.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- AI Engine -->
+      <div class="raas-card p-7">
+        <div class="w-14 h-14 rounded-2xl mb-5 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(163,230,53,0.15),rgba(6,78,59,0.3));border:1px solid rgba(163,230,53,0.2);">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7l3-7z" stroke="#A3E635" stroke-width="2" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="badge badge-lime mb-3 text-xs">Pillar 1</div>
+        <h3 class="font-display font-700 text-white text-lg mb-2">AI Question Engine</h3>
+        <p class="text-white/50 text-sm leading-relaxed">Unlimited, fresh, randomized questions generated on demand via Claude AI for any topic, course, or level across all Nigerian higher institutions. Never repeat a question — contextual and curriculum-accurate every time.</p>
+        <div class="mt-5 flex gap-2 flex-wrap">
+          <span class="badge badge-lime">Universities</span>
+          <span class="badge badge-amber">Polytechnics</span>
+          <span class="badge badge-forest">COE</span>
+        </div>
+      </div>
+
+      <!-- Full Explanations -->
+      <div class="raas-card p-7">
+        <div class="w-14 h-14 rounded-2xl mb-5 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(6,78,59,0.3));border:1px solid rgba(16,185,129,0.2);">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#10B981" stroke-width="2"/><path d="M8 12l3 3 5-5" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="badge badge-forest mb-3 text-xs">Pillar 2</div>
+        <h3 class="font-display font-700 text-white text-lg mb-2">Full Explanations System</h3>
+        <p class="text-white/50 text-sm leading-relaxed">Every objective question shows: <strong class="text-white/70">why the correct answer is right</strong> + <strong class="text-white/70">why each wrong distractor is wrong</strong> (the exact misconception behind it). Deep learning, not just answer-checking.</p>
+        <div class="mt-5 p-3 rounded-xl" style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);">
+          <div class="text-xs text-forest-200 font-600">✅ Correct reasoning · ❌ Distractor traps explained</div>
+        </div>
+      </div>
+
+      <!-- Mock Exam Mode -->
+      <div class="raas-card p-7">
+        <div class="w-14 h-14 rounded-2xl mb-5 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(15,23,42,0.8));border:1px solid rgba(245,158,11,0.2);">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="#F59E0B" stroke-width="2"/><path d="M12 6v6l4 2" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="badge badge-amber mb-3 text-xs">Pillar 3</div>
+        <h3 class="font-display font-700 text-white text-lg mb-2">Mock Exam Mode</h3>
+        <p class="text-white/50 text-sm leading-relaxed">Timed CBT simulation — 90 seconds per question. Auto-submits on completion. Generates a WAEC-style grade (A1–F9) with full performance analysis, topic heatmap, and examiner feedback.</p>
+        <div class="mt-5 flex gap-2">
+          <span class="grade-a1 badge text-xs px-2.5 py-1 rounded-lg">A1</span>
+          <span class="grade-b2 badge text-xs px-2.5 py-1 rounded-lg">B2</span>
+          <span class="grade-c4 badge text-xs px-2.5 py-1 rounded-lg">C4</span>
+          <span class="grade-f9 badge text-xs px-2.5 py-1 rounded-lg">F9</span>
+        </div>
+      </div>
+
+      <!-- Study Intelligence -->
+      <div class="raas-card p-7">
+        <div class="w-14 h-14 rounded-2xl mb-5 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(15,23,42,0.8));border:1px solid rgba(139,92,246,0.2);">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="badge badge-violet mb-3 text-xs">Pillar 4</div>
+        <h3 class="font-display font-700 text-white text-lg mb-2">Theory Questions</h3>
+        <p class="text-white/50 text-sm leading-relaxed">AI-generated model answers with examiner notes, key points, and marking schemes. Practice essay and short-answer questions exactly as your lecturers expect — with section-by-section scoring guidance.</p>
+        <div class="mt-5 text-xs text-violet-300" style="color:rgba(167,139,250,0.8);">Model Answers · Examiner Notes · Mark Schemes</div>
+      </div>
+
+      <!-- Performance Vault -->
+      <div class="raas-card p-7">
+        <div class="w-14 h-14 rounded-2xl mb-5 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(163,230,53,0.12),rgba(6,78,59,0.3));border:1px solid rgba(163,230,53,0.2);">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="#A3E635" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="badge badge-lime mb-3 text-xs">Pillar 5</div>
+        <h3 class="font-display font-700 text-white text-lg mb-2">Performance Vault</h3>
+        <p class="text-white/50 text-sm leading-relaxed">Track every score, every session, every topic. Visual trend lines, topic heatmaps, weak-area identification, and AI-recommended next-practice sequences. Your entire academic history in one place.</p>
+        <div class="mt-5 p-3 rounded-xl" style="background:rgba(163,230,53,0.05);border:1px solid rgba(163,230,53,0.12);">
+          <div class="text-xs" style="color:#A3E635;">📈 Historical grades · Topic heatmap · Trend analysis</div>
+        </div>
+      </div>
+
+      <!-- Exam Readiness Score -->
+      <div class="raas-card p-7" style="background:linear-gradient(135deg,rgba(6,78,59,0.4),rgba(15,23,42,0.9));border-color:rgba(163,230,53,0.25);">
+        <div class="w-14 h-14 rounded-2xl mb-5 flex items-center justify-center" style="background:linear-gradient(135deg,rgba(163,230,53,0.25),rgba(6,78,59,0.5));border:1px solid rgba(163,230,53,0.35);">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke="#A3E635" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="badge badge-lime mb-3 text-xs">★ RaaS Exclusive</div>
+        <h3 class="font-display font-700 text-white text-lg mb-2">Exam Readiness Score™</h3>
+        <p class="text-white/60 text-sm leading-relaxed">A single score (0–100) that <em>predicts your real exam grade</em>, updated in real time after every practice session. The live <strong style="color:#A3E635;">Results Meter™</strong> makes your grade improvement visible as you answer.</p>
+        <div class="mt-4 pt-4 border-t border-lime/10">
+          <div class="text-xs text-white/40">Also includes: <span style="color:#A3E635;">ResultsGuard™</span> — if you complete recommended batches and score &lt;75%, get a free re-subscription.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+  HOW IT WORKS — 5-STEP JOURNEY
+══════════════════════════════════════════════════════ -->
+<section id="how-it-works" class="py-28 relative overflow-hidden">
+  <div class="orb orb-lime" style="width:400px;height:400px;top:20%;left:-8%;opacity:.06;"></div>
+  <div class="noise-overlay"></div>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <div class="sec-badge">5-Step Journey</div>
+      <h2 class="font-display font-800 text-white mt-2 mb-4" style="font-size:2.6rem;letter-spacing:-.03em;">From Sign Up to <span style="color:#A3E635;">Guaranteed Result</span></h2>
+      <p class="text-white/45 max-w-xl mx-auto">The entire DealxExam RaaS journey, designed to take you from registration to a confirmed passing grade — systematically.</p>
+    </div>
+
+    <div class="relative">
+      <!-- Vertical line for desktop -->
+      <div class="hidden md:block absolute left-5 top-10 bottom-10 w-0.5" style="background:linear-gradient(to bottom,rgba(163,230,53,0.4),rgba(163,230,53,0.05));"></div>
+
+      <div class="space-y-8">
+        <!-- Step 1 -->
+        <div class="flex gap-6 md:gap-8 items-start">
+          <div class="step-number">1</div>
+          <div class="glass-card flex-1 p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="badge badge-lime mb-2">Register</div>
+                <h3 class="font-display font-700 text-white mb-2">Create Your Academic Profile</h3>
+                <p class="text-white/50 text-sm leading-relaxed">Sign up with your full details — institution type, department, current level, and personal information. Your profile powers personalized AI recommendations across all sessions.</p>
+              </div>
+              <div class="text-3xl hide-sm">📝</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 2 -->
+        <div class="flex gap-6 md:gap-8 items-start">
+          <div class="step-number">2</div>
+          <div class="glass-card flex-1 p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="badge badge-amber mb-2">Browse</div>
+                <h3 class="font-display font-700 text-white mb-2">Browse the Full Nigerian Curriculum</h3>
+                <p class="text-white/50 text-sm leading-relaxed">Navigate the complete NUC, NBTE, and NCCE curriculum organized by institution type, faculty, level, and course. Select any subject to unlock AI question generation instantly.</p>
+              </div>
+              <div class="text-3xl hide-sm">📚</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 3 -->
+        <div class="flex gap-6 md:gap-8 items-start">
+          <div class="step-number">3</div>
+          <div class="glass-card flex-1 p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="badge badge-forest mb-2">Practice</div>
+                <h3 class="font-display font-700 text-white mb-2">Practice in the Exam Lab</h3>
+                <p class="text-white/50 text-sm leading-relaxed">Use the AI Exam Lab to generate unlimited objective and theory questions on any topic. Each answer reveals a full explanation — why correct, why each wrong option is wrong — building true understanding, not memorization.</p>
+              </div>
+              <div class="text-3xl hide-sm">🧪</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 4 -->
+        <div class="flex gap-6 md:gap-8 items-start">
+          <div class="step-number">4</div>
+          <div class="glass-card flex-1 p-6">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="badge badge-amber mb-2">Simulate</div>
+                <h3 class="font-display font-700 text-white mb-2">Run a Full Mock Exam</h3>
+                <p class="text-white/50 text-sm leading-relaxed">Take a timed, full-length mock exam. 90 seconds per question, auto-submit, and receive an instant WAEC-style grade (A1–F9) with a complete examiner's performance report and topic heatmap.</p>
+              </div>
+              <div class="text-3xl hide-sm">⏱️</div>
+            </div>
+          </div>
+        </div>
+        <!-- Step 5 -->
+        <div class="flex gap-6 md:gap-8 items-start">
+          <div class="step-number" style="border-color:rgba(163,230,53,0.6);box-shadow:0 0 20px rgba(163,230,53,0.2);">5</div>
+          <div class="glass-card flex-1 p-6" style="border-color:rgba(163,230,53,0.2);background:rgba(6,78,59,0.2);">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div class="flex-1">
+                <div class="badge badge-lime mb-2">✅ Result</div>
+                <h3 class="font-display font-700 text-white mb-2">Enter the Real Exam — Guaranteed</h3>
+                <p class="text-white/50 text-sm leading-relaxed">With your Exam Readiness Score™ at 75+, your AI Study Contract completed, and your Performance Vault showing consistent A/B grades, you walk into the real exam with certainty. And if you don't hit 75% — <strong style="color:#A3E635;">ResultsGuard™</strong> gives you a free re-subscription.</p>
+              </div>
+              <div class="text-3xl hide-sm">🏆</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+  CURRICULUM BROWSER
+══════════════════════════════════════════════════════ -->
+<section id="curriculum" class="py-28 mesh-bg relative overflow-hidden">
+  <div class="orb orb-amber" style="width:400px;height:400px;top:10%;right:-5%;opacity:.07;"></div>
+  <div class="noise-overlay"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <div class="sec-badge">Curriculum Browser</div>
+      <h2 class="font-display font-800 text-white mt-2 mb-4" style="font-size:2.6rem;letter-spacing:-.03em;">Every Course. Every Level. <span style="color:#F59E0B;">Every Institution.</span></h2>
+      <p class="text-white/50 max-w-2xl mx-auto">Browse the full Nigerian higher education curriculum regulated by NUC, NBTE, and NCCE. Select any course to generate AI-powered practice questions instantly.</p>
+    </div>
+
+    <!-- Institution Type Tabs -->
+    <div class="flex gap-2 flex-wrap mb-6">
+      <button class="tab-pill active" onclick="switchInstTab(this,'inst-univ')">🎓 Universities</button>
+      <button class="tab-pill" onclick="switchInstTab(this,'inst-poly')">⚙️ Polytechnics</button>
+      <button class="tab-pill" onclick="switchInstTab(this,'inst-coe')">📖 Colleges of Education</button>
+      <button class="tab-pill" onclick="switchInstTab(this,'inst-iei')">🔧 IEI / Technical</button>
+    </div>
+
+    <!-- ─── UNIVERSITIES ─── -->
+    <div id="inst-univ" class="tab-pane active">
+      <div class="glass-card p-6 mb-5">
+        <div class="flex flex-wrap items-center gap-3 mb-5">
+          <div class="badge badge-lime">NUC Regulated</div>
+          <div class="text-white/45 text-sm">309+ accredited universities · Federal (74), State (67), Private (168)</div>
+        </div>
+
+        <!-- Level Filter -->
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-5" style="scrollbar-width:none;">
+          <button class="lvl-tab active" onclick="switchLevel(this,'ul','ul-100')">100 Level</button>
+          <button class="lvl-tab" onclick="switchLevel(this,'ul','ul-200')">200 Level</button>
+          <button class="lvl-tab" onclick="switchLevel(this,'ul','ul-300')">300 Level</button>
+          <button class="lvl-tab" onclick="switchLevel(this,'ul','ul-400')">400 Level</button>
+          <button class="lvl-tab" onclick="switchLevel(this,'ul','ul-500')">500/600 Level</button>
+          <button class="lvl-tab" onclick="switchLevel(this,'ul','ul-pg')">Postgraduate</button>
+        </div>
+
+        <!-- 100 Level -->
+        <div id="ul-100" class="ul-level-pane">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'CS101','Introduction to Computer Science','100 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">💻</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">Sciences</div><div class="text-white font-600 text-sm mb-1">Introduction to Computer Science</div><div class="text-white/35 text-xs">GST · Data concepts · Algorithms · Programming basics</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'MATH101','General Mathematics I & II','100 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">📐</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Sciences</div><div class="text-white font-600 text-sm mb-1">General Mathematics I &amp; II</div><div class="text-white/35 text-xs">Calculus · Algebra · Trigonometry · Sets &amp; Logic</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'PHY101','General Physics I & II','100 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);">⚛️</div><div><div class="badge badge-violet mb-1.5" style="font-size:.65rem;">Sciences</div><div class="text-white font-600 text-sm mb-1">General Physics I &amp; II</div><div class="text-white/35 text-xs">Mechanics · Heat · Waves · Optics · Electricity</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'CHM101','General Chemistry','100 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);">🧪</div><div><div class="badge badge-forest mb-1.5" style="font-size:.65rem;">Sciences</div><div class="text-white font-600 text-sm mb-1">General Chemistry I &amp; II</div><div class="text-white/35 text-xs">Atomic structure · Bonding · Reactions · Organic basics</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ECO101','Principles of Economics','100 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">📊</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Social Sciences</div><div class="text-white font-600 text-sm mb-1">Principles of Economics</div><div class="text-white/35 text-xs">Micro/Macro · Supply &amp; Demand · Market structures</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'GST101','Use of English & Communication','100 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">✍️</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">GST</div><div class="text-white font-600 text-sm mb-1">Use of English &amp; Communication Skills</div><div class="text-white/35 text-xs">Grammar · Essay · Report writing · Comprehension</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 200 Level -->
+        <div id="ul-200" class="ul-level-pane hidden">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'CS201','Data Structures & Algorithms','200 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">🌳</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">Computer Science</div><div class="text-white font-600 text-sm mb-1">Data Structures &amp; Algorithms</div><div class="text-white/35 text-xs">Arrays · Linked Lists · Trees · Sorting · Search</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ENG201','Engineering Mechanics','200 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">⚙️</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Engineering</div><div class="text-white font-600 text-sm mb-1">Engineering Mechanics</div><div class="text-white/35 text-xs">Statics · Dynamics · Force analysis · Moments</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ACC201','Financial Accounting','200 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);">💰</div><div><div class="badge badge-forest mb-1.5" style="font-size:.65rem;">Business</div><div class="text-white font-600 text-sm mb-1">Financial Accounting</div><div class="text-white/35 text-xs">Double entry · Trial balance · Final accounts</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'BIO201','Cell Biology & Genetics','200 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);">🔬</div><div><div class="badge badge-violet mb-1.5" style="font-size:.65rem;">Health Sciences</div><div class="text-white font-600 text-sm mb-1">Cell Biology &amp; Genetics</div><div class="text-white/35 text-xs">Cell structure · DNA · Mitosis · Inheritance</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'LAW201','Nigerian Constitutional Law','200 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">⚖️</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Law</div><div class="text-white font-600 text-sm mb-1">Nigerian Constitutional Law</div><div class="text-white/35 text-xs">Constitution · Fundamental rights · Legislature</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'COM201','Introduction to Mass Communication','200 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">📡</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">Social Sciences</div><div class="text-white font-600 text-sm mb-1">Introduction to Mass Communication</div><div class="text-white/35 text-xs">Media theory · News writing · Broadcasting</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 300 Level -->
+        <div id="ul-300" class="ul-level-pane hidden">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'CS301','Computer Networks','300 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">🌐</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">Computer Science</div><div class="text-white font-600 text-sm mb-1">Computer Networks</div><div class="text-white/35 text-xs">OSI Model · TCP/IP · Routing · Network security</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'CS302','Database Management Systems','300 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);">🗄️</div><div><div class="badge badge-forest mb-1.5" style="font-size:.65rem;">Computer Science</div><div class="text-white font-600 text-sm mb-1">Database Management Systems</div><div class="text-white/35 text-xs">SQL · ER Diagrams · Normalization · Transactions</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ELE301','Electrical Circuit Theory','300 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">⚡</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Engineering</div><div class="text-white font-600 text-sm mb-1">Electrical Circuit Theory</div><div class="text-white/35 text-xs">AC/DC circuits · Kirchhoff · Thevenin · Norton</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'MED301','Anatomy & Physiology','300 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.2);">🫀</div><div><div class="badge badge-crimson mb-1.5" style="font-size:.65rem;">Medicine</div><div class="text-white font-600 text-sm mb-1">Anatomy &amp; Physiology</div><div class="text-white/35 text-xs">Organ systems · Body structure · Histology</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ORG301','Organic Chemistry','300 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);">🧬</div><div><div class="badge badge-violet mb-1.5" style="font-size:.65rem;">Sciences</div><div class="text-white font-600 text-sm mb-1">Organic Chemistry</div><div class="text-white/35 text-xs">Functional groups · Reactions · Mechanisms · IUPAC</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'AI301','Artificial Intelligence','300 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">🤖</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">Computer Science</div><div class="text-white font-600 text-sm mb-1">Artificial Intelligence</div><div class="text-white/35 text-xs">Search algorithms · ML basics · Neural networks</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 400 Level -->
+        <div id="ul-400" class="ul-level-pane hidden">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'CS401','Software Engineering','400 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">🏗️</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">CS Final Year</div><div class="text-white font-600 text-sm mb-1">Software Engineering</div><div class="text-white/35 text-xs">SDLC · Agile · Design patterns · Testing</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'CS402','Cybersecurity Fundamentals','400 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.2);">🔐</div><div><div class="badge badge-crimson mb-1.5" style="font-size:.65rem;">CS Final Year</div><div class="text-white font-600 text-sm mb-1">Cybersecurity Fundamentals</div><div class="text-white/35 text-xs">Cryptography · Network security · Ethical hacking</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'FIN401','Corporate Finance','400 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">💼</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Finance</div><div class="text-white font-600 text-sm mb-1">Corporate Finance</div><div class="text-white/35 text-xs">Capital structure · Valuation · Investment analysis</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 500/600 Level -->
+        <div id="ul-500" class="ul-level-pane hidden">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'MED501','Clinical Medicine & Surgery','500 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.2);">🏥</div><div><div class="badge badge-crimson mb-1.5" style="font-size:.65rem;">Medicine & Surgery</div><div class="text-white font-600 text-sm mb-1">Clinical Medicine &amp; Surgery</div><div class="text-white/35 text-xs">Clinical skills · Diagnosis · Case management</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'PHARM501','Pharmacology','500 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);">💊</div><div><div class="badge badge-violet mb-1.5" style="font-size:.65rem;">Pharmacy</div><div class="text-white font-600 text-sm mb-1">Pharmacology &amp; Therapeutics</div><div class="text-white/35 text-xs">Drug mechanisms · Pharmacokinetics · Clinical use</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ENG501','Petroleum Engineering Design','500 Level','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">🛢️</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Engineering</div><div class="text-white font-600 text-sm mb-1">Petroleum Engineering Design</div><div class="text-white/35 text-xs">Reservoir · Drilling · Production · Economics</div></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Postgraduate -->
+        <div id="ul-pg" class="ul-level-pane hidden">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'MBA701','Strategic Management (MBA)','Masters','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">📈</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">MBA</div><div class="text-white font-600 text-sm mb-1">Strategic Management</div><div class="text-white/35 text-xs">Business strategy · Competitive analysis · Innovation</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'MSC701','Research Methodology','Masters','University')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);">🔬</div><div><div class="badge badge-violet mb-1.5" style="font-size:.65rem;">M.Sc / PhD</div><div class="text-white font-600 text-sm mb-1">Research Methodology</div><div class="text-white/35 text-xs">Qualitative · Quantitative · Data analysis · Writing</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── POLYTECHNICS ─── -->
+    <div id="inst-poly" class="tab-pane">
+      <div class="glass-card p-6 mb-5">
+        <div class="flex flex-wrap items-center gap-3 mb-5">
+          <div class="badge badge-amber">NBTE Regulated</div>
+          <div class="text-white/45 text-sm">78+ polytechnics · Federal (22), State (38), Private (18+)</div>
+        </div>
+        <div class="flex gap-2 overflow-x-auto pb-2 mb-5" style="scrollbar-width:none;">
+          <button class="lvl-tab active" onclick="switchLevel(this,'pl','pl-nd')">ND (Year 1 & 2)</button>
+          <button class="lvl-tab" onclick="switchLevel(this,'pl','pl-hnd')">HND (Year 1 & 2)</button>
+          <button class="lvl-tab" onclick="switchLevel(this,'pl','pl-posthnd')">Post-HND</button>
+        </div>
+        <div id="pl-nd" class="pl-level-pane">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'ND-ACC','ND Accountancy','ND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">📒</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Business/Finance</div><div class="text-white font-600 text-sm mb-1">ND Accountancy</div><div class="text-white/35 text-xs">Bookkeeping · Financial statements · Taxation</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ND-CS','ND Computer Science','ND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">💻</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">Science/IT</div><div class="text-white font-600 text-sm mb-1">ND Computer Science</div><div class="text-white/35 text-xs">Programming · OS · Networks · Database intro</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ND-EE','ND Electrical Engineering','ND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);">⚡</div><div><div class="badge badge-violet mb-1.5" style="font-size:.65rem;">Engineering</div><div class="text-white font-600 text-sm mb-1">ND Electrical Engineering</div><div class="text-white/35 text-xs">Circuit theory · Electrical machines · Electronics</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ND-MKT','ND Marketing','ND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);">📢</div><div><div class="badge badge-forest mb-1.5" style="font-size:.65rem;">Business</div><div class="text-white font-600 text-sm mb-1">ND Marketing</div><div class="text-white/35 text-xs">Market research · Consumer behavior · Advertising</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ND-ARCH','ND Architectural Technology','ND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">🏛️</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Environmental</div><div class="text-white font-600 text-sm mb-1">ND Architectural Technology</div><div class="text-white/35 text-xs">Technical drawing · Building materials · AutoCAD</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'ND-AGR','ND Agricultural Extension','ND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);">🌱</div><div><div class="badge badge-forest mb-1.5" style="font-size:.65rem;">Agriculture</div><div class="text-white font-600 text-sm mb-1">ND Agricultural Extension</div><div class="text-white/35 text-xs">Crop production · Animal production · Soil science</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div id="pl-hnd" class="pl-level-pane hidden">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'HND-CS','HND Computer Science','HND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">🖥️</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">Science/IT</div><div class="text-white font-600 text-sm mb-1">HND Computer Science</div><div class="text-white/35 text-xs">Advanced programming · Systems analysis · Project</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'HND-ACC','HND Accountancy','HND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">📊</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Business/Finance</div><div class="text-white font-600 text-sm mb-1">HND Accountancy</div><div class="text-white/35 text-xs">Advanced accounts · Auditing · Cost accounting</div></div></div>
+            </div>
+            <div class="exam-card p-4" onclick="selectCourse(this,'HND-CE','HND Civil Engineering','HND Year 1','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);">🏗️</div><div><div class="badge badge-violet mb-1.5" style="font-size:.65rem;">Engineering</div><div class="text-white font-600 text-sm mb-1">HND Civil Engineering</div><div class="text-white/35 text-xs">Structural analysis · Materials · Project management</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div id="pl-posthnd" class="pl-level-pane hidden">
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div class="exam-card p-4" onclick="selectCourse(this,'PHND-MGMT','Post-HND Management Studies','Post-HND','Polytechnic')">
+              <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">🎯</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">Post-HND</div><div class="text-white font-600 text-sm mb-1">Post-HND Management Studies</div><div class="text-white/35 text-xs">Advanced management · Strategic planning · Leadership</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── COLLEGES OF EDUCATION ─── -->
+    <div id="inst-coe" class="tab-pane">
+      <div class="glass-card p-6 mb-5">
+        <div class="flex flex-wrap items-center gap-3 mb-5">
+          <div class="badge badge-forest">NCCE Regulated</div>
+          <div class="text-white/45 text-sm">163+ COEs · Federal (21), State (50), Private (92) · NCE Award</div>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="exam-card p-4" onclick="selectCourse(this,'NCE-ENG','NCE English Language Education','NCE','College of Education')">
+            <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">📝</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">NCE</div><div class="text-white font-600 text-sm mb-1">English Language Education</div><div class="text-white/35 text-xs">Linguistics · Literature · Language teaching methodology</div></div></div>
+          </div>
+          <div class="exam-card p-4" onclick="selectCourse(this,'NCE-MATH','NCE Mathematics Education','NCE','College of Education')">
+            <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">📐</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">NCE</div><div class="text-white font-600 text-sm mb-1">Mathematics Education</div><div class="text-white/35 text-xs">Curriculum · Pedagogy · Problem-solving methods</div></div></div>
+          </div>
+          <div class="exam-card p-4" onclick="selectCourse(this,'NCE-EARLY','NCE Early Childcare & Education','NCE','College of Education')">
+            <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);">👶</div><div><div class="badge badge-forest mb-1.5" style="font-size:.65rem;">NCE</div><div class="text-white font-600 text-sm mb-1">Early Childcare &amp; Education</div><div class="text-white/35 text-xs">Child development · Play-based learning · Assessment</div></div></div>
+          </div>
+          <div class="exam-card p-4" onclick="selectCourse(this,'NCE-SCI','NCE Integrated Science Education','NCE','College of Education')">
+            <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.2);">🔭</div><div><div class="badge badge-violet mb-1.5" style="font-size:.65rem;">NCE</div><div class="text-white font-600 text-sm mb-1">Integrated Science Education</div><div class="text-white/35 text-xs">Physics · Chemistry · Biology · Teaching methodology</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── IEI / TECHNICAL ─── -->
+    <div id="inst-iei" class="tab-pane">
+      <div class="glass-card p-6 mb-5">
+        <div class="flex flex-wrap items-center gap-3 mb-5">
+          <div class="badge badge-violet">Innovation Enterprise Institutions</div>
+          <div class="text-white/45 text-sm">NID Award · Niche technical training · NIIT · PEFTI · Petroleum Tech</div>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="exam-card p-4" onclick="selectCourse(this,'NID-ICT','NID Information & Communications Technology','NID','IEI')">
+            <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(163,230,53,0.12);border:1px solid rgba(163,230,53,0.2);">📱</div><div><div class="badge badge-lime mb-1.5" style="font-size:.65rem;">ICT</div><div class="text-white font-600 text-sm mb-1">Information &amp; Communications Technology</div><div class="text-white/35 text-xs">Networking · Web dev · IT support · Cybersecurity</div></div></div>
+          </div>
+          <div class="exam-card p-4" onclick="selectCourse(this,'NID-FILM','NID Film Production','NID','IEI')">
+            <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.2);">🎬</div><div><div class="badge badge-amber mb-1.5" style="font-size:.65rem;">Creative Arts</div><div class="text-white font-600 text-sm mb-1">Film Production (PEFTI)</div><div class="text-white/35 text-xs">Cinematography · Script · Editing · Production mgmt</div></div></div>
+          </div>
+          <div class="exam-card p-4" onclick="selectCourse(this,'NID-OIL','NID Oil & Gas Technology','NID','IEI')">
+            <div class="flex items-start gap-3"><div class="course-icon" style="background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.2);">🛢️</div><div><div class="badge badge-forest mb-1.5" style="font-size:.65rem;">Petroleum</div><div class="text-white font-600 text-sm mb-1">Oil &amp; Gas Technology</div><div class="text-white/35 text-xs">Petroleum geology · Drilling · HSE · Refinery ops</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Course Action Bar -->
+    <div id="selected-course-bar" class="hidden mt-6 glass-card p-5 flex flex-wrap items-center justify-between gap-4" style="border-color:rgba(163,230,53,0.25);background:rgba(6,78,59,0.15);">
+      <div>
+        <div class="text-xs text-white/35 mb-0.5">Selected Course</div>
+        <div class="font-display font-700 text-white" id="selected-course-name">—</div>
+        <div class="text-white/45 text-xs mt-0.5" id="selected-course-meta">—</div>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <button onclick="goToExamLab()" class="btn-lime px-5 py-2.5 text-sm">🧪 Open in Exam Lab</button>
+        <button onclick="goToMockExam()" class="btn-amber px-5 py-2.5 text-sm">⏱️ Start Mock Exam</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+  EXAM LAB — AI QUESTION GENERATOR
+══════════════════════════════════════════════════════ -->
+<section id="exam-lab" class="py-28 relative overflow-hidden">
+  <div class="orb orb-forest" style="width:450px;height:450px;bottom:0;left:-8%;opacity:.12;"></div>
+  <div class="noise-overlay"></div>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <div class="sec-badge">🧪 AI Exam Lab</div>
+      <h2 class="font-display font-800 text-white mt-2 mb-4" style="font-size:2.6rem;letter-spacing:-.03em;">Unlimited <span style="color:#A3E635;">AI-Generated</span> Questions</h2>
+      <p class="text-white/50 max-w-2xl mx-auto">Generate fresh, contextual questions on any course or topic. Each answer reveals the full reasoning — why correct and why each wrong option exists — building real understanding.</p>
+    </div>
+
+    <!-- Lab Config -->
+    <div class="glass-card p-6 mb-6">
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+        <div>
+          <label class="text-xs text-white/45 mb-2 block font-600">Institution Type</label>
+          <select id="lab-inst" class="w-full px-3.5 py-2.5 text-sm" onchange="updateLabCourses()">
+            <option value="university">University</option>
+            <option value="polytechnic">Polytechnic</option>
+            <option value="coe">College of Education</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-white/45 mb-2 block font-600">Course / Subject</label>
+          <select id="lab-course" class="w-full px-3.5 py-2.5 text-sm">
+            <option value="Data Structures and Algorithms">Data Structures &amp; Algorithms</option>
+            <option value="Computer Networks">Computer Networks</option>
+            <option value="Database Management Systems">Database Management Systems</option>
+            <option value="Artificial Intelligence">Artificial Intelligence</option>
+            <option value="Electrical Circuit Theory">Electrical Circuit Theory</option>
+            <option value="Financial Accounting">Financial Accounting</option>
+            <option value="Organic Chemistry">Organic Chemistry</option>
+            <option value="Engineering Mechanics">Engineering Mechanics</option>
+            <option value="Principles of Economics">Principles of Economics</option>
+            <option value="Nigerian Constitutional Law">Nigerian Constitutional Law</option>
+            <option value="General Mathematics">General Mathematics</option>
+            <option value="Pharmacology">Pharmacology</option>
+            <option value="Cell Biology and Genetics">Cell Biology &amp; Genetics</option>
+            <option value="Mass Communication">Mass Communication</option>
+            <option value="ND Accountancy">ND Accountancy</option>
+            <option value="ND Computer Science">ND Computer Science</option>
+            <option value="English Language Education NCE">English Language Education (NCE)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-white/45 mb-2 block font-600">Question Type</label>
+          <select id="lab-qtype" class="w-full px-3.5 py-2.5 text-sm">
+            <option value="objective">Objective (MCQ)</option>
+            <option value="theory">Theory (Model Answer)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-white/45 mb-2 block font-600">Specific Topic <span class="text-white/25">(optional)</span></label>
+          <input id="lab-topic" type="text" placeholder="e.g. Binary Trees, SQL JOINs…" class="w-full px-3.5 py-2.5 text-sm"/>
+        </div>
+      </div>
+      <div class="mt-5 flex flex-wrap gap-3 items-center">
+        <button id="gen-btn" onclick="generateQuestion()" class="btn-lime px-6 py-3 text-sm flex items-center gap-2">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7l3-7z" stroke="#030712" stroke-width="2" stroke-linejoin="round"/></svg>
+          Generate Question
+        </button>
+        <button onclick="generateQuestion()" class="btn-ghost px-4 py-3 text-sm">🔄 Next Question</button>
+        <div id="lab-loading" class="hidden items-center gap-2 text-sm" style="color:#A3E635;">
+          <div class="spinner"></div> Generating with AI…
+        </div>
+        <div class="ml-auto text-xs text-white/25 hide-sm">Powered by Claude AI · Anthropic</div>
+      </div>
+    </div>
+
+    <!-- Question Display Area -->
+    <div id="lab-question-area" class="glass-card overflow-hidden">
+      <!-- Question Header -->
+      <div class="border-b border-white/06 px-6 py-4 flex flex-wrap items-center justify-between gap-3" style="background:rgba(255,255,255,0.015);">
+        <div class="flex items-center gap-3">
+          <div id="lab-course-badge" class="badge badge-lime">Course</div>
+          <div id="lab-qtype-badge" class="badge badge-amber">Type</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-white/35">Score:</span>
+          <span class="font-600 text-sm" id="lab-score" style="color:#A3E635;">0 pts</span>
+          <span class="text-xs text-white/20">|</span>
+          <span class="text-xs text-white/35" id="lab-streak">Streak: 0🔥</span>
+        </div>
+      </div>
+
+      <!-- Question Body -->
+      <div class="p-6 md:p-8">
+        <!-- Placeholder state -->
+        <div id="lab-placeholder" class="text-center py-16 text-white/25">
+          <div class="text-6xl mb-5">🎓</div>
+          <div class="text-xl font-display font-700 text-white/40 mb-2">Ready to generate your first question</div>
+          <div class="text-sm">Select a course above and click <strong style="color:#A3E635;">Generate Question</strong></div>
+        </div>
+
+        <!-- Active question -->
+        <div id="lab-q-content" class="hidden">
+          <!-- Question text -->
+          <div class="p-5 rounded-2xl border border-white/07 mb-6" style="background:rgba(255,255,255,0.025);">
+            <div class="text-xs text-white/30 font-600 mb-2.5 uppercase tracking-widest" id="q-source-label">Question</div>
+            <p class="text-white/90 leading-relaxed text-base" id="lab-q-text">—</p>
+          </div>
+
+          <!-- MCQ Options -->
+          <div id="lab-mcq-area" class="space-y-3 mb-6"></div>
+
+          <!-- Theory area -->
+          <div id="lab-theory-area" class="hidden">
+            <textarea id="theory-answer" rows="5" placeholder="Write your model answer here — include all key points…" class="w-full px-4 py-3.5 text-sm resize-none rounded-2xl mb-4"></textarea>
+            <button onclick="showTheoryAnswer()" class="btn-lime px-5 py-2.5 text-sm">📋 Show Model Answer</button>
+          </div>
+
+          <!-- Explanation panel -->
+          <div id="lab-explanation" class="hidden rounded-2xl overflow-hidden mb-5">
+            <div id="exp-header" class="px-5 py-3.5 text-sm font-700 font-display"></div>
+            <div id="exp-body" class="px-5 pb-5 text-sm text-white/65 leading-relaxed space-y-2.5"></div>
+          </div>
+
+          <!-- Next button -->
+          <div id="lab-next-btn" class="hidden">
+            <button onclick="generateQuestion()" class="btn-lime px-6 py-3 text-sm">→ Next Question</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results Meter (Lab) -->
+    <div id="lab-results-meter" class="hidden mt-5 glass-card p-5">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+          <div class="text-xs text-white/35 mb-0.5">Live Exam Readiness Score™</div>
+          <div class="font-display font-800 text-2xl" style="color:#A3E635;"><span id="lab-readiness-score">50</span><span class="text-white/35 text-base">/100</span></div>
+        </div>
+        <div id="lab-readiness-label" class="badge badge-amber">Building…</div>
+      </div>
+      <div class="results-meter-track">
+        <div class="results-meter-fill" id="lab-meter-fill" style="width:50%;"></div>
+        <div class="results-meter-needle" id="lab-meter-needle" style="left:48%;"></div>
+      </div>
+      <div class="flex justify-between text-xs text-white/25 mt-1.5">
+        <span>0 — Needs Work</span><span style="color:#F59E0B;">75% Target</span><span>100 — Ready</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+  MOCK EXAM — TIMED CBT SIMULATION
+══════════════════════════════════════════════════════ -->
+<section id="mock-exam" class="py-28 mesh-bg relative overflow-hidden">
+  <div class="orb orb-amber" style="width:400px;height:400px;top:5%;right:-8%;opacity:.07;"></div>
+  <div class="noise-overlay"></div>
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-12">
+      <div class="sec-badge">⏱️ Mock Exam Mode</div>
+      <h2 class="font-display font-800 text-white mt-2 mb-4" style="font-size:2.6rem;letter-spacing:-.03em;">Real Exam Conditions. <span style="color:#F59E0B;">WAEC Grading.</span></h2>
+      <p class="text-white/50 max-w-xl mx-auto">90 seconds per question. Auto-submits. Generates a full performance report with WAEC-style A1–F9 grade and topic-level analysis.</p>
+    </div>
+
+    <!-- Setup Screen -->
+    <div id="mock-setup" class="glass-card p-7">
+      <h3 class="font-display font-700 text-white text-xl mb-6">Configure Your Mock Exam</h3>
+      <div class="grid md:grid-cols-2 gap-5 mb-6">
+        <div>
+          <label class="text-xs text-white/45 mb-2 block font-600">Institution Type</label>
+          <select id="mock-inst" class="w-full px-4 py-3 text-sm" onchange="updateMockCourses()">
+            <option value="university">University</option>
+            <option value="polytechnic">Polytechnic</option>
+            <option value="coe">College of Education</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-white/45 mb-2 block font-600">Course / Subject</label>
+          <select id="mock-course" class="w-full px-4 py-3 text-sm">
+            <option value="Data Structures and Algorithms">Data Structures &amp; Algorithms</option>
+            <option value="Computer Networks">Computer Networks</option>
+            <option value="Database Management Systems">Database Management Systems</option>
+            <option value="Financial Accounting">Financial Accounting</option>
+            <option value="Organic Chemistry">Organic Chemistry</option>
+            <option value="Principles of Economics">Principles of Economics</option>
+            <option value="General Mathematics">General Mathematics</option>
+            <option value="Engineering Mechanics">Engineering Mechanics</option>
+            <option value="Nigerian Constitutional Law">Nigerian Constitutional Law</option>
+            <option value="Pharmacology">Pharmacology</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-white/45 mb-2 block font-600">Number of Questions</label>
+          <select id="mock-count" class="w-full px-4 py-3 text-sm">
+            <option value="10">10 Questions (~15 min)</option>
+            <option value="20" selected>20 Questions (~30 min)</option>
+            <option value="40">40 Questions (~60 min)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-white/45 mb-2 block font-600">Time Per Question</label>
+          <select id="mock-time" class="w-full px-4 py-3 text-sm">
+            <option value="60">60 seconds (Challenging)</option>
+            <option value="90" selected>90 seconds (Standard)</option>
+            <option value="120">120 seconds (Relaxed)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- RaaS Feature Notice -->
+      <div class="p-4 rounded-xl mb-6" style="background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.15);">
+        <div class="flex items-start gap-3">
+          <span class="text-xl">🛡️</span>
+          <div>
+            <div class="text-sm font-700 mb-1" style="color:#A3E635;">ResultsGuard™ Active</div>
+            <p class="text-white/50 text-xs leading-relaxed">Complete 5 recommended mock exam sessions and maintain consistent practice. If your readiness score doesn't reach 75% — your subscription is extended free of charge.</p>
+          </div>
+        </div>
+      </div>
+
+      <button id="mock-start-btn" onclick="startMockExam()" class="btn-lime w-full py-4 text-base font-display font-700">
+        🚀 Start Mock Exam
+      </button>
+    </div>
+
+    <!-- Active Mock Exam -->
+    <div id="mock-active" class="hidden">
+      <!-- Top Bar -->
+      <div class="glass-card p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-4">
+          <!-- Timer Ring -->
+          <div class="raas-score-ring relative">
+            <svg width="56" height="56" viewBox="0 0 72 72">
+              <circle cx="36" cy="36" r="32" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
+              <circle id="mock-timer-ring" cx="36" cy="36" r="32" fill="none" stroke="#F59E0B" stroke-width="5" stroke-dasharray="201" stroke-dashoffset="0" stroke-linecap="round"/>
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span id="mock-timer-text" style="color:#F59E0B;">90</span>
+            </div>
+          </div>
+          <div>
+            <div class="text-xs text-white/35">Question</div>
+            <div class="font-display font-800 text-white text-xl"><span id="mock-q-num">1</span><span class="text-white/35 text-sm">/<span id="mock-total">20</span></span></div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="text-center">
+            <div class="text-xs text-white/35 mb-0.5">Score</div>
+            <div class="font-display font-700 text-base" style="color:#A3E635;" id="mock-live-score">0/0</div>
+          </div>
+          <button onclick="if(confirm('End mock exam early?'))showMockResults()" class="btn-ghost px-4 py-2 text-xs">End Exam</button>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="prog mb-5">
+        <div class="prog-fill prog-lime" id="mock-progress" style="width:5%;"></div>
+      </div>
+
+      <!-- Question Navigator -->
+      <div id="mock-q-nav" class="flex flex-wrap gap-2 mb-5 p-4 glass-card"></div>
+
+      <!-- Question Card -->
+      <div class="glass-card p-6 md:p-8 mb-4">
+        <div id="mock-loading" class="hidden text-center py-10">
+          <div class="spinner mx-auto mb-3"></div>
+          <div class="text-sm" style="color:#A3E635;">Generating exam question…</div>
+        </div>
+        <div id="mock-q-body">
+          <div class="p-5 rounded-2xl border border-white/07 mb-6" style="background:rgba(255,255,255,0.02);">
+            <div class="text-xs text-white/30 mb-2 uppercase tracking-widest font-600" id="mock-course-label">Course</div>
+            <p class="text-white/90 leading-relaxed text-base" id="mock-q-text">—</p>
+          </div>
+          <div id="mock-options-area" class="space-y-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mock Results -->
+    <div id="mock-results" class="hidden">
+      <div class="glass-card p-8 text-center mb-5">
+        <div class="text-5xl mb-4" id="result-emoji">🏆</div>
+        <div class="text-xs text-white/35 mb-3 uppercase tracking-widest">WAEC Grade</div>
+        <div id="result-grade-badge" class="inline-block px-10 py-4 rounded-2xl text-4xl font-display font-800 mb-4 grade-a1">A1</div>
+        <div class="font-display font-600 text-white text-xl mb-1" id="result-desc">Distinction – Excellent Performance</div>
+        <div class="text-white/45 mb-5" id="result-score">18/20</div>
+        <div class="text-sm font-700" id="result-pct">90% · TARGET ACHIEVED ✅</div>
+
+        <!-- Readiness Meter in Results -->
+        <div class="mt-6 max-w-sm mx-auto">
+          <div class="text-xs text-white/35 mb-2">Final Exam Readiness Score™</div>
+          <div class="results-meter-track">
+            <div class="results-meter-fill" id="result-meter-fill" style="width:50%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breakdown -->
+      <div class="glass-card p-6 mb-5">
+        <h3 class="font-display font-700 text-white text-lg mb-5">📋 Examiner Performance Report</h3>
+        <div id="result-breakdown"></div>
+      </div>
+
+      <!-- Wrong Answers Review -->
+      <div class="glass-card p-6 mb-5">
+        <h3 class="font-display font-700 text-white text-lg mb-4">📖 Questions Review</h3>
+        <div id="result-review"></div>
+      </div>
+
+      <div class="flex gap-4 flex-wrap">
+        <button onclick="restartMock()" class="btn-lime flex-1 py-4 text-sm font-display font-700">🔄 Retake Exam</button>
+        <button onclick="document.getElementById('mock-setup').classList.remove('hidden');document.getElementById('mock-results').classList.add('hidden');" class="btn-ghost flex-1 py-4 text-sm">⚙️ Change Settings</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+  DASHBOARD PREVIEW (RaaS Analytics)
+══════════════════════════════════════════════════════ -->
+<section id="dashboard-preview" class="py-28 relative overflow-hidden">
+  <div class="orb orb-forest" style="width:500px;height:500px;top:10%;left:-5%;opacity:.12;"></div>
+  <div class="noise-overlay"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <div class="sec-badge">Student Dashboard</div>
+      <h2 class="font-display font-800 text-white mt-2 mb-4" style="font-size:2.6rem;letter-spacing:-.03em;">Your Personal <span style="color:#A3E635;">Performance Command Center</span></h2>
+      <p class="text-white/45 max-w-2xl mx-auto">Every metric, every trend, every AI insight — organized to give you a complete picture of your exam readiness in real time.</p>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-5">
+      <!-- Left: Overview Stats -->
+      <div class="space-y-4">
+        <div class="dash-stat p-5 rounded-2xl">
+          <div class="text-xs text-white/35 mb-1">Exam Readiness Score™</div>
+          <div class="font-display font-800 text-3xl mb-3" style="color:#A3E635;">82<span class="text-white/35 text-lg">/100</span></div>
+          <div class="results-meter-track">
+            <div class="results-meter-fill" style="width:82%;"></div>
+            <div class="results-meter-needle" style="left:80%;"></div>
+          </div>
+          <div class="flex justify-between text-xs text-white/25 mt-1.5">
+            <span>0</span><span style="color:#F59E0B;">75%</span><span>100</span>
+          </div>
+        </div>
+        <div class="dash-stat p-5 rounded-2xl">
+          <div class="text-xs text-white/35 mb-2">Activity Streak</div>
+          <div class="flex items-center gap-3">
+            <span class="text-3xl">🔥</span>
+            <div>
+              <div class="font-display font-800 text-2xl text-white">21 days</div>
+              <div class="text-xs text-white/35">Current streak</div>
+            </div>
+          </div>
+        </div>
+        <div class="dash-stat p-5 rounded-2xl">
+          <div class="text-xs text-white/35 mb-2">Total Practice</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="text-center"><div class="font-display font-700 text-xl text-white">347</div><div class="text-xs text-white/35">Questions</div></div>
+            <div class="text-center"><div class="font-display font-700 text-xl" style="color:#A3E635;">12</div><div class="text-xs text-white/35">Mock Exams</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Topic Heatmap -->
+      <div class="dash-stat p-6 rounded-2xl">
+        <div class="text-sm font-700 text-white mb-4">Topic Performance Heatmap</div>
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between text-xs mb-1.5"><span class="text-white/60">Data Structures</span><span class="font-600" style="color:#A3E635;">91%</span></div>
+            <div class="prog"><div class="prog-fill" style="width:91%;background:linear-gradient(90deg,#064E3B,#A3E635);"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1.5"><span class="text-white/60">Algorithms</span><span class="font-600" style="color:#A3E635;">85%</span></div>
+            <div class="prog"><div class="prog-fill" style="width:85%;background:linear-gradient(90deg,#064E3B,#A3E635);"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1.5"><span class="text-white/60">Database Systems</span><span class="font-600" style="color:#A3E635;">79%</span></div>
+            <div class="prog"><div class="prog-fill" style="width:79%;background:linear-gradient(90deg,#064E3B,#A3E635);"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1.5"><span class="text-white/60">Computer Networks</span><span class="font-600" style="color:#F59E0B;">62%</span></div>
+            <div class="prog"><div class="prog-fill prog-amber" style="width:62%;"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1.5"><span class="text-white/60">Operating Systems</span><span class="font-600" style="color:#F59E0B;">58%</span></div>
+            <div class="prog"><div class="prog-fill prog-amber" style="width:58%;"></div></div>
+          </div>
+          <div>
+            <div class="flex justify-between text-xs mb-1.5"><span class="text-white/60">Cybersecurity</span><span class="font-600" style="color:#DC2626;">44%</span></div>
+            <div class="prog"><div class="prog-fill prog-crimson" style="width:44%;"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: AI Insight + Recent -->
+      <div class="space-y-4">
+        <div class="p-5 rounded-2xl" style="background:rgba(163,230,53,0.07);border:1px solid rgba(163,230,53,0.18);">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-base">🤖</span>
+            <div class="text-sm font-700" style="color:#A3E635;">AI Study Insight</div>
+          </div>
+          <p class="text-white/60 text-sm leading-relaxed mb-3">Your Cybersecurity score is 44% — your riskiest topic. 18 targeted questions on Cryptography and Network Defense will push this above 75% and secure your grade.</p>
+          <button onclick="generateQuestion()" class="btn-lime w-full py-2.5 text-xs">→ Practice Cybersecurity Now</button>
+        </div>
+
+        <div class="dash-stat p-5 rounded-2xl">
+          <div class="text-sm font-700 text-white mb-3">Recent Mock Exams</div>
+          <div class="space-y-2.5">
+            <div class="flex justify-between items-center">
+              <div><div class="text-xs text-white/65">Data Structures</div><div class="text-xs text-white/30">Today</div></div>
+              <span class="grade-a1 text-xs px-2.5 py-1 rounded-lg font-700">A1 · 88%</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <div><div class="text-xs text-white/65">Computer Networks</div><div class="text-xs text-white/30">Yesterday</div></div>
+              <span class="grade-c6 text-xs px-2.5 py-1 rounded-lg font-700">C6 · 62%</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <div><div class="text-xs text-white/65">Database Systems</div><div class="text-xs text-white/30">2 days ago</div></div>
+              <span class="grade-b3 text-xs px-2.5 py-1 rounded-lg font-700">B3 · 79%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-xl text-center" style="background:rgba(6,78,59,0.3);border:1px solid rgba(163,230,53,0.2);">
+          <div class="text-xs text-white/35 mb-1">ResultsGuard™ Status</div>
+          <div class="font-display font-700" style="color:#A3E635;">✅ Protected</div>
+          <div class="text-xs text-white/30 mt-0.5">Complete 3 more sessions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+  PRICING
+══════════════════════════════════════════════════════ -->
+<section id="pricing" class="py-28 mesh-bg relative overflow-hidden">
+  <div class="noise-overlay"></div>
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-14">
+      <div class="sec-badge">Pricing Plans</div>
+      <h2 class="font-display font-800 text-white mt-2 mb-4" style="font-size:2.6rem;letter-spacing:-.03em;">Results-Focused <span style="color:#A3E635;">Access for Every Student</span></h2>
+      <p class="text-white/45 max-w-xl mx-auto">Free to start, upgrade when ready. All prices in Nigerian Naira. No hidden fees. Cancel anytime.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <!-- Free Plan -->
+      <div class="plan-card glass-card p-8 flex flex-col">
+        <div class="badge badge-gray mb-4 self-start">Free Forever</div>
+        <div class="font-display font-800 text-4xl text-white mb-1">₦0</div>
+        <div class="text-white/35 text-sm mb-7">No credit card required</div>
+        <ul class="space-y-3.5 flex-1 mb-8 text-sm text-white/60">
+          <li class="flex items-center gap-2.5"><span style="color:#10B981;">✓</span>5 AI questions per day</li>
+          <li class="flex items-center gap-2.5"><span style="color:#10B981;">✓</span>Basic explanations</li>
+          <li class="flex items-center gap-2.5"><span style="color:#10B981;">✓</span>Full curriculum browser</li>
+          <li class="flex items-center gap-2.5"><span style="color:#10B981;">✓</span>3 mock exams per month</li>
+          <li class="flex items-center gap-2.5 opacity-35"><span>✗</span>Theory model answers</li>
+          <li class="flex items-center gap-2.5 opacity-35"><span>✗</span>Performance analytics</li>
+          <li class="flex items-center gap-2.5 opacity-35"><span>✗</span>Exam Readiness Score™</li>
+          <li class="flex items-center gap-2.5 opacity-35"><span>✗</span>ResultsGuard™</li>
+        </ul>
+        <button onclick="openModal('signup-modal')" class="btn-outline-lime py-3.5 text-sm w-full font-600">Get Started Free</button>
+      </div>
+
+      <!-- Student Pro Plan (Featured) -->
+      <div class="plan-card featured p-8 flex flex-col relative">
+        <div class="absolute -top-3.5 left-1/2 -translate-x-1/2">
+          <span class="px-4 py-1 rounded-full text-xs font-700" style="background:#A3E635;color:#030712;">Most Popular</span>
+        </div>
+        <div class="badge badge-lime mb-4 self-start">Student Pro</div>
+        <div class="font-display font-800 text-4xl text-white mb-1">₦5,000</div>
+        <div class="text-white/45 text-sm mb-7">per semester · ~₦833/month</div>
+        <ul class="space-y-3.5 flex-1 mb-8 text-sm text-white/80">
+          <li class="flex items-center gap-2.5"><span style="color:#A3E635;">★</span><strong class="text-white">Unlimited</strong> AI questions</li>
+          <li class="flex items-center gap-2.5"><span style="color:#A3E635;">★</span>Full explanations + distractor traps</li>
+          <li class="flex items-center gap-2.5"><span style="color:#A3E635;">★</span>Theory model answers + mark schemes</li>
+          <li class="flex items-center gap-2.5"><span style="color:#A3E635;">★</span>Unlimited mock exams</li>
+          <li class="flex items-center gap-2.5"><span style="color:#A3E635;">★</span>Exam Readiness Score™ live</li>
+          <li class="flex items-center gap-2.5"><span style="color:#A3E635;">★</span>Performance Vault &amp; analytics</li>
+          <li class="flex items-center gap-2.5"><span style="color:#A3E635;">★</span>AI Study Contract</li>
+          <li class="flex items-center gap-2.5"><span style="color:#A3E635;">★</span><strong style="color:#A3E635;">ResultsGuard™</strong> protection</li>
+        </ul>
+        <button onclick="openModal('signup-modal')" class="btn-lime py-4 text-sm w-full font-display font-700">Subscribe Now — ₦5,000</button>
+      </div>
+
+      <!-- Departmental Plan -->
+      <div class="plan-card glass-card p-8 flex flex-col">
+        <div class="badge badge-amber mb-4 self-start">Departmental</div>
+        <div class="font-display font-800 text-4xl text-white mb-1">₦25,000</div>
+        <div class="text-white/35 text-sm mb-7">per department · per academic year</div>
+        <ul class="space-y-3.5 flex-1 mb-8 text-sm text-white/65">
+          <li class="flex items-center gap-2.5"><span style="color:#10B981;">✓</span>All Student Pro features</li>
+          <li class="flex items-center gap-2.5"><span style="color:#F59E0B;">★</span>Up to 200 students</li>
+          <li class="flex items-center gap-2.5"><span style="color:#F59E0B;">★</span>Cohort analytics dashboard</li>
+          <li class="flex items-center gap-2.5"><span style="color:#F59E0B;">★</span>Pre-exam failure prediction</li>
+          <li class="flex items-center gap-2.5"><span style="color:#F59E0B;">★</span>Custom question sets</li>
+          <li class="flex items-center gap-2.5"><span style="color:#F59E0B;">★</span>Export performance reports</li>
+          <li class="flex items-center gap-2.5"><span style="color:#F59E0B;">★</span>Department admin panel</li>
+          <li class="flex items-center gap-2.5"><span style="color:#F59E0B;">★</span>Priority support</li>
+        </ul>
+        <button onclick="showToast('📧 Contact us at departments@dealxexam.ng for institutional pricing.')" class="btn-amber py-4 text-sm w-full font-display font-700">Contact for Departments</button>
+      </div>
+    </div>
+
+    <!-- ResultsGuard Explainer -->
+    <div class="mt-8 p-6 rounded-2xl flex flex-wrap gap-4 items-center" style="background:rgba(6,78,59,0.2);border:1px solid rgba(163,230,53,0.15);">
+      <div class="text-3xl">🛡️</div>
+      <div class="flex-1">
+        <div class="font-display font-700 text-white mb-1">ResultsGuard™ — Our Guarantee</div>
+        <p class="text-white/50 text-sm">Complete the AI-recommended practice batches on Student Pro. If you score below 75% in your mock exam after completing the program — we extend your subscription free of charge, no questions asked.</p>
+      </div>
+      <button onclick="openModal('signup-modal')" class="btn-lime px-6 py-3 text-sm flex-shrink-0">Get Protected</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+  FOOTER
+══════════════════════════════════════════════════════ -->
+<footer class="border-t pt-16 pb-8" style="border-color:rgba(255,255,255,0.04);background:#020509;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid md:grid-cols-4 gap-10 mb-12">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#064E3B,#065F46);border:1px solid rgba(163,230,53,0.3);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 9l10 6 10-6-10-6z" stroke="#A3E635" stroke-width="2" stroke-linejoin="round"/><path d="M2 15l10 6 10-6" stroke="#A3E635" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/></svg>
+          </div>
+          <span class="font-display font-800 text-xl"><span class="text-white">Dealx</span><span style="color:#A3E635;">Exam</span></span>
+          <span class="badge badge-lime text-xs" style="font-size:.6rem;">RaaS</span>
+        </div>
+        <p class="text-white/35 text-sm leading-relaxed max-w-sm mb-5">Nigeria's AI-powered Results-as-a-Service platform for undergraduate exam preparation. Universities · Polytechnics · Colleges of Education nationwide.</p>
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 rounded-xl border border-white/08 flex items-center justify-center text-white/35 hover:text-lime-DEFAULT transition-all text-sm" style="background:rgba(255,255,255,0.04);">𝕏</a>
+          <a href="#" class="w-9 h-9 rounded-xl border border-white/08 flex items-center justify-center text-white/35 hover:text-lime-DEFAULT transition-all text-sm" style="background:rgba(255,255,255,0.04);">f</a>
+          <a href="#" class="w-9 h-9 rounded-xl border border-white/08 flex items-center justify-center text-white/35 hover:text-lime-DEFAULT transition-all text-sm" style="background:rgba(255,255,255,0.04);">in</a>
+          <a href="#" class="w-9 h-9 rounded-xl border border-white/08 flex items-center justify-center text-white/35 hover:text-lime-DEFAULT transition-all text-sm" style="background:rgba(255,255,255,0.04);">📱</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="text-white/50 text-xs font-700 uppercase tracking-widest mb-4">Platform</h4>
+        <ul class="space-y-2.5 text-sm text-white/35">
+          <li><a href="#features" class="hover:text-lime-DEFAULT transition-colors">Features</a></li>
+          <li><a href="#how-it-works" class="hover:text-lime-DEFAULT transition-colors">How It Works</a></li>
+          <li><a href="#curriculum" class="hover:text-lime-DEFAULT transition-colors">Curriculum</a></li>
+          <li><a href="#exam-lab" class="hover:text-lime-DEFAULT transition-colors">Exam Lab</a></li>
+          <li><a href="#mock-exam" class="hover:text-lime-DEFAULT transition-colors">Mock Exam</a></li>
+          <li><a href="#dashboard-preview" class="hover:text-lime-DEFAULT transition-colors">Dashboard</a></li>
+          <li><a href="#pricing" class="hover:text-lime-DEFAULT transition-colors">Pricing</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white/50 text-xs font-700 uppercase tracking-widest mb-4">Institutions</h4>
+        <ul class="space-y-2.5 text-sm text-white/35">
+          <li><a href="#curriculum" class="hover:text-lime-DEFAULT transition-colors">Universities (NUC)</a></li>
+          <li><a href="#curriculum" class="hover:text-lime-DEFAULT transition-colors">Polytechnics (NBTE)</a></li>
+          <li><a href="#curriculum" class="hover:text-lime-DEFAULT transition-colors">Colleges of Education</a></li>
+          <li><a href="#curriculum" class="hover:text-lime-DEFAULT transition-colors">IEIs &amp; Technical</a></li>
+          <li class="pt-2 border-t border-white/05">
+            <a href="#" class="hover:text-lime-DEFAULT transition-colors">Privacy Policy</a>
+          </li>
+          <li><a href="#" class="hover:text-lime-DEFAULT transition-colors">Terms of Service</a></li>
+          <li><a href="#" class="hover:text-lime-DEFAULT transition-colors">Contact Support</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/04 pt-6 flex flex-wrap items-center justify-between gap-4">
+      <p class="text-white/20 text-xs">© 2025 DealxExam. All rights reserved. Curriculum aligned: NUC · NBTE · NCCE. AI powered by Anthropic Claude.</p>
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full pulse-dot" style="background:#A3E635;"></div>
+        <span class="text-white/20 text-xs">AI Systems Operational · RaaS Platform v2.0</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════════════════════
+  SIGN UP MODAL (14 fields)
+══════════════════════════════════════════════════════ -->
+<div id="signup-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal('signup-modal')"></div>
+  <div class="glass relative w-full max-w-2xl max-h-[92vh] overflow-y-auto rounded-2xl border border-white/08 z-10 modal-enter">
+    <!-- Modal Header -->
+    <div class="sticky top-0 glass z-10 flex items-center justify-between p-6 border-b border-white/07">
+      <div>
+        <h2 class="font-display font-800 text-xl text-white">Create Your Account</h2>
+        <p class="text-white/40 text-xs mt-0.5">Join DealxExam — Free to start · Full RaaS access</p>
+      </div>
+      <button onclick="closeModal('signup-modal')" class="w-9 h-9 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-all" style="background:rgba(255,255,255,0.05);">✕</button>
+    </div>
+
+    <div class="p-6">
+      <!-- Progress Steps -->
+      <div class="flex gap-2 mb-6">
+        <div class="flex-1 h-1.5 rounded-full" style="background:#A3E635;"></div>
+        <div class="flex-1 h-1.5 rounded-full" id="step2-bar" style="background:rgba(255,255,255,0.1);"></div>
+        <div class="flex-1 h-1.5 rounded-full" id="step3-bar" style="background:rgba(255,255,255,0.1);"></div>
+      </div>
+
+      <!-- Personal Information -->
+      <div class="mb-6">
+        <div class="text-xs font-700 uppercase tracking-widest mb-4" style="color:#A3E635;">Personal Information</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Full Name *</label>
+            <input type="text" id="su-fullName" placeholder="Emeka Okonkwo" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Date of Birth *</label>
+            <input type="date" id="su-dateOfBirth" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Mobile Number *</label>
+            <input type="tel" id="su-mobileNumber" placeholder="+234 800 000 0000" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">WhatsApp Number</label>
+            <input type="tel" id="su-whatsappNumber" placeholder="+234 800 000 0000" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">NIN (National ID) *</label>
+            <input type="text" id="su-nin" placeholder="12345678901" maxlength="11" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Email Address *</label>
+            <input type="email" id="su-email" placeholder="emeka@university.edu.ng" class="w-full px-4 py-3 text-sm"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location Information -->
+      <div class="mb-6">
+        <div class="text-xs font-700 uppercase tracking-widest mb-4" style="color:#A3E635;">Location Details</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">State of Residence *</label>
+            <select id="su-stateOfResidence" class="w-full px-4 py-3 text-sm">
+              <option value="">Select State…</option>
+              <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option><option>Anambra</option><option>Bauchi</option><option>Bayelsa</option><option>Benue</option><option>Borno</option><option>Cross River</option><option>Delta</option><option>Ebonyi</option><option>Edo</option><option>Ekiti</option><option>Enugu</option><option>FCT Abuja</option><option>Gombe</option><option>Imo</option><option>Jigawa</option><option>Kaduna</option><option>Kano</option><option>Katsina</option><option>Kebbi</option><option>Kogi</option><option>Kwara</option><option>Lagos</option><option>Nasarawa</option><option>Niger</option><option>Ogun</option><option>Ondo</option><option>Osun</option><option>Oyo</option><option>Plateau</option><option>Rivers</option><option>Sokoto</option><option>Taraba</option><option>Yobe</option><option>Zamfara</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">State of Origin *</label>
+            <select id="su-stateOfOrigin" class="w-full px-4 py-3 text-sm">
+              <option value="">Select State…</option>
+              <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option><option>Anambra</option><option>Bauchi</option><option>Bayelsa</option><option>Benue</option><option>Borno</option><option>Cross River</option><option>Delta</option><option>Ebonyi</option><option>Edo</option><option>Ekiti</option><option>Enugu</option><option>FCT Abuja</option><option>Gombe</option><option>Imo</option><option>Jigawa</option><option>Kaduna</option><option>Kano</option><option>Katsina</option><option>Kebbi</option><option>Kogi</option><option>Kwara</option><option>Lagos</option><option>Nasarawa</option><option>Niger</option><option>Ogun</option><option>Ondo</option><option>Osun</option><option>Oyo</option><option>Plateau</option><option>Rivers</option><option>Sokoto</option><option>Taraba</option><option>Yobe</option><option>Zamfara</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">LGA (Local Govt. Area) *</label>
+            <input type="text" id="su-lga" placeholder="e.g. Ikeja, Enugu North" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Residential Address *</label>
+            <input type="text" id="su-address" placeholder="No. 12, University Road, Zaria" class="w-full px-4 py-3 text-sm"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Academic Information -->
+      <div class="mb-6">
+        <div class="text-xs font-700 uppercase tracking-widest mb-4" style="color:#A3E635;">Academic Profile</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Institution Type *</label>
+            <select id="su-instType" class="w-full px-4 py-3 text-sm">
+              <option value="">Select…</option>
+              <option>Federal University</option>
+              <option>State University</option>
+              <option>Private University</option>
+              <option>Federal Polytechnic</option>
+              <option>State Polytechnic</option>
+              <option>Private Polytechnic</option>
+              <option>Federal College of Education</option>
+              <option>State College of Education</option>
+              <option>Private College of Education</option>
+              <option>Innovation Enterprise Institution (IEI)</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Institution Name *</label>
+            <input type="text" id="su-instName" placeholder="University of Lagos, UNILAG" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Department / Course *</label>
+            <input type="text" id="su-dept" placeholder="Computer Science" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Current Level *</label>
+            <select id="su-level" class="w-full px-4 py-3 text-sm">
+              <option value="">Select Level…</option>
+              <option>100 Level</option><option>200 Level</option><option>300 Level</option><option>400 Level</option><option>500 Level</option><option>600 Level</option>
+              <option>ND Year 1</option><option>ND Year 2</option><option>HND Year 1</option><option>HND Year 2</option><option>Post-HND</option>
+              <option>NCE Year 1</option><option>NCE Year 2</option><option>NCE Year 3</option>
+              <option>NID</option><option>Masters</option><option>PhD</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account Security -->
+      <div class="mb-6">
+        <div class="text-xs font-700 uppercase tracking-widest mb-4" style="color:#A3E635;">Account Security</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Password *</label>
+            <input type="password" id="su-password" placeholder="Minimum 8 characters" class="w-full px-4 py-3 text-sm"/>
+          </div>
+          <div>
+            <label class="text-xs text-white/45 mb-1.5 block font-600">Confirm Password *</label>
+            <input type="password" id="su-confirm" placeholder="Re-enter password" class="w-full px-4 py-3 text-sm"/>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-xs text-white/30 mb-5">By creating an account you agree to our <a href="#" class="text-lime-DEFAULT hover:underline">Terms of Service</a> and <a href="#" class="text-lime-DEFAULT hover:underline">Privacy Policy</a>. Your NIN and personal data are secured and will not be shared.</p>
+      <button onclick="handleSignup()" class="btn-lime w-full py-4 text-base font-display font-700">🚀 Create Free Account</button>
+      <p class="text-center text-white/30 text-xs mt-4">Already have an account? <button onclick="closeModal('signup-modal');openModal('login-modal')" class="text-lime-DEFAULT hover:underline">Sign In</button></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+  SIGN IN MODAL
+══════════════════════════════════════════════════════ -->
+<div id="login-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal('login-modal')"></div>
+  <div class="glass relative w-full max-w-sm rounded-2xl border border-white/08 z-10 p-8 modal-enter">
+    <button onclick="closeModal('login-modal')" class="absolute top-4 right-4 w-9 h-9 rounded-xl flex items-center justify-center text-white/40 hover:text-white transition-all" style="background:rgba(255,255,255,0.05);">✕</button>
+    <div class="text-center mb-7">
+      <div class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style="background:linear-gradient(135deg,#064E3B,#065F46);border:1px solid rgba(163,230,53,0.3);box-shadow:0 0 24px rgba(6,78,59,0.5);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3L2 9l10 6 10-6-10-6z" stroke="#A3E635" stroke-width="2.5" stroke-linejoin="round"/><path d="M2 15l10 6 10-6" stroke="#A3E635" stroke-width="2" stroke-linecap="round" opacity=".7"/></svg>
+      </div>
+      <h2 class="font-display font-800 text-xl text-white">Welcome Back</h2>
+      <p class="text-white/30 text-xs mt-1">Sign in to DealxExam</p>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="text-xs text-white/45 mb-1.5 block font-600">Email or Matric No.</label>
+        <input type="text" placeholder="emeka@university.edu.ng" class="w-full px-4 py-3.5 text-sm"/>
+      </div>
+      <div>
+        <label class="text-xs text-white/45 mb-1.5 block font-600">Password</label>
+        <input type="password" placeholder="••••••••" class="w-full px-4 py-3.5 text-sm"/>
+      </div>
+      <div class="flex items-center justify-between text-xs">
+        <label class="flex items-center gap-2 text-white/40 cursor-pointer"><input type="checkbox" class="accent-green-400"/> Remember me</label>
+        <a href="#" class="text-lime-DEFAULT hover:underline">Forgot password?</a>
+      </div>
+      <button onclick="showToast('✅ Signed in! Welcome back to DealxExam.');closeModal(\"login-modal\");" class="btn-lime w-full py-4 text-sm font-display font-700">Sign In →</button>
+      <p class="text-center text-white/30 text-xs">New to DealxExam? <button onclick="closeModal('login-modal');openModal('signup-modal')" class="text-lime-DEFAULT hover:underline">Register free</button></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+  TOAST NOTIFICATION
+══════════════════════════════════════════════════════ -->
+<div id="toast" class="fixed bottom-6 right-4 sm:right-6 z-[200] opacity-0 pointer-events-none transform translate-y-4 transition-all duration-500 max-w-xs w-full">
+  <div class="glass-card px-5 py-3.5 flex items-center gap-3" style="border-color:rgba(163,230,53,0.2);">
+    <span class="text-lime-DEFAULT text-lg flex-shrink-0">✅</span>
+    <div class="text-white font-600 text-sm" id="toast-msg">Done!</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+  JAVASCRIPT ENGINE
+══════════════════════════════════════════════════════ -->
+<script>
+// ════════════════════════════════════════════════════
+// NAV
+// ════════════════════════════════════════════════════
+let navOpen=false;
+function toggleNav(){
+  navOpen=!navOpen;
+  const m=document.getElementById('mob-nav');
+  const b1=document.getElementById('hb1'),b2=document.getElementById('hb2'),b3=document.getElementById('hb3');
+  m.style.maxHeight=navOpen?'500px':'0';
+  m.style.opacity=navOpen?'1':'0';
+  b1.style.transform=navOpen?'rotate(45deg) translate(5px,5px)':'';
+  b2.style.opacity=navOpen?'0':'1';
+  b3.style.transform=navOpen?'rotate(-45deg) translate(5px,-5px)':'';
+  b3.style.width=navOpen?'20px':'16px';
+}
+function closeNav(){if(navOpen)toggleNav();}
+window.addEventListener('scroll',()=>{
+  const nav=document.getElementById('nav');
+  nav.style.boxShadow=window.scrollY>30?'0 8px 48px rgba(0,0,0,0.7)':'';
+});
+
+// ════════════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════════════
+function openModal(id){
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById(id).classList.add('flex');
+  document.body.style.overflow='hidden';
+}
+function closeModal(id){
+  document.getElementById(id).classList.add('hidden');
+  document.getElementById(id).classList.remove('flex');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){['signup-modal','login-modal'].forEach(closeModal);}
+});
+
+// ════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  const icon=t.querySelector('span');
+  const m=document.getElementById('toast-msg');
+  icon.textContent=type==='error'?'❌':'✅';
+  m.textContent=msg;
+  t.style.opacity='1';t.style.transform='translateY(0)';t.style.pointerEvents='auto';
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(16px)';t.style.pointerEvents='none';},4000);
+}
+
+// ════════════════════════════════════════════════════
+// SIGNUP HANDLER
+// ════════════════════════════════════════════════════
+function handleSignup(){
+  const fullName=document.getElementById('su-fullName').value;
+  const email=document.getElementById('su-email').value;
+  const password=document.getElementById('su-password').value;
+  const phoneNumber=document.getElementById('su-mobileNumber').value;
+  const stateOfResidence=document.getElementById('su-stateOfResidence').value;
+  const address=document.getElementById('su-address').value;
+  const dateOfBirth=document.getElementById('su-dateOfBirth').value;
+  const stateOfOrigin=document.getElementById('su-stateOfOrigin').value;
+  const nin=document.getElementById('su-nin').value;
+  const lga=document.getElementById('su-lga').value;
+  const whatsappNumber=document.getElementById('su-whatsappNumber').value;
+  const mobileNumber=document.getElementById('su-mobileNumber').value;
+  if(!fullName||!email||!password||!phoneNumber||!stateOfResidence){
+    showToast('Please fill in all required fields (*).','error');return;
+  }
+  const formData={fullName,email,password,phoneNumber,stateOfResidence,address,dateOfBirth,stateOfOrigin,nin,lga,whatsappNumber,mobileNumber};
+  console.log('FormData:',formData);
+  closeModal('signup-modal');
+  showToast('🎓 Account created! Check your email to verify and start your RaaS journey.');
+}
+
+// ════════════════════════════════════════════════════
+// CURRICULUM TABS
+// ════════════════════════════════════════════════════
+function switchInstTab(btn,paneId){
+  document.querySelectorAll('.tab-pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>{p.classList.remove('active');p.style.display='none';});
+  btn.classList.add('active');
+  const pane=document.getElementById(paneId);
+  pane.style.display='block';
+  pane.classList.add('active');
+}
+function switchLevel(btn,group,paneId){
+  document.querySelectorAll(`.${group}-level-pane`).forEach(p=>p.classList.add('hidden'));
+  btn.parentElement.querySelectorAll('.lvl-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(paneId).classList.remove('hidden');
+}
+
+// ════════════════════════════════════════════════════
+// COURSE SELECTION
+// ════════════════════════════════════════════════════
+let selectedCourse={name:'',code:'',level:'',instType:''};
+function selectCourse(card,code,name,level,instType){
+  document.querySelectorAll('.exam-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedCourse={name,code,level,instType};
+  const bar=document.getElementById('selected-course-bar');
+  document.getElementById('selected-course-name').textContent=name;
+  document.getElementById('selected-course-meta').textContent=`${instType} · ${level} · Code: ${code}`;
+  bar.classList.remove('hidden');
+  setTimeout(()=>bar.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+}
+function goToExamLab(){
+  if(selectedCourse.name){
+    document.getElementById('lab-topic').value=selectedCourse.name;
+  }
+  document.getElementById('exam-lab').scrollIntoView({behavior:'smooth'});
+}
+function goToMockExam(){
+  document.getElementById('mock-exam').scrollIntoView({behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════════════
+// CLAUDE AI API — QUESTION GENERATION
+// ════════════════════════════════════════════════════
+let labScore=0,labStreak=0,labTotal=0;
+let currentQuestion=null;
+
+async function generateQuestion(){
+  const course=document.getElementById('lab-course').value;
+  const qtype=document.getElementById('lab-qtype').value;
+  const topic=document.getElementById('lab-topic').value.trim();
+  const inst=document.getElementById('lab-inst').value;
+
+  // UI State: Loading
+  document.getElementById('gen-btn').disabled=true;
+  document.getElementById('lab-loading').classList.remove('hidden');
+  document.getElementById('lab-loading').style.display='flex';
+  document.getElementById('lab-placeholder').classList.add('hidden');
+  document.getElementById('lab-q-content').classList.add('hidden');
+  document.getElementById('lab-explanation').classList.add('hidden');
+  document.getElementById('lab-next-btn').classList.add('hidden');
+
+  // Update badges
+  document.getElementById('lab-course-badge').textContent=course;
+  document.getElementById('lab-qtype-badge').textContent=qtype==='objective'?'MCQ':'Theory';
+
+  const topicStr=topic?` specifically on the subtopic: "${topic}"`:'';
+  const instStr=inst==='university'?'Nigerian university':inst==='polytechnic'?'Nigerian polytechnic':'Nigerian College of Education';
+
+  let prompt='';
+  if(qtype==='objective'){
+    prompt=`You are an expert Nigerian higher education examiner for a ${instStr}. Generate ONE challenging multiple-choice question for the course "${course}"${topicStr}.
+
+Return ONLY valid JSON in this exact format, no other text:
+{
+  "question": "The question text here?",
+  "options": {"A": "Option A text", "B": "Option B text", "C": "Option C text", "D": "Option D text"},
+  "correct": "A",
+  "topic": "specific topic name",
+  "explanation_correct": "Detailed explanation of why this answer is correct and the principle behind it.",
+  "explanation_A": "Why A is correct/wrong — the reasoning or misconception.",
+  "explanation_B": "Why B is correct/wrong — the reasoning or misconception.",
+  "explanation_C": "Why C is correct/wrong — the reasoning or misconception.",
+  "explanation_D": "Why D is correct/wrong — the reasoning or misconception."
+}
+
+Make the question challenging, curriculum-accurate, and exam-standard. All distractors should represent common misconceptions.`;
+  } else {
+    prompt=`You are an expert Nigerian higher education examiner for a ${instStr}. Generate ONE theory/essay question for the course "${course}"${topicStr}.
+
+Return ONLY valid JSON in this exact format, no other text:
+{
+  "question": "The theory question here.",
+  "topic": "specific topic name",
+  "model_answer": "A comprehensive model answer (3–5 paragraphs) that a top student should give.",
+  "key_points": ["Key point 1", "Key point 2", "Key point 3", "Key point 4", "Key point 5"],
+  "examiner_notes": "What examiners look for, common mistakes, and how to score maximum marks.",
+  "marks": 20
+}`;
+  }
+
+  try {
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data=await resp.json();
+    const raw=data.content.map(i=>i.text||'').join('');
+    const clean=raw.replace(/```json|```/g,'').trim();
+    const q=JSON.parse(clean);
+    currentQuestion=q;
+    currentQuestion.type=qtype;
+    renderQuestion(q,qtype);
+    updateLabMeter();
+  } catch(err){
+    console.error(err);
+    // Fallback sample question
+    if(qtype==='objective'){
+      currentQuestion={
+        type:'objective',
+        question:`Which of the following best describes the time complexity of binary search on a sorted array of ${course} data?`,
+        options:{A:'O(n)',B:'O(log n)',C:'O(n²)',D:'O(1)'},
+        correct:'B',
+        topic:course,
+        explanation_correct:'Binary search halves the search space at each step, giving O(log n) complexity — this is the fundamental efficiency of divide-and-conquer approaches.',
+        explanation_A:'O(n) is linear search complexity — scanning every element sequentially. Binary search is fundamentally more efficient.',
+        explanation_B:'Correct. O(log n) because each comparison eliminates half the remaining elements.',
+        explanation_C:'O(n²) is typical of inefficient sorting algorithms like bubble sort, not searching.',
+        explanation_D:'O(1) would mean constant time regardless of input — only hash table lookups achieve this consistently.'
+      };
+    } else {
+      currentQuestion={
+        type:'theory',
+        question:`Explain the fundamental principles of ${course}, discussing its key concepts and their practical applications in the Nigerian context.`,
+        topic:course,
+        model_answer:`${course} is a fundamental discipline that encompasses several core principles. First, it establishes theoretical frameworks that guide practical application. In the Nigerian educational context, students must understand both global standards and local applications.\n\nThe key principles involve systematic understanding, practical application, and critical analysis. Students are expected to demonstrate mastery of foundational concepts while showing ability to apply these in real-world scenarios.\n\nPractical applications in Nigeria include industry implementations, regulatory compliance, and professional practice standards. Understanding these applications is essential for examination success and professional development.`,
+        key_points:['Fundamental theoretical framework','Core principles and definitions','Nigerian regulatory context','Practical applications','Professional standards'],
+        examiner_notes:'Examiners award marks for: clear definitions (20%), theoretical understanding (30%), practical applications (30%), Nigerian context (20%). Common mistakes: vague definitions, failure to provide examples, ignoring Nigerian context.',
+        marks:20
+      };
+    }
+    renderQuestion(currentQuestion,qtype);
+    updateLabMeter();
+  } finally {
+    document.getElementById('gen-btn').disabled=false;
+    document.getElementById('lab-loading').style.display='none';
+    document.getElementById('lab-loading').classList.add('hidden');
+  }
+}
+
+function renderQuestion(q,qtype){
+  document.getElementById('lab-q-content').classList.remove('hidden');
+  document.getElementById('lab-q-text').textContent=q.question;
+  document.getElementById('q-source-label').textContent=`${q.topic||'Question'} · ${qtype==='objective'?'Multiple Choice':'Theory'}`;
+
+  if(qtype==='objective'){
+    document.getElementById('lab-mcq-area').classList.remove('hidden');
+    document.getElementById('lab-theory-area').classList.add('hidden');
+    const area=document.getElementById('lab-mcq-area');
+    area.innerHTML='';
+    ['A','B','C','D'].forEach(k=>{
+      if(!q.options[k])return;
+      const btn=document.createElement('button');
+      btn.className='opt-btn';
+      btn.innerHTML=`<span class="font-700 mr-3 text-xs px-2 py-0.5 rounded-lg" style="background:rgba(255,255,255,0.08);">${k}</span>${q.options[k]}`;
+      btn.onclick=()=>handleAnswer(k,q,area);
+      area.appendChild(btn);
+    });
+  } else {
+    document.getElementById('lab-mcq-area').classList.add('hidden');
+    document.getElementById('lab-theory-area').classList.remove('hidden');
+    document.getElementById('theory-answer').value='';
+  }
+  document.getElementById('lab-results-meter').classList.remove('hidden');
+}
+
+function handleAnswer(chosen,q,area){
+  const correct=q.correct;
+  const btns=area.querySelectorAll('.opt-btn');
+  btns.forEach((b,i)=>{
+    b.disabled=true;
+    const k=['A','B','C','D'][i];
+    if(k===correct){b.classList.add('correct');}
+    else if(k===chosen){b.classList.add('wrong');}
+    else{b.classList.add('dimmed');}
+  });
+  labTotal++;
+  const isRight=(chosen===correct);
+  if(isRight){labScore++;labStreak++;}
+  else{labStreak=0;}
+  document.getElementById('lab-score').textContent=`${labScore} pts`;
+  document.getElementById('lab-streak').textContent=`Streak: ${labStreak}🔥`;
+
+  // Show explanation
+  const expEl=document.getElementById('lab-explanation');
+  const expH=document.getElementById('exp-header');
+  const expB=document.getElementById('exp-body');
+  expEl.classList.remove('hidden');
+  expEl.className=isRight?'exp-correct rounded-2xl overflow-hidden mb-5':'exp-wrong rounded-2xl overflow-hidden mb-5';
+  expH.textContent=isRight?`✅ Correct! The answer is ${correct}.`:`❌ Incorrect. The correct answer is ${correct}.`;
+  expH.style.color=isRight?'#6EE7B7':'#FCA5A5';
+  expH.style.background=isRight?'rgba(16,185,129,0.08)':'rgba(220,38,38,0.06)';
+
+  let html=`<div class="p-3 rounded-xl mb-3" style="background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.12);">
+    <div class="text-xs font-700 mb-1" style="color:#A3E635;">📖 Why ${correct} is correct:</div>
+    <p class="text-white/65 text-sm">${q['explanation_'+correct]||q.explanation_correct||''}</p>
+  </div>`;
+  ['A','B','C','D'].forEach(k=>{
+    if(k===correct||!q['explanation_'+k])return;
+    html+=`<div class="mb-2">
+      <span class="text-xs font-700" style="color:#F87171;">✗ Why ${k} is wrong:</span>
+      <span class="text-white/45 text-xs ml-2">${q['explanation_'+k]}</span>
+    </div>`;
+  });
+  expB.innerHTML=html;
+  document.getElementById('lab-next-btn').classList.remove('hidden');
+  updateLabMeter();
+}
+
+function showTheoryAnswer(){
+  if(!currentQuestion)return;
+  const q=currentQuestion;
+  const expEl=document.getElementById('lab-explanation');
+  const expH=document.getElementById('exp-header');
+  const expB=document.getElementById('exp-body');
+  expEl.classList.remove('hidden');
+  expEl.className='exp-theory rounded-2xl overflow-hidden mb-5';
+  expH.textContent='📋 Model Answer';
+  expH.style.color='#A3E635';
+  expH.style.background='rgba(163,230,53,0.06)';
+  const kp=Array.isArray(q.key_points)?q.key_points.map(p=>`<li class="text-white/65 text-xs">• ${p}</li>`).join(''):'';
+  expB.innerHTML=`
+    <div class="p-4 rounded-xl mb-3" style="background:rgba(163,230,53,0.05);border:1px solid rgba(163,230,53,0.12);">
+      <div class="text-xs font-700 mb-2" style="color:#A3E635;">Model Answer (${q.marks||20} marks):</div>
+      <p class="text-white/65 text-sm leading-relaxed whitespace-pre-line">${q.model_answer}</p>
+    </div>
+    ${kp?`<div class="mb-3"><div class="text-xs font-700 mb-2 text-white/60">Key Points Examiners Expect:</div><ul class="space-y-1">${kp}</ul></div>`:''}
+    ${q.examiner_notes?`<div class="p-3 rounded-xl" style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.15);"><div class="text-xs font-700 mb-1" style="color:#FCD34D;">📝 Examiner's Notes:</div><p class="text-white/50 text-xs leading-relaxed">${q.examiner_notes}</p></div>`:''}`;
+  document.getElementById('lab-next-btn').classList.remove('hidden');
+}
+
+function updateLabMeter(){
+  const pct=labTotal>0?Math.round((labScore/labTotal)*100):50;
+  const readiness=Math.min(95,Math.max(10,pct));
+  document.getElementById('lab-readiness-score').textContent=readiness;
+  const fill=document.getElementById('lab-meter-fill');
+  const needle=document.getElementById('lab-meter-needle');
+  if(fill)fill.style.width=readiness+'%';
+  if(needle)needle.style.left=Math.max(0,readiness-2)+'%';
+  const label=document.getElementById('lab-readiness-label');
+  if(label){
+    if(readiness>=75){label.className='badge badge-lime';label.textContent='✅ Ready to pass!';}
+    else if(readiness>=60){label.className='badge badge-amber';label.textContent='⚠️ Getting there…';}
+    else{label.className='badge badge-crimson';label.textContent='📚 Keep practicing';}
+  }
+}
+
+function updateLabCourses(){
+  const inst=document.getElementById('lab-inst').value;
+  const sel=document.getElementById('lab-course');
+  const uniCourses=[
+    ['Data Structures and Algorithms','Data Structures & Algorithms'],
+    ['Computer Networks','Computer Networks'],
+    ['Database Management Systems','Database Management Systems'],
+    ['Artificial Intelligence','Artificial Intelligence'],
+    ['Electrical Circuit Theory','Electrical Circuit Theory'],
+    ['Financial Accounting','Financial Accounting'],
+    ['Organic Chemistry','Organic Chemistry'],
+    ['Engineering Mechanics','Engineering Mechanics'],
+    ['Principles of Economics','Principles of Economics'],
+    ['Nigerian Constitutional Law','Nigerian Constitutional Law'],
+    ['General Mathematics','General Mathematics'],
+    ['Pharmacology','Pharmacology'],
+    ['Cell Biology and Genetics','Cell Biology & Genetics'],
+    ['Mass Communication','Mass Communication'],
+  ];
+  const polyCourses=[
+    ['ND Accountancy','ND Accountancy'],
+    ['ND Computer Science','ND Computer Science'],
+    ['ND Electrical Engineering','ND Electrical Engineering'],
+    ['ND Marketing','ND Marketing'],
+    ['HND Computer Science','HND Computer Science'],
+    ['HND Accountancy','HND Accountancy'],
+    ['ND Agricultural Extension','ND Agricultural Extension'],
+    ['ND Architectural Technology','ND Architectural Technology'],
+  ];
+  const coeCourses=[
+    ['English Language Education NCE','English Language Education (NCE)'],
+    ['Mathematics Education NCE','Mathematics Education (NCE)'],
+    ['Early Childcare Education NCE','Early Childcare Education (NCE)'],
+    ['Integrated Science Education NCE','Integrated Science (NCE)'],
+  ];
+  const courses=inst==='university'?uniCourses:inst==='polytechnic'?polyCourses:coeCourses;
+  sel.innerHTML=courses.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+}
+
+// ════════════════════════════════════════════════════
+// MOCK EXAM ENGINE
+// ════════════════════════════════════════════════════
+let mockQuestions=[],mockAnswers=[],mockCurrent=0,mockTotal=10,mockTimePerQ=90,mockTimeLeft=90,mockTimerInterval=null;
+
+function updateMockCourses(){
+  const inst=document.getElementById('mock-inst').value;
+  const sel=document.getElementById('mock-course');
+  const courses=inst==='university'?[
+    ['Data Structures and Algorithms','Data Structures & Algorithms'],
+    ['Computer Networks','Computer Networks'],
+    ['Database Management Systems','Database Management Systems'],
+    ['Financial Accounting','Financial Accounting'],
+    ['Organic Chemistry','Organic Chemistry'],
+    ['Principles of Economics','Principles of Economics'],
+    ['General Mathematics','General Mathematics'],
+    ['Engineering Mechanics','Engineering Mechanics'],
+    ['Nigerian Constitutional Law','Nigerian Constitutional Law'],
+    ['Pharmacology','Pharmacology'],
+  ]:inst==='polytechnic'?[
+    ['ND Accountancy','ND Accountancy'],
+    ['ND Computer Science','ND Computer Science'],
+    ['ND Electrical Engineering','ND Electrical Engineering'],
+    ['HND Accountancy','HND Accountancy'],
+  ]:[
+    ['English Language Education NCE','English Language Education (NCE)'],
+    ['Mathematics Education NCE','Mathematics Education (NCE)'],
+  ];
+  sel.innerHTML=courses.map(([v,t])=>`<option value="${v}">${t}</option>`).join('');
+}
+
+async function startMockExam(){
+  mockTotal=parseInt(document.getElementById('mock-count').value)||20;
+  mockTimePerQ=parseInt(document.getElementById('mock-time').value)||90;
+  mockQuestions=new Array(mockTotal).fill(null);
+  mockAnswers=new Array(mockTotal).fill(null);
+  mockCurrent=0;
+
+  document.getElementById('mock-setup').classList.add('hidden');
+  document.getElementById('mock-results').classList.add('hidden');
+  document.getElementById('mock-active').classList.remove('hidden');
+  document.getElementById('mock-total').textContent=mockTotal;
+
+  buildNavDots();
+  await loadMockQuestion(0);
+}
+
+function buildNavDots(){
+  const nav=document.getElementById('mock-q-nav');
+  nav.innerHTML='';
+  for(let i=0;i<mockTotal;i++){
+    const b=document.createElement('button');
+    b.id=`mqnav-${i}`;
+    b.textContent=i+1;
+    b.className='w-8 h-8 rounded-lg text-xs font-600 border transition-all '+
+      (i===0?'border-lime/50 text-lime-DEFAULT':'border-white/12 text-white/30');
+    b.style.background=i===0?'rgba(163,230,53,0.12)':'rgba(255,255,255,0.04)';
+    b.onclick=()=>jumpToQuestion(i);
+    nav.appendChild(b);
+  }
+}
+
+async function loadMockQuestion(idx){
+  document.getElementById('mock-loading').classList.remove('hidden');
+  document.getElementById('mock-q-body').style.opacity='0';
+  document.getElementById('mock-q-num').textContent=idx+1;
+  updateMockProgress(idx);
+  clearInterval(mockTimerInterval);
+
+  const course=document.getElementById('mock-course').value;
+  document.getElementById('mock-course-label').textContent=course;
+
+  // Update nav dot to active
+  for(let i=0;i<mockTotal;i++){
+    const b=document.getElementById(`mqnav-${i}`);
+    if(!b)continue;
+    if(i===idx){
+      b.className='w-8 h-8 rounded-lg text-xs font-600 border transition-all border-lime/50 text-lime-DEFAULT';
+      b.style.background='rgba(163,230,53,0.12)';
+    } else if(mockAnswers[i]!==null){
+      const correct=mockQuestions[i]&&mockAnswers[i]===mockQuestions[i].correct;
+      b.className='w-8 h-8 rounded-lg text-xs font-600 border transition-all '+(correct?'border-green-500/50 text-green-400':'border-red-500/50 text-red-400');
+      b.style.background=correct?'rgba(16,185,129,0.1)':'rgba(220,38,38,0.1)';
+    }
+  }
+
+  const prompt=`You are an expert Nigerian higher education examiner. Generate ONE challenging multiple-choice exam question for "${course}".
+Return ONLY valid JSON:
+{"question":"?","options":{"A":"","B":"","C":"","D":""},"correct":"A","topic":"topic","explanation_correct":"why correct","explanation_A":"","explanation_B":"","explanation_C":"","explanation_D":""}`;
+
+  try{
+    if(!mockQuestions[idx]){
+      const resp=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:prompt}]})
+      });
+      const data=await resp.json();
+      const raw=data.content.map(i=>i.text||'').join('');
+      mockQuestions[idx]=JSON.parse(raw.replace(/```json|```/g,'').trim());
+    }
+  }catch(e){
+    if(!mockQuestions[idx]){
+      mockQuestions[idx]={
+        question:`Exam question ${idx+1} for ${course}: Which approach provides the best theoretical foundation?`,
+        options:{A:'First principles approach',B:'Empirical observation only',C:'Theoretical modeling combined with practical verification',D:'Memorization of formulas'},
+        correct:'C',topic:course,
+        explanation_correct:'Combining theoretical modeling with practical verification is the scientifically sound approach.',
+        explanation_A:'First principles alone neglect empirical validation.',
+        explanation_B:'Empirical observation without theory lacks predictive power.',
+        explanation_C:'Correct — this is the established scientific method.',
+        explanation_D:'Memorization without understanding fails in novel situations.'
+      };
+    }
+  }
+
+  document.getElementById('mock-loading').classList.add('hidden');
+  document.getElementById('mock-q-body').style.opacity='1';
+  const q=mockQuestions[idx];
+  document.getElementById('mock-q-text').textContent=q.question;
+  const optArea=document.getElementById('mock-options-area');
+  optArea.innerHTML='';
+  ['A','B','C','D'].forEach(k=>{
+    if(!q.options[k])return;
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.innerHTML=`<span class="font-700 mr-3 text-xs px-2 py-0.5 rounded-lg" style="background:rgba(255,255,255,0.07);">${k}</span>${q.options[k]}`;
+    btn.onclick=()=>handleMockAnswer(k,idx);
+    optArea.appendChild(btn);
+  });
+
+  // If already answered, show result state
+  if(mockAnswers[idx]!==null){
+    const ans=mockAnswers[idx];
+    optArea.querySelectorAll('.opt-btn').forEach((b,i)=>{
+      b.disabled=true;
+      const k=['A','B','C','D'][i];
+      if(k===q.correct)b.classList.add('correct');
+      else if(k===ans)b.classList.add('wrong');
+      else b.classList.add('dimmed');
+    });
+  } else {
+    startMockTimer(idx);
+  }
+  updateLiveScore();
+}
+
+function handleMockAnswer(chosen,idx){
+  if(mockAnswers[idx]!==null)return;
+  clearInterval(mockTimerInterval);
+  mockAnswers[idx]=chosen;
+  const q=mockQuestions[idx];
+  const optArea=document.getElementById('mock-options-area');
+  optArea.querySelectorAll('.opt-btn').forEach((b,i)=>{
+    b.disabled=true;
+    const k=['A','B','C','D'][i];
+    if(k===q.correct)b.classList.add('correct');
+    else if(k===chosen)b.classList.add('wrong');
+    else b.classList.add('dimmed');
+  });
+  // Update nav dot
+  const nb=document.getElementById(`mqnav-${idx}`);
+  if(nb){
+    const correct=(chosen===q.correct);
+    nb.className='w-8 h-8 rounded-lg text-xs font-600 border transition-all '+(correct?'border-green-500/50 text-green-400':'border-red-500/50 text-red-400');
+    nb.style.background=correct?'rgba(16,185,129,0.1)':'rgba(220,38,38,0.1)';
+  }
+  updateLiveScore();
+  setTimeout(()=>advanceMock(idx),900);
+}
+
+function advanceMock(idx){
+  const next=idx+1;
+  if(next>=mockTotal){showMockResults();}
+  else{mockCurrent=next;loadMockQuestion(next);}
+}
+
+function jumpToQuestion(idx){
+  mockCurrent=idx;loadMockQuestion(idx);
+}
+
+function updateLiveScore(){
+  let c=0,a=0;
+  mockAnswers.forEach((ans,i)=>{if(ans!==null){a++;if(mockQuestions[i]&&ans===mockQuestions[i].correct)c++;}});
+  document.getElementById('mock-live-score').textContent=`${c}/${a}`;
+}
+
+function updateMockProgress(idx){
+  const pct=Math.max(5,Math.round(((idx+0.5)/mockTotal)*100));
+  document.getElementById('mock-progress').style.width=pct+'%';
+}
+
+function startMockTimer(idx){
+  clearInterval(mockTimerInterval);
+  mockTimeLeft=mockTimePerQ;
+  updateMockTimerDisplay();
+  mockTimerInterval=setInterval(()=>{
+    mockTimeLeft--;
+    updateMockTimerDisplay();
+    if(mockTimeLeft<=0){
+      clearInterval(mockTimerInterval);
+      if(mockAnswers[idx]===null)mockAnswers[idx]='TIMEOUT';
+      const nb=document.getElementById(`mqnav-${idx}`);
+      if(nb){nb.className='w-8 h-8 rounded-lg text-xs font-600 border transition-all border-white/20 text-white/30';nb.style.background='rgba(255,255,255,0.04)';}
+      advanceMock(idx);
+    }
+  },1000);
+}
+
+function updateMockTimerDisplay(){
+  const el=document.getElementById('mock-timer-text');
+  const ring=document.getElementById('mock-timer-ring');
+  if(el)el.textContent=mockTimeLeft;
+  if(ring){
+    const r=32,circ=2*Math.PI*r;
+    const dashOffset=circ-(circ*(mockTimeLeft/mockTimePerQ));
+    ring.style.strokeDasharray=circ;
+    ring.style.strokeDashoffset=dashOffset;
+    ring.style.stroke=mockTimeLeft<=10?'#DC2626':mockTimeLeft<=20?'#F59E0B':'#F59E0B';
+  }
+  if(el)el.style.color=mockTimeLeft<=10?'#DC2626':mockTimeLeft<=20?'#F59E0B':'#F59E0B';
+}
+
+function showMockResults(){
+  clearInterval(mockTimerInterval);
+  document.getElementById('mock-active').classList.add('hidden');
+  document.getElementById('mock-results').classList.remove('hidden');
+
+  let correct=0;
+  const validQ=mockQuestions.filter(Boolean);
+  validQ.forEach((q,i)=>{if(mockAnswers[i]===q.correct)correct++;});
+  const total=validQ.length;
+  const pct=total>0?Math.round((correct/total)*100):0;
+
+  // Grade
+  let grade,desc,emoji,gClass;
+  if(pct>=75){grade='A1';desc='Distinction — Excellent Performance';emoji='🏆';gClass='grade-a1';}
+  else if(pct>=70){grade='B2';desc='Very Good — Strong Performance';emoji='🥇';gClass='grade-b2';}
+  else if(pct>=65){grade='B3';desc='Good — Above Average';emoji='🥈';gClass='grade-b3';}
+  else if(pct>=60){grade='C4';desc='Credit — Satisfactory';emoji='✅';gClass='grade-c4';}
+  else if(pct>=55){grade='C5';desc='Credit — Pass';emoji='✅';gClass='grade-c5';}
+  else if(pct>=50){grade='C6';desc='Credit — Minimum Pass';emoji='⚠️';gClass='grade-c6';}
+  else if(pct>=45){grade='D7';desc='Pass — Weak Performance';emoji='📚';gClass='grade-d7';}
+  else if(pct>=40){grade='E8';desc='Pass — Below Average';emoji='📖';gClass='grade-e8';}
+  else{grade='F9';desc='Fail — Requires Serious Review';emoji='❌';gClass='grade-f9';}
+
+  document.getElementById('result-emoji').textContent=emoji;
+  document.getElementById('result-grade-badge').textContent=grade;
+  document.getElementById('result-grade-badge').className=`inline-block px-10 py-4 rounded-2xl text-4xl font-display font-800 mb-4 ${gClass}`;
+  document.getElementById('result-desc').textContent=desc;
+  document.getElementById('result-score').textContent=`${correct} out of ${total} correct`;
+  document.getElementById('result-pct').textContent=`${pct}% · ${pct>=75?'TARGET ACHIEVED ✅':'Below 75% Target ⚠️'}`;
+
+  // Readiness meter
+  const mf=document.getElementById('result-meter-fill');
+  if(mf)mf.style.width=pct+'%';
+
+  // Topic breakdown
+  const topicMap={};
+  validQ.forEach((q,i)=>{
+    const t=q.topic||'General';
+    if(!topicMap[t])topicMap[t]={correct:0,total:0};
+    topicMap[t].total++;
+    if(mockAnswers[i]===q.correct)topicMap[t].correct++;
+  });
+
+  const bd=document.getElementById('result-breakdown');
+  bd.innerHTML=`
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+      <div class="text-center dash-stat p-4 rounded-xl"><div class="font-display font-800 text-2xl" style="color:#A3E635;">${correct}</div><div class="text-xs text-white/35 mt-0.5">Correct</div></div>
+      <div class="text-center dash-stat p-4 rounded-xl"><div class="font-display font-800 text-2xl" style="color:#DC2626;">${total-correct}</div><div class="text-xs text-white/35 mt-0.5">Wrong</div></div>
+      <div class="text-center dash-stat p-4 rounded-xl"><div class="font-display font-800 text-2xl text-white">${total}</div><div class="text-xs text-white/35 mt-0.5">Total</div></div>
+      <div class="text-center dash-stat p-4 rounded-xl"><div class="font-display font-800 text-2xl" style="color:${pct>=75?'#A3E635':'#F59E0B'};">${pct}%</div><div class="text-xs text-white/35 mt-0.5">Score</div></div>
+    </div>
+    <div class="space-y-3 mb-5">
+      ${Object.entries(topicMap).map(([topic,d])=>{
+        const tp=Math.round((d.correct/d.total)*100);
+        const col=tp>=75?'#A3E635':tp>=50?'#F59E0B':'#DC2626';
+        const bg=tp>=75?'linear-gradient(90deg,#064E3B,#A3E635)':tp>=50?'linear-gradient(90deg,#D97706,#F59E0B)':'linear-gradient(90deg,#991B1B,#DC2626)';
+        return `<div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-white/65">${topic}</span><span style="color:${col};font-weight:700;">${d.correct}/${d.total} · ${tp}%</span></div>
+          <div class="prog"><div class="prog-fill" style="width:${tp}%;background:${bg};"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="p-4 rounded-xl" style="background:rgba(163,230,53,0.06);border:1px solid rgba(163,230,53,0.15);">
+      <div class="text-xs font-700 mb-1.5" style="color:#A3E635;">📋 Examiner's Recommendation</div>
+      <p class="text-white/50 text-sm leading-relaxed">${pct>=75
+        ?`Excellent! Grade ${grade} at ${pct}% — you've achieved the 75% DealxExam target. Review any topics below 80% to build an even stronger foundation for the real exam.`
+        :pct>=60
+        ?`Grade ${grade} at ${pct}% — you're close to the 75% target. Focus revision on your lowest-scoring topics. 2–3 more targeted practice sessions should push you above 75%.`
+        :`Grade ${grade} at ${pct}% — your score is below the 75% target. Use the Exam Lab to intensively practice your weakest topics. The ResultsGuard™ protects your subscription if you complete the recommended program.`
+      }</p>
+    </div>`;
+
+  // Review questions
+  document.getElementById('result-review').innerHTML=validQ.map((q,i)=>{
+    const isC=mockAnswers[i]===q.correct;
+    const chosen=mockAnswers[i]==='TIMEOUT'?'⏱️ Timed Out':(mockAnswers[i]||'—');
+    return `<div class="mb-4 p-4 rounded-xl border ${isC?'border-green-500/15':'border-red-500/15'}" style="${isC?'background:rgba(16,185,129,0.05)':'background:rgba(220,38,38,0.05)'}">
+      <div class="flex items-start gap-3 mb-2"><span class="flex-shrink-0">${isC?'✅':'❌'}</span><p class="text-white/75 text-sm leading-relaxed">${q.question}</p></div>
+      ${!isC?`<div class="text-xs mb-1.5" style="color:#FCA5A5;">Your answer: <strong>${chosen}</strong> · Correct: <strong>${q.correct}</strong></div><p class="text-white/45 text-xs leading-relaxed">${q['explanation_correct']||q['explanation_'+q.correct]||''}</p>`
+      :`<p class="text-xs" style="color:#6EE7B7;">${q['explanation_correct']||q['explanation_'+q.correct]||'Well done!'}</p>`}
+    </div>`;
+  }).join('');
+
+  if(pct>=75)showToast(`🏆 Grade ${grade}! ${pct}% — Target achieved!`);
+  else showToast(`Grade ${grade} · ${pct}% · Target: 75%. Keep practicing!`);
+}
+
+function restartMock(){
+  clearInterval(mockTimerInterval);
+  mockQuestions=[];mockAnswers=[];mockCurrent=0;
+  document.getElementById('mock-results').classList.add('hidden');
+  document.getElementById('mock-active').classList.add('hidden');
+  document.getElementById('mock-setup').classList.remove('hidden');
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded',()=>{
+  // Hide non-active level panes
+  document.querySelectorAll('.ul-level-pane:not(#ul-100)').forEach(p=>p.classList.add('hidden'));
+  document.querySelectorAll('.pl-level-pane:not(#pl-nd)').forEach(p=>p.classList.add('hidden'));
+
+  // Hero meter animation
+  setTimeout(()=>{
+    const m=document.getElementById('hero-meter');
+    if(m){m.style.width='0%';setTimeout(()=>{m.style.width='78%';},200);}
+  },800);
+
+  // Smooth scroll for all anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      const t=document.querySelector(a.getAttribute('href'));
+      if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CollegeCBT — Dashboard, Pricing & Account | Results as a Service</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Bebas+Neue&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{
+  --bg:#0d0820;--violet:#7c3aed;--violet-light:#a78bfa;
+  --lime:#84cc16;--amber:#f59e0b;--rose:#e11d48;
+  --glass:rgba(255,255,255,0.05);--glass-border:rgba(255,255,255,0.10);
+  --text:#ffffff;--muted:#94a3b8;--card:#1a1535;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6;}
+::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--bg);}::-webkit-scrollbar-thumb{background:var(--violet);border-radius:3px;}
+
+/* BG */
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.orb{position:absolute;border-radius:50%;filter:blur(90px);animation:drift 14s ease-in-out infinite alternate;}
+.orb-1{width:600px;height:600px;background:rgba(124,58,237,0.13);top:-150px;right:-100px;}
+.orb-2{width:400px;height:400px;background:rgba(132,204,22,0.07);bottom:0;left:-80px;animation-delay:-5s;}
+.orb-3{width:300px;height:300px;background:rgba(245,158,11,0.06);top:40%;left:40%;animation-delay:-8s;}
+@keyframes drift{0%{transform:translate(0,0);}100%{transform:translate(30px,20px) scale(1.08);}}
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.018) 1px,transparent 1px);
+  background-size:60px 60px;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 1.25rem;
+  border-bottom:1px solid var(--glass-border);backdrop-filter:blur(20px);
+  background:rgba(13,8,32,0.9);transition:background 0.3s;}
+.ni{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:68px;}
+.logo{font-family:'DM Serif Display',serif;font-size:1.5rem;letter-spacing:-0.02em;
+  background:linear-gradient(135deg,#fff 40%,var(--violet-light));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;}
+.logo span{-webkit-text-fill-color:var(--lime);}
+.nav-links{display:flex;gap:0.2rem;align-items:center;}
+.nl{padding:0.45rem 0.8rem;border-radius:8px;color:var(--muted);font-size:0.86rem;font-weight:500;
+  text-decoration:none;transition:all 0.2s;white-space:nowrap;}
+.nl:hover,.nl.on{color:#fff;background:var(--glass);}
+.nl.on{color:var(--violet-light);}
+.nav-act{display:flex;gap:0.5rem;align-items:center;}
+.bg{padding:0.5rem 1rem;border-radius:10px;border:1px solid var(--glass-border);
+  background:transparent;color:#fff;font-size:0.86rem;font-weight:500;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;}
+.bg:hover{background:var(--glass);border-color:var(--violet);}
+.bp{padding:0.5rem 1.2rem;border-radius:10px;background:var(--violet);border:1px solid rgba(124,58,237,0.5);
+  color:#fff;font-size:0.86rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;
+  transition:all 0.2s;box-shadow:0 0 20px rgba(124,58,237,0.3);text-decoration:none;display:inline-flex;align-items:center;}
+.bp:hover{background:#6d28d9;}
+.ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:8px;
+  border-radius:8px;background:var(--glass);border:1px solid var(--glass-border);}
+.ham span{display:block;width:22px;height:2px;background:#fff;border-radius:2px;transition:all 0.3s;}
+.ham.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+.ham.open span:nth-child(2){opacity:0;}
+.ham.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+.mob-nav{display:none;position:fixed;top:68px;left:0;right:0;z-index:99;
+  background:rgba(13,8,32,0.98);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--glass-border);padding:1rem;flex-direction:column;gap:0.5rem;}
+.mob-nav.open{display:flex;}
+.mob-nav .nl{display:block;padding:0.75rem 1rem;font-size:1rem;}
+.mob-act{flex-direction:column;gap:0.5rem;padding-top:0.75rem;display:flex;}
+.mob-act .bg,.mob-act .bp{width:100%;padding:0.75rem;text-align:center;justify-content:center;}
+
+/* PAGE */
+.pw{max-width:1280px;margin:0 auto;padding:90px 1.25rem 4rem;position:relative;z-index:1;}
+section{position:relative;z-index:1;}
+.sec{padding:5rem 1.25rem;}
+.sec-inner{max-width:1280px;margin:0 auto;}
+.sec-tag{display:inline-flex;align-items:center;gap:0.5rem;color:var(--violet-light);
+  font-size:0.78rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1rem;}
+.sec-h{font-family:'DM Serif Display',serif;font-size:clamp(1.8rem,3.5vw,2.8rem);
+  line-height:1.1;letter-spacing:-0.02em;margin-bottom:0.75rem;}
+.sec-d{color:var(--muted);font-size:1rem;max-width:600px;line-height:1.7;}
+.hl{background:linear-gradient(135deg,var(--violet-light),var(--lime));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+
+/* GLASS CARD */
+.gc{background:var(--glass);backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:16px;}
+
+/* ======== DASHBOARD ======== */
+#dashboard{padding-top:5rem;}
+.dash-wrap{display:grid;grid-template-columns:240px 1fr;gap:2rem;min-height:70vh;}
+
+/* sidebar */
+.d-sidebar{background:var(--glass);border:1px solid var(--glass-border);border-radius:20px;
+  padding:1.5rem;height:fit-content;position:sticky;top:90px;}
+.d-avatar{width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,var(--violet),#a855f7);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;margin:0 auto 0.75rem;border:3px solid rgba(124,58,237,0.4);}
+.d-name{text-align:center;font-weight:700;font-size:0.95rem;}
+.d-email{text-align:center;font-size:0.75rem;color:var(--muted);margin-top:0.2rem;}
+.d-plan{display:inline-flex;align-items:center;gap:0.3rem;margin:0.5rem auto 0;
+  padding:0.25rem 0.6rem;border-radius:100px;
+  background:rgba(132,204,22,0.12);border:1px solid rgba(132,204,22,0.25);
+  color:var(--lime);font-size:0.7rem;font-weight:600;display:flex;justify-content:center;}
+.d-divider{border:none;border-top:1px solid var(--glass-border);margin:1.25rem 0;}
+.d-nav{display:flex;flex-direction:column;gap:0.3rem;}
+.d-btn{display:flex;align-items:center;gap:0.6rem;padding:0.65rem 0.85rem;border-radius:10px;
+  border:none;background:transparent;color:var(--muted);font-size:0.86rem;font-weight:500;
+  cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;text-align:left;width:100%;}
+.d-btn:hover{background:var(--glass);color:#fff;}
+.d-btn.on{background:rgba(124,58,237,0.2);border:1px solid rgba(124,58,237,0.3);color:var(--violet-light);}
+.d-btn .ico{width:20px;text-align:center;}
+
+/* panels */
+.d-main{min-width:0;}
+.d-panel{display:none;}
+.d-panel.on{display:block;}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.75rem;}
+.kpi{padding:1.25rem;border-radius:14px;background:var(--glass);border:1px solid var(--glass-border);position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--c,var(--violet));}
+.kpi-ico{font-size:1.4rem;margin-bottom:0.7rem;}
+.kpi-v{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--c,var(--violet-light));line-height:1;}
+.kpi-l{font-size:0.75rem;color:var(--muted);margin-top:0.2rem;}
+.kpi-ch{font-size:0.73rem;color:var(--lime);margin-top:0.4rem;}
+
+/* readiness */
+.ri-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.75rem;}
+.ri-card{padding:1.5rem;border-radius:16px;background:var(--glass);border:1px solid var(--glass-border);}
+.ri-title{font-weight:700;font-size:0.95rem;margin-bottom:0.4rem;}
+.ri-sub{font-size:0.78rem;color:var(--muted);margin-bottom:1rem;}
+/* gauge */
+.gauge-wrap{width:140px;height:70px;position:relative;margin:0 auto 0.5rem;overflow:hidden;}
+.gauge-bg{width:140px;height:70px;border-radius:140px 140px 0 0;border:10px solid rgba(255,255,255,0.06);border-bottom:none;position:absolute;bottom:0;}
+.gauge-fg{width:140px;height:70px;border-radius:140px 140px 0 0;border:10px solid var(--lime);border-bottom:none;position:absolute;bottom:0;transform-origin:50% 100%;transition:transform 1.2s ease;}
+.gauge-num{position:absolute;bottom:4px;left:0;right:0;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:1.6rem;color:var(--lime);}
+.gauge-label{text-align:center;font-size:0.78rem;color:var(--muted);}
+
+/* chart */
+.chart-card{padding:1.5rem;border-radius:16px;background:var(--glass);border:1px solid var(--glass-border);margin-bottom:1.75rem;}
+.chart-h{font-weight:700;font-size:0.95rem;margin-bottom:1.25rem;}
+.bars{display:flex;align-items:flex-end;gap:8px;height:140px;padding-bottom:24px;position:relative;}
+.bar{flex:1;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#a855f7,var(--violet));min-width:18px;position:relative;cursor:pointer;transition:opacity 0.2s;}
+.bar:hover{opacity:0.8;}
+.bar-lbl{position:absolute;bottom:-20px;left:50%;transform:translateX(-50%);font-size:0.62rem;color:var(--muted);white-space:nowrap;}
+.bar-val{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:0.68rem;color:var(--violet-light);font-family:'JetBrains Mono',monospace;}
+.bar-line{position:absolute;left:0;right:0;border-top:1px dashed rgba(132,204,22,0.3);top:calc(100% * (1 - 75/100) - 24px);}
+.bar-line-label{position:absolute;right:0;font-size:0.62rem;color:rgba(132,204,22,0.6);top:-14px;}
+
+/* heatmap */
+.heat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:0.75rem;}
+.heat-cell{padding:0.85rem;border-radius:12px;background:var(--glass);border:1px solid var(--glass-border);}
+.heat-topic{font-size:0.78rem;font-weight:600;color:#e2e8f0;margin-bottom:0.5rem;}
+.heat-bar{height:5px;border-radius:3px;background:var(--glass-border);overflow:hidden;margin-bottom:0.35rem;}
+.heat-fill{height:100%;border-radius:3px;}
+.heat-pct{font-family:'JetBrains Mono',monospace;font-size:0.75rem;}
+
+/* activity */
+.act-feed{display:flex;flex-direction:column;gap:0.75rem;}
+.act-item{display:flex;align-items:center;gap:1rem;padding:0.85rem 1rem;border-radius:12px;background:var(--glass);border:1px solid var(--glass-border);}
+.act-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.act-txt{flex:1;min-width:0;}
+.act-ttl{font-size:0.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.act-meta{font-size:0.73rem;color:var(--muted);}
+.act-badge{padding:0.2rem 0.6rem;border-radius:100px;font-size:0.7rem;font-weight:600;white-space:nowrap;}
+
+/* recs */
+.rec-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;}
+.rec-card{padding:1.1rem;border-radius:14px;background:var(--glass);border:1px solid var(--glass-border);cursor:pointer;transition:all 0.2s;}
+.rec-card:hover{border-color:var(--violet);transform:translateY(-2px);}
+.rec-ico{font-size:1.4rem;margin-bottom:0.4rem;}
+.rec-title{font-weight:600;font-size:0.83rem;margin-bottom:0.2rem;}
+.rec-meta{font-size:0.73rem;color:var(--muted);}
+.rec-cta{font-size:0.78rem;color:var(--violet-light);font-weight:600;margin-top:0.5rem;}
+
+/* prediction rows */
+.pred-row{display:flex;align-items:center;justify-content:space-between;
+  padding:0.8rem 1rem;border-radius:10px;border:1px solid var(--glass-border);background:rgba(0,0,0,0.15);}
+
+/* ======== PRICING ======== */
+.price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:3rem;}
+.p-card{padding:2rem;border-radius:20px;background:var(--glass);border:1px solid var(--glass-border);position:relative;transition:all 0.3s;}
+.p-card:hover{transform:translateY(-5px);}
+.p-card.feat{background:linear-gradient(135deg,rgba(124,58,237,0.22),rgba(168,85,247,0.12));
+  border-color:rgba(124,58,237,0.5);box-shadow:0 24px 60px rgba(124,58,237,0.2);}
+.p-badge{position:absolute;top:-13px;left:50%;transform:translateX(-50%);
+  padding:0.3rem 1rem;border-radius:100px;background:var(--violet);color:#fff;
+  font-size:0.73rem;font-weight:700;white-space:nowrap;}
+.p-plan{font-size:0.82rem;font-weight:600;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.75rem;}
+.p-amount{font-family:'Bebas Neue',sans-serif;font-size:3.5rem;line-height:1;color:#fff;}
+.p-amount sup{font-size:1.4rem;font-family:'DM Sans',sans-serif;font-weight:700;vertical-align:super;}
+.p-period{font-size:0.82rem;color:var(--muted);margin-bottom:1.5rem;margin-top:0.2rem;}
+.p-feats{display:flex;flex-direction:column;gap:0.55rem;margin-bottom:1.75rem;}
+.pf{display:flex;align-items:flex-start;gap:0.55rem;font-size:0.86rem;}
+.pf-y{color:var(--lime);flex-shrink:0;margin-top:2px;}
+.pf-n{color:var(--rose);flex-shrink:0;margin-top:2px;}
+.pf-n~span{color:var(--muted);}
+.p-btn{width:100%;padding:0.875rem;border-radius:12px;font-size:0.925rem;font-weight:700;
+  cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.25s;border:1px solid;}
+.p-btn-free{background:transparent;color:#fff;border-color:var(--glass-border);}
+.p-btn-free:hover{background:var(--glass);}
+.p-btn-pro{background:var(--violet);color:#fff;border-color:rgba(124,58,237,0.5);
+  box-shadow:0 0 28px rgba(124,58,237,0.3);}
+.p-btn-pro:hover{background:#6d28d9;box-shadow:0 0 50px rgba(124,58,237,0.5);}
+.p-btn-inst{background:rgba(132,204,22,0.15);color:var(--lime);border-color:rgba(132,204,22,0.35);}
+.p-btn-inst:hover{background:rgba(132,204,22,0.25);}
+
+/* paystack */
+.pay-strip{display:flex;align-items:center;justify-content:center;gap:0.75rem;
+  margin-top:2.5rem;padding:1rem;border-radius:12px;background:rgba(0,0,0,0.3);
+  border:1px solid var(--glass-border);}
+.pay-txt{font-size:0.8rem;color:var(--muted);}
+.pay-logo{height:22px;display:inline-flex;align-items:center;
+  background:#00C3F7;padding:3px 10px;border-radius:6px;
+  font-family:'DM Sans',sans-serif;font-weight:800;font-size:0.82rem;color:#fff;}
+
+/* ======== TESTIMONIALS ======== */
+.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2.5rem;}
+.test-card{padding:1.75rem;border-radius:16px;background:var(--glass);border:1px solid var(--glass-border);position:relative;}
+.test-card::before{content:'"';position:absolute;top:1rem;right:1.25rem;
+  font-size:3rem;color:rgba(124,58,237,0.2);font-family:'DM Serif Display',serif;line-height:1;}
+.test-q{font-size:0.92rem;color:#e2e8f0;line-height:1.7;font-style:italic;margin-bottom:1.25rem;}
+.test-auth{display:flex;align-items:center;gap:0.75rem;}
+.test-av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.test-name{font-weight:700;font-size:0.86rem;}
+.test-meta{font-size:0.73rem;color:var(--muted);}
+.test-grade{font-family:'JetBrains Mono',monospace;font-size:0.78rem;font-weight:600;color:var(--lime);}
+
+/* ======== FAQ ======== */
+.faq-list{display:flex;flex-direction:column;gap:0.75rem;margin-top:2rem;}
+.faq-item{border:1px solid var(--glass-border);border-radius:14px;background:var(--glass);overflow:hidden;}
+.faq-q{display:flex;align-items:center;justify-content:space-between;
+  padding:1.1rem 1.4rem;cursor:pointer;font-weight:600;font-size:0.92rem;transition:color 0.2s;}
+.faq-q:hover{color:var(--violet-light);}
+.faq-ico{font-size:1.1rem;transition:transform 0.3s;flex-shrink:0;}
+.faq-item.open .faq-ico{transform:rotate(45deg);}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease;}
+.faq-item.open .faq-a{max-height:400px;}
+.faq-a-inner{padding:0 1.4rem 1.1rem;color:var(--muted);font-size:0.86rem;line-height:1.7;}
+
+/* ======== AUTH FORMS ======== */
+.auth-section{padding:6rem 1.25rem 4rem;min-height:90vh;display:flex;align-items:center;justify-content:center;}
+.auth-wrap{width:100%;max-width:580px;}
+.auth-tabs{display:flex;gap:0.5rem;margin-bottom:2rem;
+  border:1px solid var(--glass-border);border-radius:14px;padding:0.4rem;background:rgba(0,0,0,0.25);}
+.auth-tab{flex:1;padding:0.65rem;border-radius:10px;border:none;background:transparent;
+  color:var(--muted);font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;}
+.auth-tab.on{background:var(--violet);color:#fff;}
+.auth-panel{display:none;}
+.auth-panel.on{display:block;}
+.auth-card{background:var(--glass);backdrop-filter:blur(20px);border:1px solid var(--glass-border);
+  border-radius:20px;padding:2rem;position:relative;overflow:hidden;}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--violet),var(--lime));}
+.auth-h{font-family:'DM Serif Display',serif;font-size:1.7rem;margin-bottom:0.4rem;}
+.auth-sub{color:var(--muted);font-size:0.86rem;margin-bottom:1.5rem;}
+
+/* step progress */
+.step-prog{display:flex;align-items:center;gap:0;margin-bottom:2rem;}
+.step-node{display:flex;flex-direction:column;align-items:center;gap:0.2rem;}
+.step-circle{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:0.78rem;font-weight:700;border:2px solid var(--glass-border);color:var(--muted);transition:all 0.3s;}
+.step-circle.act{border-color:var(--violet);background:var(--violet);color:#fff;}
+.step-circle.done{border-color:var(--lime);background:rgba(132,204,22,0.18);color:var(--lime);}
+.step-txt{font-size:0.65rem;color:var(--muted);white-space:nowrap;}
+.step-line{flex:1;height:2px;background:var(--glass-border);margin:0 0.4rem;margin-bottom:18px;border-radius:1px;transition:background 0.3s;}
+.step-line.done{background:var(--lime);}
+
+/* form */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;margin-bottom:0.875rem;}
+.fg-1{grid-template-columns:1fr;}
+.f-group{display:flex;flex-direction:column;gap:0.35rem;}
+.f-lbl{font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;}
+.f-inp,.f-sel{
+  padding:0.7rem 1rem;border-radius:10px;border:1px solid var(--glass-border);
+  background:rgba(0,0,0,0.2);color:#fff;font-size:0.86rem;font-family:'DM Sans',sans-serif;
+  transition:border-color 0.2s;appearance:none;width:100%;}
+.f-sel{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M5 7L0 2h10z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;
+  background-color:rgba(0,0,0,0.2);padding-right:2rem;}
+.f-inp:focus,.f-sel:focus{outline:none;border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,58,237,0.15);}
+.f-inp::placeholder{color:var(--muted);}
+.f-sel option{background:#1a1535;color:#fff;}
+.f-hint{font-size:0.7rem;color:var(--muted);margin-top:0.2rem;}
+/* pw strength */
+.pw-bar{height:3px;border-radius:2px;background:var(--glass-border);overflow:hidden;margin-top:0.4rem;}
+.pw-fill{height:100%;border-radius:2px;width:0;transition:all 0.3s;}
+/* actions */
+.f-acts{display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap;}
+.btn-next-step{padding:0.8rem 2rem;border-radius:12px;background:var(--violet);color:#fff;
+  border:1px solid rgba(124,58,237,0.4);font-size:0.92rem;font-weight:700;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all 0.25s;box-shadow:0 0 24px rgba(124,58,237,0.3);}
+.btn-next-step:hover{background:#6d28d9;}
+.btn-back-step{padding:0.8rem 1.5rem;border-radius:12px;background:transparent;color:var(--muted);
+  border:1px solid var(--glass-border);font-size:0.92rem;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all 0.2s;}
+.btn-back-step:hover{background:var(--glass);color:#fff;}
+
+/* ======== FOOTER ======== */
+footer{background:rgba(0,0,0,0.55);border-top:1px solid var(--glass-border);padding:4rem 1.25rem 2rem;position:relative;z-index:1;}
+.footer-inner{max-width:1280px;margin:0 auto;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem;}
+.ft-brand .logo{font-size:1.75rem;display:inline-block;margin-bottom:1rem;}
+.ft-tag{color:var(--muted);font-size:0.86rem;line-height:1.7;max-width:260px;margin-bottom:1.25rem;}
+.ft-social{display:flex;gap:0.6rem;}
+.ft-soc{width:36px;height:36px;border-radius:10px;border:1px solid var(--glass-border);
+  background:var(--glass);display:flex;align-items:center;justify-content:center;
+  font-size:0.9rem;cursor:pointer;transition:all 0.2s;text-decoration:none;}
+.ft-soc:hover{border-color:var(--violet);background:rgba(124,58,237,0.15);}
+.ft-col-h{font-weight:700;font-size:0.88rem;margin-bottom:1rem;color:#fff;}
+.ft-links{display:flex;flex-direction:column;gap:0.5rem;}
+.ft-link{color:var(--muted);font-size:0.86rem;text-decoration:none;transition:color 0.2s;}
+.ft-link:hover{color:var(--violet-light);}
+.ft-bottom{display:flex;align-items:center;justify-content:space-between;
+  padding-top:2rem;border-top:1px solid var(--glass-border);flex-wrap:wrap;gap:1rem;}
+.ft-copy{color:var(--muted);font-size:0.78rem;}
+.status-pill{display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.8rem;
+  border-radius:100px;background:rgba(132,204,22,0.1);border:1px solid rgba(132,204,22,0.2);}
+.s-dot{width:6px;height:6px;border-radius:50%;background:var(--lime);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.s-txt{font-size:0.73rem;color:var(--lime);font-weight:600;}
+.ft-legal{display:flex;gap:1.25rem;flex-wrap:wrap;}
+.ft-legal a{color:var(--muted);font-size:0.78rem;text-decoration:none;}
+.ft-legal a:hover{color:var(--violet-light);}
+.ai-badge{font-size:0.76rem;color:var(--muted);}
+.ai-badge strong{color:var(--violet-light);}
+
+/* PARTS NAV */
+.parts-nav{padding:1.25rem;background:rgba(0,0,0,0.4);border-top:1px solid var(--glass-border);position:relative;z-index:1;}
+.pn-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.pn-title{font-size:0.85rem;color:var(--muted);}
+.pn-links{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.p-link{padding:0.45rem 0.9rem;border-radius:8px;font-size:0.78rem;font-weight:600;
+  text-decoration:none;border:1px solid var(--glass-border);color:var(--muted);transition:all 0.2s;}
+.p-link:hover,.p-link.cur{background:var(--violet);border-color:var(--violet);color:#fff;}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;z-index:999;padding:1rem 1.5rem;border-radius:14px;
+  background:var(--card);border:1px solid var(--glass-border);box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  transform:translateY(100px);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast-t{font-weight:700;font-size:0.9rem;margin-bottom:0.2rem;}
+.toast-m{font-size:0.8rem;color:var(--muted);}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .dash-wrap{grid-template-columns:1fr;}
+  .d-sidebar{position:static;}
+  .d-nav{flex-direction:row;flex-wrap:wrap;}
+  .d-btn{width:auto;}
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .ri-row{grid-template-columns:1fr;}
+  .price-grid{grid-template-columns:1fr;}
+  .test-grid{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:2rem;}
+  .fg{grid-template-columns:1fr;}
+}
+@media(max-width:768px){
+  .nav-links,.nav-act{display:none;}
+  .ham{display:flex;}
+  .kpi-row{grid-template-columns:repeat(2,1fr);}
+  .footer-grid{grid-template-columns:1fr;}
+  .heat-grid{grid-template-columns:repeat(2,1fr);}
+  .rec-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){
+  .kpi-row{grid-template-columns:1fr;}
+  .rec-grid{grid-template-columns:1fr;}
+  .auth-card{padding:1.5rem;}
+  .fg{grid-template-columns:1fr;}
+  .p-amount{font-size:2.8rem;}
+}
+</style>
+</head>
+<body>
+<div class="bg-mesh"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav id="topNav">
+  <div class="ni">
+    <a href="collegecbt-part1.html" class="logo">College<span>CBT</span></a>
+    <div class="nav-links">
+      <a href="collegecbt-part1.html#features" class="nl">Features</a>
+      <a href="collegecbt-part1.html#curriculum" class="nl">Curriculum</a>
+      <a href="collegecbt-part2.html" class="nl">Exam Lab</a>
+      <a href="#pricing" class="nl">Pricing</a>
+      <a href="#dashboard" class="nl on">Dashboard</a>
+    </div>
+    <div class="nav-act">
+      <button class="bg" onclick="showAuth('login')">Sign In</button>
+      <button class="bp" onclick="showAuth('signup')">Get Started →</button>
+    </div>
+    <div class="ham" id="ham" onclick="toggleMob()"><span></span><span></span><span></span></div>
+  </div>
+</nav>
+<div class="mob-nav" id="mobNav">
+  <a href="collegecbt-part1.html" class="nl">🏠 Home</a>
+  <a href="collegecbt-part2.html" class="nl">🤖 Exam Lab</a>
+  <a href="#pricing" class="nl" onclick="closeMob()">💰 Pricing</a>
+  <a href="#dashboard" class="nl" onclick="closeMob()">📊 Dashboard</a>
+  <a href="#faq" class="nl" onclick="closeMob()">❓ FAQ</a>
+  <div class="mob-act">
+    <button class="bg" onclick="showAuth('login')">Sign In</button>
+    <button class="bp" onclick="showAuth('signup')">Get Started Free →</button>
+  </div>
+</div>
+
+<div class="pw">
+
+<!-- ============ DASHBOARD ============ -->
+<section id="dashboard">
+  <div style="margin-bottom:0.75rem;" class="sec-tag">📊 Student Dashboard</div>
+  <h2 class="sec-h">Your Results Intelligence<br/>Command Centre</h2>
+  <p class="sec-d" style="margin-bottom:2rem;">Track performance, readiness score, topic heatmaps and grade predictions — all powered by AI.</p>
+
+  <div class="dash-wrap">
+    <!-- SIDEBAR -->
+    <div class="d-sidebar">
+      <div class="d-avatar">🎓</div>
+      <div class="d-name">Adaobi Chukwu</div>
+      <div class="d-email">adaobi@unn.edu.ng</div>
+      <div style="text-align:center;"><span class="d-plan">⭐ Pro Student</span></div>
+      <hr class="d-divider"/>
+      <div class="d-nav">
+        <button class="d-btn on" onclick="switchDash('overview')"><span class="ico">📊</span> Overview</button>
+        <button class="d-btn" onclick="switchDash('results')"><span class="ico">🎯</span> Results Intelligence</button>
+        <button class="d-btn" onclick="switchDash('activity')"><span class="ico">📋</span> Activity</button>
+        <button class="d-btn" onclick="switchDash('settings')"><span class="ico">⚙️</span> Settings</button>
+        <hr class="d-divider" style="margin:0.5rem 0;"/>
+        <button class="d-btn" onclick="window.location.href='collegecbt-part2.html'"><span class="ico">🤖</span> Go to Exam Lab →</button>
+        <button class="d-btn" onclick="window.location.href='collegecbt-part2.html#mock'"><span class="ico">⏱️</span> Take Mock Exam →</button>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="d-main">
+
+      <!-- OVERVIEW -->
+      <div class="d-panel on" id="dash-overview">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;">
+          <div>
+            <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;">Good morning, Adaobi! 👋</div>
+            <div style="color:var(--muted);font-size:0.83rem;margin-top:0.25rem;">300L Computer Science · University of Nigeria, Nsukka</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;border-radius:12px;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);">
+            <span>🔥</span><span style="font-weight:700;color:var(--amber);">14-Day Streak</span>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-row">
+          <div class="kpi" style="--c:var(--violet-light);">
+            <div class="kpi-ico">📝</div><div class="kpi-v">342</div>
+            <div class="kpi-l">Questions Answered</div><div class="kpi-ch">↑ +28 this week</div>
+          </div>
+          <div class="kpi" style="--c:var(--lime);">
+            <div class="kpi-ico">🏆</div><div class="kpi-v">12</div>
+            <div class="kpi-l">Mock Exams Taken</div><div class="kpi-ch">Best: A1 (82%)</div>
+          </div>
+          <div class="kpi" style="--c:var(--amber);">
+            <div class="kpi-ico">📈</div><div class="kpi-v">71%</div>
+            <div class="kpi-l">Average Score</div><div class="kpi-ch">↑ +6% this month</div>
+          </div>
+          <div class="kpi" style="--c:#22d3ee;">
+            <div class="kpi-ico">🎯</div><div class="kpi-v">78</div>
+            <div class="kpi-l">AI Readiness Score</div><div class="kpi-ch">Target: 85+</div>
+          </div>
+        </div>
+
+        <!-- Readiness + Prediction -->
+        <div class="ri-row">
+          <div class="ri-card">
+            <div class="ri-title">🎯 AI Readiness Score</div>
+            <div class="ri-sub">Based on 342 questions & 12 mock exams</div>
+            <div class="gauge-wrap">
+              <div class="gauge-bg"></div>
+              <div class="gauge-fg" id="gaugeEl" style="transform:rotate(0deg);"></div>
+              <div class="gauge-num" id="gaugeNum">0</div>
+            </div>
+            <div class="gauge-label">/ 100 — <span style="color:var(--lime);">Exam Ready</span></div>
+            <div style="margin-top:1rem;padding:0.75rem;border-radius:10px;
+              background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.2);
+              font-size:0.8rem;color:#a3e635;">
+              📈 At current pace, you'll reach 85+ within 2 weeks of consistent practice.
+            </div>
+          </div>
+          <div class="ri-card">
+            <div class="ri-title">🔮 Grade Prediction</div>
+            <div class="ri-sub">DBMS End-of-Semester Exam</div>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;">
+              <div class="pred-row" style="background:rgba(132,204,22,0.08);border-color:rgba(132,204,22,0.25);">
+                <span style="font-size:0.85rem;">Predicted Grade</span>
+                <span style="font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--lime);">B2 — 72%</span>
+              </div>
+              <div class="pred-row" style="background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.25);">
+                <span style="font-size:0.85rem;">National Benchmark</span>
+                <span style="font-size:0.83rem;color:var(--violet-light);">Top 27% of 300L CS</span>
+              </div>
+              <div class="pred-row" style="background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.25);">
+                <span style="font-size:0.85rem;">To reach A1 (75%+)</span>
+                <span style="font-size:0.83rem;color:var(--amber);">12 more correct answers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grade Chart -->
+        <div class="chart-card">
+          <div class="chart-h">📈 Grade Trajectory — Last 10 Mock Exams</div>
+          <div class="bars" id="barChart">
+            <div class="bar-line"><span class="bar-line-label">75% target</span></div>
+          </div>
+        </div>
+
+        <!-- Recommended Topics -->
+        <div style="margin-bottom:1.5rem;">
+          <div style="font-weight:700;font-size:0.95rem;margin-bottom:0.3rem;">🔥 Recommended Next Topics</div>
+          <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem;">Based on your weak areas from recent sessions</div>
+          <div class="rec-grid">
+            <div class="rec-card" onclick="window.location.href='collegecbt-part2.html'">
+              <div class="rec-ico">🗄️</div>
+              <div class="rec-title">Database Normalization</div>
+              <div class="rec-meta">DBMS · 300L · 45% avg</div>
+              <div class="rec-cta">Start Practising →</div>
+            </div>
+            <div class="rec-card" onclick="window.location.href='collegecbt-part2.html'">
+              <div class="rec-ico">🌐</div>
+              <div class="rec-title">TCP/IP Protocol Suite</div>
+              <div class="rec-meta">Networks · 300L · 62% avg</div>
+              <div class="rec-cta">Start Practising →</div>
+            </div>
+            <div class="rec-card" onclick="window.location.href='collegecbt-part2.html'">
+              <div class="rec-ico">⚡</div>
+              <div class="rec-title">Algorithm Complexity</div>
+              <div class="rec-meta">Data Structures · 300L</div>
+              <div class="rec-cta">Start Practising →</div>
+            </div>
+            <div class="rec-card" onclick="window.location.href='collegecbt-part2.html'">
+              <div class="rec-ico">🔍</div>
+              <div class="rec-title">SQL Query Optimization</div>
+              <div class="rec-meta">DBMS · 300L · 58% avg</div>
+              <div class="rec-cta">Start Practising →</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS INTELLIGENCE -->
+      <div class="d-panel" id="dash-results">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem;">🎯 Results Intelligence (RaaS)</div>
+        <div style="color:var(--muted);font-size:0.86rem;margin-bottom:2rem;">Outcome tracking — performance trends, topic mastery, and grade forecasting.</div>
+
+        <div class="chart-card">
+          <div class="chart-h">📊 Topic Performance Heatmap</div>
+          <div class="heat-grid">
+            <div class="heat-cell"><div class="heat-topic">DBMS Normalization</div><div class="heat-bar"><div class="heat-fill" style="width:45%;background:var(--rose);"></div></div><div class="heat-pct" style="color:var(--rose);">45% ⚠️</div></div>
+            <div class="heat-cell"><div class="heat-topic">Computer Networks</div><div class="heat-bar"><div class="heat-fill" style="width:62%;background:var(--amber);"></div></div><div class="heat-pct" style="color:var(--amber);">62%</div></div>
+            <div class="heat-cell"><div class="heat-topic">Data Structures</div><div class="heat-bar"><div class="heat-fill" style="width:80%;background:var(--lime);"></div></div><div class="heat-pct" style="color:var(--lime);">80% ✓</div></div>
+            <div class="heat-cell"><div class="heat-topic">OOP Concepts</div><div class="heat-bar"><div class="heat-fill" style="width:88%;background:var(--lime);"></div></div><div class="heat-pct" style="color:var(--lime);">88% ✓</div></div>
+            <div class="heat-cell"><div class="heat-topic">SQL Queries</div><div class="heat-bar"><div class="heat-fill" style="width:58%;background:var(--amber);"></div></div><div class="heat-pct" style="color:var(--amber);">58%</div></div>
+            <div class="heat-cell"><div class="heat-topic">AI & ML</div><div class="heat-bar"><div class="heat-fill" style="width:72%;background:var(--lime);"></div></div><div class="heat-pct" style="color:var(--lime);">72% ✓</div></div>
+          </div>
+        </div>
+
+        <div style="padding:1.5rem;border-radius:16px;background:rgba(124,58,237,0.1);border:1px solid rgba(124,58,237,0.25);margin-bottom:1.5rem;">
+          <div style="font-weight:700;color:var(--violet-light);margin-bottom:0.75rem;display:flex;align-items:center;gap:0.5rem;">🤖 AI Outcome Projection</div>
+          <div style="font-size:0.9rem;color:#e2e8f0;line-height:1.75;">Based on your current practice trajectory across DBMS, Computer Networks, and Data Structures, you are on course to achieve a <strong style="color:var(--lime);">B2 grade (70–74%)</strong> in your end-of-semester examinations. To elevate to <strong style="color:var(--lime);">A1 (75%+)</strong>, focus specifically on <strong>Database Normalization</strong> (currently 45%) and SQL Query optimization. Completing 3 more focused practice sessions in these topics within the next 7 days will likely push you above the threshold. <strong style="color:var(--amber);">You are exactly 12 correct answers away from the A1 guarantee.</strong></div>
+        </div>
+
+        <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+          <button style="padding:0.75rem 1.5rem;border-radius:12px;background:var(--violet);color:#fff;border:none;font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="showToast('📄 Certificate Ready','Your performance certificate is being generated...')">📄 Download Certificate</button>
+          <button style="padding:0.75rem 1.5rem;border-radius:12px;background:rgba(132,204,22,0.15);color:var(--lime);border:1px solid rgba(132,204,22,0.35);font-size:0.875rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="window.location.href='collegecbt-part2.html'">🤖 Practice Weak Topics</button>
+        </div>
+      </div>
+
+      <!-- ACTIVITY -->
+      <div class="d-panel" id="dash-activity">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:1.5rem;">📋 Recent Activity</div>
+        <div class="act-feed">
+          <div class="act-item">
+            <div class="act-ico" style="background:rgba(132,204,22,0.15);">✅</div>
+            <div class="act-txt"><div class="act-ttl">Mock Exam — Database Management Systems</div><div class="act-meta">Today, 10:42 AM · 20 questions · 90s/question</div></div>
+            <div class="act-badge" style="background:rgba(132,204,22,0.15);color:var(--lime);">A1 — 82%</div>
+          </div>
+          <div class="act-item">
+            <div class="act-ico" style="background:rgba(124,58,237,0.15);">🤖</div>
+            <div class="act-txt"><div class="act-ttl">Exam Lab — Computer Networks (MCQ)</div><div class="act-meta">Yesterday, 7:15 PM · 18 questions answered</div></div>
+            <div class="act-badge" style="background:rgba(245,158,11,0.15);color:var(--amber);">71% correct</div>
+          </div>
+          <div class="act-item">
+            <div class="act-ico" style="background:rgba(34,211,238,0.15);">📝</div>
+            <div class="act-txt"><div class="act-ttl">Theory Practice — DBMS Normalization</div><div class="act-meta">2 days ago · 5 theory questions reviewed</div></div>
+            <div class="act-badge" style="background:rgba(34,211,238,0.1);color:#22d3ee;">+25 pts</div>
+          </div>
+          <div class="act-item">
+            <div class="act-ico" style="background:rgba(168,85,247,0.15);">⏱️</div>
+            <div class="act-txt"><div class="act-ttl">Mock Exam — Data Structures & Algorithms</div><div class="act-meta">3 days ago · 10 questions · Timed</div></div>
+            <div class="act-badge" style="background:rgba(34,211,238,0.1);color:#22d3ee;">B2 — 70%</div>
+          </div>
+          <div class="act-item">
+            <div class="act-ico" style="background:rgba(132,204,22,0.15);">🎯</div>
+            <div class="act-txt"><div class="act-ttl">Exam Lab — Artificial Intelligence & ML</div><div class="act-meta">4 days ago · 22 questions answered</div></div>
+            <div class="act-badge" style="background:rgba(132,204,22,0.15);color:var(--lime);">80% correct</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="d-panel" id="dash-settings">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:1.5rem;">⚙️ Account Settings</div>
+        <div class="gc" style="padding:1.5rem;margin-bottom:1.5rem;">
+          <div style="font-weight:700;font-size:0.95rem;margin-bottom:1.25rem;">📚 Academic Profile</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div class="f-group"><label class="f-lbl">Full Name</label><input type="text" class="f-inp" value="Adaobi Chukwu"/></div>
+            <div class="f-group"><label class="f-lbl">Email</label><input type="email" class="f-inp" value="adaobi@unn.edu.ng"/></div>
+            <div class="f-group"><label class="f-lbl">Phone Number</label><input type="tel" class="f-inp" value="08012345678"/></div>
+            <div class="f-group"><label class="f-lbl">WhatsApp Number</label><input type="tel" class="f-inp" value="08012345678"/></div>
+            <div class="f-group"><label class="f-lbl">Institution</label><input type="text" class="f-inp" value="University of Nigeria, Nsukka"/></div>
+            <div class="f-group"><label class="f-lbl">Current Level</label>
+              <select class="f-sel"><option>100 Level</option><option>200 Level</option><option selected>300 Level</option><option>400 Level</option><option>500/600 Level</option></select>
+            </div>
+            <div class="f-group"><label class="f-lbl">Department</label><input type="text" class="f-inp" value="Computer Science"/></div>
+            <div class="f-group"><label class="f-lbl">State of Residence</label>
+              <select class="f-sel"><option>Enugu</option><option>Lagos</option><option>FCT</option></select>
+            </div>
+          </div>
+          <button class="btn-next-step" style="margin-top:1.25rem;font-size:0.875rem;padding:0.7rem 1.5rem;" onclick="showToast('✅ Profile Saved','Your account settings have been updated.')">Save Changes</button>
+        </div>
+        <div class="gc" style="padding:1.5rem;">
+          <div style="font-weight:700;font-size:0.95rem;margin-bottom:1rem;">💳 Subscription</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+            <div>
+              <div style="color:var(--muted);font-size:0.82rem;">Current Plan</div>
+              <div style="font-size:1.05rem;font-weight:700;color:var(--lime);margin-top:0.25rem;">⭐ Pro Student — ₦5,000/semester</div>
+              <div style="font-size:0.78rem;color:var(--muted);margin-top:0.25rem;">Renews: June 30, 2025</div>
+            </div>
+            <button class="btn-next-step" style="font-size:0.875rem;padding:0.7rem 1.25rem;" onclick="document.getElementById('pricing').scrollIntoView({behavior:'smooth'})">Manage Plan</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============ PRICING ============ -->
+<section id="pricing" class="sec">
+  <div class="sec-inner">
+    <div class="sec-tag">💰 Pricing Plans</div>
+    <h2 class="sec-h">Simple Pricing. <span class="hl">Nigerian Naira.</span></h2>
+    <p class="sec-d">No foreign currency conversion. Pay with Paystack — card, bank transfer, or USSD. Cancel anytime.</p>
+    <div class="price-grid">
+
+      <!-- FREE -->
+      <div class="p-card">
+        <div class="p-plan">Free Forever</div>
+        <div class="p-amount"><sup>₦</sup>0</div>
+        <div class="p-period">No credit card required · Forever free</div>
+        <div class="p-feats">
+          <div class="pf"><span class="pf-y">✓</span><span>5 AI questions per day</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Basic answer explanations</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>3 mock exams per month</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Full curriculum browser</span></div>
+          <div class="pf"><span class="pf-n">✗</span><span>Distractor misconception analysis</span></div>
+          <div class="pf"><span class="pf-n">✗</span><span>Theory questions & model answers</span></div>
+          <div class="pf"><span class="pf-n">✗</span><span>AI Readiness Score & grade prediction</span></div>
+          <div class="pf"><span class="pf-n">✗</span><span>Performance certificate download</span></div>
+          <div class="pf"><span class="pf-n">✗</span><span>National benchmarking</span></div>
+        </div>
+        <button class="p-btn p-btn-free" onclick="showAuth('signup')">Start Free Today</button>
+      </div>
+
+      <!-- PRO -->
+      <div class="p-card feat">
+        <div class="p-badge">⭐ Most Popular</div>
+        <div class="p-plan">Student Pro</div>
+        <div class="p-amount"><sup>₦</sup>5,000</div>
+        <div class="p-period">per semester · or <strong style="color:var(--lime);">₦8,500/year</strong> (save 15%)</div>
+        <div class="p-feats">
+          <div class="pf"><span class="pf-y">✓</span><span><strong>Unlimited</strong> AI-generated questions</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Full explanations + distractor analysis</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Unlimited mock exams with WAEC grades</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Theory questions with model answers</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>AI Readiness Score (0–100)</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Grade prediction & trajectory chart</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>National benchmarking</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Downloadable performance certificate</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Topic heatmap & weak-area alerts</span></div>
+        </div>
+        <button class="p-btn p-btn-pro" onclick="handlePaystack('Pro Student','5000')">Pay ₦5,000 → Start Now</button>
+      </div>
+
+      <!-- INSTITUTIONAL -->
+      <div class="p-card">
+        <div class="p-plan">Departmental / Institutional</div>
+        <div class="p-amount"><sup>₦</sup>25,000</div>
+        <div class="p-period">per year · up to 200 students</div>
+        <div class="p-feats">
+          <div class="pf"><span class="pf-y">✓</span><span>All Pro features for up to 200 students</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Lecturer admin dashboard</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Department-level analytics</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Custom question sets per course</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Cohort performance reports</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Bulk student onboarding</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Priority AI support</span></div>
+          <div class="pf"><span class="pf-y">✓</span><span>Dedicated account manager</span></div>
+          <div class="pf"><span class="pf-n">✗</span><span>Unlimited students (contact for enterprise)</span></div>
+        </div>
+        <button class="p-btn p-btn-inst" onclick="handlePaystack('Departmental','25000')">Pay ₦25,000 → Get Started</button>
+      </div>
+
+    </div>
+
+    <!-- Paystack strip -->
+    <div class="pay-strip">
+      <div class="pay-logo">Paystack</div>
+      <div class="pay-txt">🔒 Secure payments via Paystack · Card · Bank Transfer · USSD · POS · Nigeria-native payment infrastructure</div>
+    </div>
+
+    <!-- Annual banner -->
+    <div style="margin-top:2rem;padding:1.5rem;border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(132,204,22,0.08));border:1px solid rgba(124,58,237,0.3);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <div style="font-weight:700;font-size:1.05rem;margin-bottom:0.25rem;">💡 Annual Plan — Save 15%</div>
+        <div style="color:var(--muted);font-size:0.86rem;">Pay ₦8,500/year instead of ₦10,000 (2×₦5,000 semesters). Best value for serious students.</div>
+      </div>
+      <button class="p-btn p-btn-pro" style="width:auto;padding:0.75rem 1.5rem;font-size:0.875rem;" onclick="handlePaystack('Annual Pro','8500')">Pay ₦8,500/year →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section class="sec" id="testimonials">
+  <div class="sec-inner">
+    <div class="sec-tag">💬 Student Success Stories</div>
+    <h2 class="sec-h">Real Students. <span class="hl">Real Results.</span></h2>
+    <p class="sec-d">Nigerian undergraduates across universities and polytechnics sharing their CollegeCBT experience.</p>
+    <div class="test-grid">
+      <div class="test-card">
+        <div class="test-q">"I failed DBMS in 200L. After 3 weeks with CollegeCBT's Exam Lab and Mock Exams, I scored 79% in my 300L resit. The distractor explanations are what made the difference — I finally understood <em>why</em> my answers were wrong."</div>
+        <div class="test-auth">
+          <div class="test-av" style="background:rgba(124,58,237,0.2);">👨🏾‍🎓</div>
+          <div><div class="test-name">Emeka Okonkwo</div><div class="test-meta">Computer Science · 300L · UNN</div><div class="test-grade">🏆 A1 — 79% in DBMS</div></div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-q">"As a pharmacy student at UNILAG, finding relevant practice questions was nearly impossible. CollegeCBT generated questions specific to Pharmacology and Clinical Pharmacy at exactly my level. I went from 58% to 81% in one semester."</div>
+        <div class="test-auth">
+          <div class="test-av" style="background:rgba(132,204,22,0.15);">👩🏽‍⚕️</div>
+          <div><div class="test-name">Fatima Abdullahi</div><div class="test-meta">Pharmacy · 400L · UNILAG</div><div class="test-grade">🏆 A1 — 81% in Pharmacology</div></div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-q">"I'm a HND Accountancy student at Yaba Tech and CollegeCBT is the first platform that actually has our level and courses. The mock exam timer prepared me mentally. I scored C4 before — now I consistently get B2."</div>
+        <div class="test-auth">
+          <div class="test-av" style="background:rgba(245,158,11,0.15);">👨🏿‍💼</div>
+          <div><div class="test-name">Chidi Nwosu</div><div class="test-meta">Accountancy HND · Yaba Tech</div><div class="test-grade">📈 C4 → B2 improvement</div></div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-q">"The AI Readiness Score is brilliant. It told me I was at 63% readiness two weeks before my exam and highlighted normalization as my weakest topic. I drilled it and entered the hall confident. Got B2."</div>
+        <div class="test-auth">
+          <div class="test-av" style="background:rgba(34,211,238,0.15);">👩🏾‍💻</div>
+          <div><div class="test-name">Ngozi Eze</div><div class="test-meta">Computer Science · 300L · ABU</div><div class="test-grade">📊 63→82 Readiness Score</div></div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-q">"My engineering lecturer told us CollegeCBT was being used by students across our department. The theory model answers with mark schemes are exceptional — they read like something from NABTEB marking guides."</div>
+        <div class="test-auth">
+          <div class="test-av" style="background:rgba(225,29,72,0.15);">👨🏽‍🔧</div>
+          <div><div class="test-name">Tunde Adeleke</div><div class="test-meta">Civil Engineering ND · Auchi Poly</div><div class="test-grade">✅ Passed ND with Distinction</div></div>
+        </div>
+      </div>
+      <div class="test-card">
+        <div class="test-q">"I'm doing NCE Mathematics at FCE Zaria. This is the only platform that has NCE-specific content. The AI generates questions on exactly what I need — from number theory to teaching methods. Absolutely worth every naira."</div>
+        <div class="test-auth">
+          <div class="test-av" style="background:rgba(168,85,247,0.15);">👩🏿‍🏫</div>
+          <div><div class="test-name">Maryam Suleiman</div><div class="test-meta">Mathematics Education NCE · FCE Zaria</div><div class="test-grade">🎓 NCE Merit Pass</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="sec" id="faq">
+  <div class="sec-inner">
+    <div class="sec-tag">❓ Frequently Asked Questions</div>
+    <h2 class="sec-h">Questions About<br/><span class="hl">CollegeCBT</span></h2>
+    <div class="faq-list" id="faqList">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>How does the AI generate relevant exam questions for my specific course?</span><span class="faq-ico">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">CollegeCBT uses Anthropic's Claude AI, which is trained on a vast body of academic literature, textbooks, and past examination materials. When you select your institution type, course, level, and topic, the system constructs a detailed academic prompt that specifies your exact context. Claude then generates questions that are accurate, contextual, and aligned with the NUC, NBTE, or NCCE curriculum for that subject. Every question is freshly generated — you will never get the same question twice.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>Is CollegeCBT suitable for all Nigerian higher institutions?</span><span class="faq-ico">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Yes. CollegeCBT covers the entire Nigerian higher education landscape: all 309+ accredited universities (federal, state, and private) regulated by NUC; all 78+ polytechnics (federal, state, private) regulated by NBTE; all 163+ Colleges of Education regulated by NCCE; and Innovation Enterprise Institutions (IEIs) offering NID programs. Whether you are studying at 100 Level in a federal university, HND at a polytechnic, or NCE at a college of education, CollegeCBT has your course content.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>What is the difference between the Exam Lab and Mock Exam mode?</span><span class="faq-ico">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">The <strong>Exam Lab</strong> is an open-ended practice environment where you generate one question at a time, with full explanations shown immediately after each answer. It's ideal for learning and deep understanding. The <strong>Mock Exam</strong> simulates real examination conditions — questions are timed (90 seconds each by default), auto-submitted on timeout, and no explanations are shown until after the entire exam. At the end, you receive a WAEC grade (A1–F9), a full performance analysis, and a question-by-question review. Use Exam Lab to learn; use Mock Exam to test your readiness.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>How accurate and reliable are the AI-generated questions?</span><span class="faq-ico">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">CollegeCBT uses Claude Sonnet by Anthropic — one of the world's most capable AI models for academic tasks. The questions are generated with explicit academic context (course name, institution type, level, topic) and are reviewed through our Quality Evaluator layer before rendering. While no AI system is perfect, our users report very high accuracy rates. We also continuously refine our prompt engineering based on user feedback. For any question you believe is inaccurate, you can flag it directly from the exam interface.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>How does payment work? Can I pay in Naira?</span><span class="faq-ico">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">Yes — all pricing is in Nigerian Naira (₦). We use Paystack, Nigeria's leading payment gateway, which supports debit cards (Verve, Mastercard, Visa), bank transfer, USSD, and POS payments. There is no need for a dollar card or foreign currency. The Free plan requires no payment at all. The Student Pro plan is ₦5,000 per semester or ₦8,500 per year. The Departmental plan is ₦25,000 per year for up to 200 students.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>What is the AI Readiness Score and how is it calculated?</span><span class="faq-ico">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">The AI Readiness Score (0–100) is a composite metric calculated from your practice history. It weights your: (1) average correct-answer rate across all sessions, (2) consistency of performance (streak), (3) performance on timed mock exams vs. untimed practice, and (4) coverage of different topics within your course. A score of 75+ indicates exam readiness. The score updates after every session and is used to generate your grade prediction and personalized study recommendations.</div></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)"><span>What is "Results as a Service" (RaaS)?</span><span class="faq-ico">+</span></div>
+        <div class="faq-a"><div class="faq-a-inner">RaaS means we measure our success by your exam score — not by whether you use our software. Traditional EdTech sells subscriptions regardless of outcomes. CollegeCBT is built around outcome accountability: our AI tracks your grade trajectory, predicts your readiness, generates an Outcome Projection report, and continues providing targeted practice until you hit 75%. Pro students who complete 30+ mock exams and do not achieve 75% are eligible for a free semester extension — because your result is our result.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ AUTH SECTION ============ -->
+<section id="auth" class="auth-section">
+  <div class="auth-wrap">
+    <div class="auth-tabs">
+      <button class="auth-tab on" id="tab-signup" onclick="switchAuth('signup')">Create Account</button>
+      <button class="auth-tab" id="tab-login" onclick="switchAuth('login')">Sign In</button>
+    </div>
+
+    <!-- SIGNUP -->
+    <div class="auth-panel on" id="auth-signup">
+      <div class="auth-card">
+        <!-- step progress -->
+        <div class="step-prog" id="signupSteps">
+          <div class="step-node">
+            <div class="step-circle act" id="s1">1</div>
+            <div class="step-txt">Personal</div>
+          </div>
+          <div class="step-line" id="l1"></div>
+          <div class="step-node">
+            <div class="step-circle" id="s2">2</div>
+            <div class="step-txt">Contact</div>
+          </div>
+          <div class="step-line" id="l2"></div>
+          <div class="step-node">
+            <div class="step-circle" id="s3">3</div>
+            <div class="step-txt">Academic</div>
+          </div>
+        </div>
+
+        <!-- STEP 1: Personal -->
+        <div id="su-step1">
+          <div class="auth-h">Create Your Account</div>
+          <div class="auth-sub">Step 1 of 3 — Personal Information</div>
+          <div class="fg">
+            <div class="f-group">
+              <label class="f-lbl">Full Name *</label>
+              <input type="text" class="f-inp" id="su-fullName" placeholder="e.g. Adaobi Chukwu"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Date of Birth *</label>
+              <input type="date" class="f-inp" id="su-dob"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Email Address *</label>
+              <input type="email" class="f-inp" id="su-email" placeholder="you@university.edu.ng"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">NIN (National ID No.) *</label>
+              <input type="text" class="f-inp" id="su-nin" placeholder="11-digit NIN" maxlength="11"/>
+              <div class="f-hint">Your NIN is used for identity verification only.</div>
+            </div>
+            <div class="f-group fg-1" style="grid-column:1/-1;">
+              <label class="f-lbl">Password *</label>
+              <input type="password" class="f-inp" id="su-password" placeholder="Create a strong password" oninput="checkPwStrength(this.value)"/>
+              <div class="pw-bar"><div class="pw-fill" id="pwFill"></div></div>
+              <div class="f-hint" id="pwHint">Enter password to check strength</div>
+            </div>
+          </div>
+          <div class="f-acts">
+            <button class="btn-next-step" onclick="nextStep(1)">Continue to Step 2 →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: Contact & Location -->
+        <div id="su-step2" style="display:none;">
+          <div class="auth-h">Contact & Location</div>
+          <div class="auth-sub">Step 2 of 3 — How to reach you</div>
+          <div class="fg">
+            <div class="f-group">
+              <label class="f-lbl">Phone Number *</label>
+              <input type="tel" class="f-inp" id="su-phone" placeholder="080x xxx xxxx"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">WhatsApp Number</label>
+              <input type="tel" class="f-inp" id="su-whatsapp" placeholder="Same or different number"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Mobile Number (Alt.)</label>
+              <input type="tel" class="f-inp" id="su-mobile" placeholder="Optional alternate number"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">State of Origin *</label>
+              <select class="f-sel" id="su-stateOrigin"><option value="">Select State</option></select>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">State of Residence *</label>
+              <select class="f-sel" id="su-stateRes"><option value="">Select State</option></select>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Local Government Area (LGA) *</label>
+              <input type="text" class="f-inp" id="su-lga" placeholder="Your LGA"/>
+            </div>
+            <div class="f-group fg-1" style="grid-column:1/-1;">
+              <label class="f-lbl">Home Address *</label>
+              <input type="text" class="f-inp" id="su-address" placeholder="Street address, city"/>
+            </div>
+          </div>
+          <div class="f-acts">
+            <button class="btn-back-step" onclick="backStep(2)">← Back</button>
+            <button class="btn-next-step" onclick="nextStep(2)">Continue to Step 3 →</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: Academic -->
+        <div id="su-step3" style="display:none;">
+          <div class="auth-h">Academic Profile</div>
+          <div class="auth-sub">Step 3 of 3 — Your institution and course details</div>
+          <div class="fg">
+            <div class="f-group">
+              <label class="f-lbl">Institution Type *</label>
+              <select class="f-sel" id="su-instType" onchange="updateSuCourses()">
+                <option value="">Select Type</option>
+                <option>University (NUC)</option>
+                <option>Polytechnic (NBTE)</option>
+                <option>College of Education (NCCE)</option>
+                <option>IEI / Technical College</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Institution Name *</label>
+              <input type="text" class="f-inp" id="su-instName" placeholder="e.g. University of Nigeria, Nsukka"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Faculty / School</label>
+              <input type="text" class="f-inp" id="su-faculty" placeholder="e.g. Faculty of Physical Sciences"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Department *</label>
+              <input type="text" class="f-inp" id="su-dept" placeholder="e.g. Computer Science"/>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Current Level *</label>
+              <select class="f-sel" id="su-level">
+                <option value="">Select Level</option>
+                <option>100 Level</option><option>200 Level</option><option>300 Level</option>
+                <option>400 Level</option><option>500/600 Level</option><option>Postgraduate (M.Sc./MBA)</option>
+                <option>Ph.D.</option><option>PRE-ND</option><option>ND Year 1</option>
+                <option>ND Year 2</option><option>HND Year 1</option><option>HND Year 2</option>
+                <option>Post-HND</option><option>NCE Year 1</option><option>NCE Year 2</option>
+                <option>NCE Year 3</option><option>B.Ed. (Affiliated)</option>
+              </select>
+            </div>
+            <div class="f-group">
+              <label class="f-lbl">Matric / Student ID No.</label>
+              <input type="text" class="f-inp" id="su-matric" placeholder="Optional"/>
+            </div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:0.5rem;margin-bottom:1.25rem;">
+            <input type="checkbox" id="su-terms" style="margin-top:4px;accent-color:var(--violet);"/>
+            <label for="su-terms" style="font-size:0.82rem;color:var(--muted);cursor:pointer;">I agree to the <a href="#" style="color:var(--violet-light);">Terms of Service</a> and <a href="#" style="color:var(--violet-light);">Privacy Policy</a>. I understand my NIN is used solely for identity verification.</label>
+          </div>
+          <div class="f-acts">
+            <button class="btn-back-step" onclick="backStep(3)">← Back</button>
+            <button class="btn-next-step" onclick="completeSignup()">🎓 Create My Account →</button>
+          </div>
+        </div>
+
+        <!-- SUCCESS STATE (hidden) -->
+        <div id="su-success" style="display:none;text-align:center;padding:2rem 0;">
+          <div style="font-size:4rem;margin-bottom:1rem;">🎉</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.75rem;margin-bottom:0.5rem;">Welcome to CollegeCBT!</div>
+          <div style="color:var(--muted);font-size:0.9rem;margin-bottom:2rem;">Your account has been created. Start practising immediately and track your results.</div>
+          <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+            <a href="collegecbt-part2.html" class="btn-next-step" style="text-decoration:none;display:inline-flex;align-items:center;">🤖 Go to Exam Lab →</a>
+            <button class="btn-back-step" onclick="switchDash('overview');document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">📊 View Dashboard</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-panel" id="auth-login">
+      <div class="auth-card">
+        <div class="auth-h">Welcome Back</div>
+        <div class="auth-sub">Sign in to your CollegeCBT account to continue practising.</div>
+        <div class="fg fg-1">
+          <div class="f-group">
+            <label class="f-lbl">Email Address or Matric No.</label>
+            <input type="text" class="f-inp" placeholder="your@email.com or matric number"/>
+          </div>
+          <div class="f-group">
+            <label class="f-lbl">Password</label>
+            <input type="password" class="f-inp" placeholder="Your password"/>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:-0.25rem;">
+            <label style="display:flex;align-items:center;gap:0.4rem;font-size:0.82rem;color:var(--muted);cursor:pointer;">
+              <input type="checkbox" style="accent-color:var(--violet);"/> Remember me
+            </label>
+            <a href="#" style="font-size:0.82rem;color:var(--violet-light);">Forgot password?</a>
+          </div>
+        </div>
+        <div class="f-acts" style="margin-top:1.25rem;">
+          <button class="btn-next-step" style="width:100%;justify-content:center;" onclick="handleLogin()">Sign In →</button>
+        </div>
+        <div style="text-align:center;margin-top:1rem;color:var(--muted);font-size:0.82rem;">
+          Don't have an account? <a href="#" onclick="switchAuth('signup')" style="color:var(--violet-light);">Create one free →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div><!-- END .pw -->
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="ft-brand">
+        <a href="collegecbt-part1.html" class="logo">College<span>CBT</span></a>
+        <div class="ft-tag">Nigeria's #1 AI-powered exam preparation platform. Results-as-a-Service for every Nigerian undergraduate — university, polytechnic, or college of education.</div>
+        <div class="ft-social">
+          <a class="ft-soc" href="#" title="Twitter/X">𝕏</a>
+          <a class="ft-soc" href="#" title="Instagram">📷</a>
+          <a class="ft-soc" href="#" title="WhatsApp">💬</a>
+          <a class="ft-soc" href="#" title="LinkedIn">in</a>
+          <a class="ft-soc" href="#" title="YouTube">▶</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Platform</div>
+        <div class="ft-links">
+          <a href="collegecbt-part1.html#features" class="ft-link">Features</a>
+          <a href="collegecbt-part1.html#curriculum" class="ft-link">Curriculum Browser</a>
+          <a href="collegecbt-part2.html" class="ft-link">AI Exam Lab</a>
+          <a href="collegecbt-part2.html" class="ft-link">Mock Exam Engine</a>
+          <a href="#dashboard" class="ft-link">Student Dashboard</a>
+          <a href="#pricing" class="ft-link">Pricing Plans</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Institutions</div>
+        <div class="ft-links">
+          <a href="collegecbt-part1.html#curriculum" class="ft-link">Universities (NUC)</a>
+          <a href="collegecbt-part1.html#curriculum" class="ft-link">Polytechnics (NBTE)</a>
+          <a href="collegecbt-part1.html#curriculum" class="ft-link">Colleges of Education</a>
+          <a href="collegecbt-part1.html#curriculum" class="ft-link">IEIs & Technical</a>
+          <a href="#pricing" class="ft-link">Departmental Plan</a>
+          <a href="#pricing" class="ft-link">Institutional Plan</a>
+        </div>
+      </div>
+      <div>
+        <div class="ft-col-h">Company</div>
+        <div class="ft-links">
+          <a href="#" class="ft-link">About CollegeCBT</a>
+          <a href="#" class="ft-link">Blog & Resources</a>
+          <a href="#faq" class="ft-link">FAQ</a>
+          <a href="#" class="ft-link">Contact Us</a>
+          <a href="#" class="ft-link">Privacy Policy</a>
+          <a href="#" class="ft-link">Terms of Service</a>
+          <a href="#" class="ft-link">NDPR Compliance</a>
+        </div>
+      </div>
+    </div>
+    <div class="ft-bottom">
+      <div class="ft-copy">© 2025 CollegeCBT. All rights reserved. Nigeria's Results-as-a-Service Exam Platform.</div>
+      <div class="status-pill">
+        <div class="s-dot"></div>
+        <div class="s-txt">All Systems Operational</div>
+      </div>
+      <div class="ft-legal">
+        <a href="#">Privacy</a><a href="#">Terms</a><a href="#">NDPR</a>
+        <div class="ai-badge">AI powered by <strong>Anthropic Claude</strong></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- PARTS NAV -->
+<div class="parts-nav">
+  <div class="pn-inner">
+    <div class="pn-title">CollegeCBT — Multi-Part Application</div>
+    <div class="pn-links">
+      <a href="collegecbt-part1.html" class="p-link">Part 1: Landing & Curriculum</a>
+      <a href="collegecbt-part2.html" class="p-link">Part 2: Exam Lab & Mock Exam</a>
+      <a href="#" class="p-link cur">Part 3: Dashboard, Auth & Pricing</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><div class="toast-t" id="toastT"></div><div class="toast-m" id="toastM"></div></div>
+
+<script>
+// ====== UTILS ======
+function showToast(t,m){
+  const el=document.getElementById('toast');
+  document.getElementById('toastT').textContent=t;
+  document.getElementById('toastM').textContent=m;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3500);
+}
+
+// ====== NAV ======
+function toggleMob(){
+  document.getElementById('ham').classList.toggle('open');
+  document.getElementById('mobNav').classList.toggle('open');
+}
+function closeMob(){
+  document.getElementById('ham').classList.remove('open');
+  document.getElementById('mobNav').classList.remove('open');
+}
+window.addEventListener('scroll',()=>{
+  document.getElementById('topNav').style.background=
+    window.scrollY>60?'rgba(13,8,32,0.98)':'rgba(13,8,32,0.9)';
+});
+
+// ====== DASHBOARD ======
+function switchDash(id){
+  document.querySelectorAll('.d-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.d-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('dash-'+id).classList.add('on');
+  event.currentTarget.classList.add('on');
+}
+
+// ====== GRADE BAR CHART ======
+const gradeData=[{label:'M1',pct:52},{label:'M2',pct:58},{label:'M3',pct:61},{label:'M4',pct:60},{label:'M5',pct:65},{label:'M6',pct:68},{label:'M7',pct:64},{label:'M8',pct:71},{label:'M9',pct:75},{label:'M10',pct:82}];
+function renderBarChart(){
+  const container=document.getElementById('barChart');
+  if(!container)return;
+  const existing=container.querySelectorAll('.bar');
+  existing.forEach(e=>e.remove());
+  const maxH=140-24;
+  gradeData.forEach(d=>{
+    const bar=document.createElement('div');
+    bar.className='bar';
+    const h=Math.max(4,(d.pct/100)*maxH);
+    bar.style.height=h+'px';
+    const c=d.pct>=75?'linear-gradient(180deg,var(--lime),#4ade80)':d.pct>=60?'linear-gradient(180deg,var(--amber),#fbbf24)':'linear-gradient(180deg,var(--rose),#fb7185)';
+    bar.style.background=c;
+    bar.innerHTML=`<span class="bar-val">${d.pct}%</span><span class="bar-lbl">${d.label}</span>`;
+    bar.title=`Mock ${d.label}: ${d.pct}%`;
+    container.appendChild(bar);
+  });
+}
+
+// ====== GAUGE ======
+function animateGauge(target){
+  const el=document.getElementById('gaugeEl');
+  const num=document.getElementById('gaugeNum');
+  if(!el||!num)return;
+  let current=0;
+  const step=target/60;
+  const t=setInterval(()=>{
+    current=Math.min(current+step,target);
+    const pct=current/100;
+    // rotate from 0 (fully left) to -0.5turn (fully right)
+    el.style.transform=`rotate(${-0.5+pct*0.5}turn)`;
+    num.textContent=Math.round(current);
+    if(current>=target)clearInterval(t);
+  },20);
+}
+
+// ====== NIGERIAN STATES ======
+const STATES=['Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno','Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','FCT (Abuja)','Gombe','Imo','Jigawa','Kaduna','Kano','Katsina','Kebbi','Kogi','Kwara','Lagos','Nasarawa','Niger','Ogun','Ondo','Osun','Oyo','Plateau','Rivers','Sokoto','Taraba','Yobe','Zamfara'];
+function populateStates(){
+  ['su-stateOrigin','su-stateRes'].forEach(id=>{
+    const sel=document.getElementById(id);
+    if(!sel)return;
+    STATES.forEach(s=>{
+      const opt=document.createElement('option');
+      opt.value=s;opt.textContent=s;
+      sel.appendChild(opt);
+    });
+  });
+}
+
+// ====== SIGNUP STEPS ======
+let signupStep=1;
+function nextStep(from){
+  if(from===1){
+    const fn=document.getElementById('su-fullName').value;
+    const em=document.getElementById('su-email').value;
+    const pw=document.getElementById('su-password').value;
+    if(!fn||!em||!pw){showToast('⚠️ Required Fields','Please fill Full Name, Email, and Password.');return;}
+    if(pw.length<8){showToast('⚠️ Weak Password','Password must be at least 8 characters.');return;}
+  }
+  if(from===2){
+    const ph=document.getElementById('su-phone').value;
+    const so=document.getElementById('su-stateOrigin').value;
+    const sr=document.getElementById('su-stateRes').value;
+    if(!ph||!so||!sr){showToast('⚠️ Required Fields','Please fill Phone, State of Origin, and State of Residence.');return;}
+  }
+  document.getElementById('su-step'+from).style.display='none';
+  document.getElementById('su-step'+(from+1)).style.display='block';
+  // Update progress circles
+  document.getElementById('s'+from).className='step-circle done';
+  document.getElementById('s'+from).textContent='✓';
+  if(from<3)document.getElementById('l'+from).classList.add('done');
+  document.getElementById('s'+(from+1)).classList.add('act');
+  signupStep=from+1;
+  showToast('✅ Step '+from+' Done','Moving to step '+(from+1)+'...');
+}
+function backStep(current){
+  document.getElementById('su-step'+current).style.display='none';
+  document.getElementById('su-step'+(current-1)).style.display='block';
+  document.getElementById('s'+current).className='step-circle';
+  document.getElementById('s'+current).textContent=current;
+  if(current>1){
+    document.getElementById('l'+(current-1)).classList.remove('done');
+    document.getElementById('s'+(current-1)).className='step-circle act';
+  }
+  signupStep=current-1;
+}
+function completeSignup(){
+  const it=document.getElementById('su-instType').value;
+  const ins=document.getElementById('su-instName').value;
+  const lv=document.getElementById('su-level').value;
+  const tc=document.getElementById('su-terms').checked;
+  if(!it||!ins||!lv){showToast('⚠️ Required Fields','Please complete all required academic fields.');return;}
+  if(!tc){showToast('⚠️ Terms Required','Please accept the Terms of Service to continue.');return;}
+  // Mark step 3 done
+  document.getElementById('s3').className='step-circle done';
+  document.getElementById('s3').textContent='✓';
+  document.getElementById('l2').classList.add('done');
+  document.getElementById('su-step3').style.display='none';
+  document.getElementById('su-success').style.display='block';
+  showToast('🎉 Account Created!','Welcome to CollegeCBT! Your dashboard is ready.');
+}
+function updateSuCourses(){}// placeholder
+
+// ====== STRENGTH METER ======
+function checkPwStrength(pw){
+  const fill=document.getElementById('pwFill');
+  const hint=document.getElementById('pwHint');
+  if(!fill||!hint)return;
+  let s=0,msg='',color='';
+  if(pw.length>=8)s++;
+  if(/[A-Z]/.test(pw))s++;
+  if(/[0-9]/.test(pw))s++;
+  if(/[^A-Za-z0-9]/.test(pw))s++;
+  const map=['','Weak — add uppercase, numbers & symbols','Fair — almost there!','Good password','Strong password ✓'];
+  const colors=['','var(--rose)','var(--amber)','#22d3ee','var(--lime)'];
+  fill.style.width=(s*25)+'%';
+  fill.style.background=colors[s]||'var(--rose)';
+  hint.textContent=pw.length===0?'Enter password to check strength':map[s]||'Weak';
+  hint.style.color=colors[s]||'var(--muted)';
+}
+
+// ====== AUTH TABS ======
+function switchAuth(tab){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.auth-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('tab-'+tab).classList.add('on');
+  document.getElementById('auth-'+tab).classList.add('on');
+  document.getElementById('auth').scrollIntoView({behavior:'smooth'});
+}
+function showAuth(tab){
+  switchAuth(tab);
+  closeMob();
+}
+
+// ====== LOGIN ======
+function handleLogin(){
+  showToast('✅ Login Successful!','Welcome back! Redirecting to your dashboard...');
+  setTimeout(()=>document.getElementById('dashboard').scrollIntoView({behavior:'smooth'}),1500);
+}
+
+// ====== PAYSTACK ======
+function handlePaystack(plan,amount){
+  showToast('💳 Redirecting to Paystack','Secure payment for '+plan+' — ₦'+parseInt(amount).toLocaleString());
+  // In production: initialize Paystack popup here
+  // PaystackPop.setup({key:'pk_live_...', email, amount:amount*100, ...})
+}
+
+// ====== FAQ ======
+function toggleFaq(el){
+  const item=el.closest('.faq-item');
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+
+// ====== PRICING CTA ======
+document.querySelectorAll('.p-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.getElementById('auth').scrollIntoView({behavior:'smooth'});
+  });
+});
+
+// ====== INIT ======
+window.addEventListener('DOMContentLoaded',()=>{
+  populateStates();
+  renderBarChart();
+  // Animate gauge after short delay
+  setTimeout(()=>animateGauge(78),800);
+
+  // Check hash for auth section
+  if(window.location.hash==='#signup'){showAuth('signup');}
+  else if(window.location.hash==='#login'){showAuth('login');}
+
+  // Observer for chart animation
+  const chartEl=document.getElementById('barChart');
+  if(chartEl){
+    const obs=new IntersectionObserver(entries=>{
+      if(entries[0].isIntersecting){renderBarChart();obs.disconnect();}
+    },{threshold:0.3});
+    obs.observe(chartEl);
+  }
+});
+</script>
+</body>
+</html>
