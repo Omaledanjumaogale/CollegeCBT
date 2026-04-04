@@ -21,13 +21,13 @@
 		<h1 class="font-display text-3xl mb-3">Sign In to CollegeCBT</h1>
 		<p class="text-white/50 text-sm max-w-sm mx-auto mb-6">
 			Opening the sign-in form... If it doesn't appear, <button
-				on:click={() => activeModal.set('login')}
+				onclick={() => activeModal.set('login')}
 				class="text-violet-light hover:underline font-semibold"
 			>click here</button>.
 		</p>
 		<div class="text-white/30 text-sm">
 			Don't have an account? <button
-				on:click={() => activeModal.set('signup')}
+				onclick={() => activeModal.set('signup')}
 				class="text-violet-light hover:underline"
 			>Create one free →</button>
 		</div>

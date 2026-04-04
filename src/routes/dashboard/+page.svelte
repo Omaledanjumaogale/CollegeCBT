@@ -202,7 +202,13 @@
 				<div class="text-center font-bold text-sm">{userProfile.name}</div>
 				<div class="text-center text-xs text-white/40 mt-0.5">{userProfile.email}</div>
 				<div class="flex justify-center mt-2 mb-4">
-					<span class="badge badge-lime text-xs">⭐ Pro Student</span>
+					{#if $currentUser?.plan === 'pro'}
+						<span class="badge badge-lime text-xs">⭐ Pro Plan</span>
+					{:else if $currentUser?.plan === 'institutional'}
+						<span class="badge text-xs" style="background:rgba(34,211,238,0.12);color:#22d3ee;border:1px solid rgba(34,211,238,0.25);">🏛️ Institutional</span>
+					{:else}
+						<span class="badge badge-violet text-xs">🎓 Free Plan</span>
+					{/if}
 				</div>
 				<hr class="border-white/8 mb-4" />
 				<nav class="space-y-1">
@@ -234,7 +240,7 @@
 					<!-- Greeting row -->
 					<div class="flex items-center justify-between flex-wrap gap-3 mb-6">
 						<div>
-							<div class="font-display text-2xl">Good morning, {userProfile.name.split(' ')[0]}! 👋</div>
+							<div class="font-display text-2xl">Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {userProfile.name.split(' ')[0]}! 👋</div>
 							<div class="text-xs text-white/40 mt-0.5">{userProfile.level} {userProfile.department} · {userProfile.institution}</div>
 						</div>
 						<div class="flex items-center gap-2 px-3 py-2 rounded-xl" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);">

@@ -3,43 +3,46 @@
 	import { signUpWithEmail, signInWithEmail } from '$lib/services/firebase';
 	import { NIGERIA_STATES, COURSES, INSTITUTION_TYPES, LEVELS, type InstitutionType } from '$lib/data/courseData';
 	import { fade, scale } from 'svelte/transition';
+	import { goto } from '$app/navigation';
 
-	let activeTab: 'login' | 'signup' = 'signup';
-	let step = 1;
-	let loading = false;
-	let errorMsg = '';
+	let activeTab = $state<'login' | 'signup'>('signup');
+	let step = $state(1);
+	let loading = $state(false);
 
 	// Login form
-	let loginEmail = '';
-	let loginPassword = '';
+	let loginEmail = $state('');
+	let loginPassword = $state('');
 
 	// Signup form
-	let suFullName = '';
-	let suDob = '';
-	let suEmail = '';
-	let suNin = '';
-	let suPassword = '';
-	let suPhone = '';
-	let suWhatsapp = '';
-	let suStateOrigin = '';
-	let suStateRes = '';;
-	let suLga = '';
-	let suAddress = '';
-	let suInstType: InstitutionType | '' = '';
-	let suInstName = '';
-	let suFaculty = '';
-	let suDept = '';
-	let suLevel = '';
-	let suMatric = '';
-	let suTerms = false;
-	let signupSuccess = false;
+	let suFullName = $state('');
+	let suDob = $state('');
+	let suEmail = $state('');
+	let suNin = $state('');
+	let suPassword = $state('');
+	let suConfirmPassword = $state('');
+	let suPhone = $state('');
+	let suWhatsapp = $state('');
+	let suStateOrigin = $state('');
+	let suStateRes = $state('');
+	let suLga = $state('');
+	let suAddress = $state('');
+	let suInstType = $state<InstitutionType | ''>('');
+	let suInstName = $state('');
+	let suFaculty = $state('');
+	let suDept = $state('');
+	let suLevel = $state('');
+	let suMatric = $state('');
+	let suTerms = $state(false);
+	let signupSuccess = $state(false);
 
-	$: if ($activeModal) {
-		activeTab = $activeModal;
-		step = 1;
-		errorMsg = '';
-		signupSuccess = false;
-	}
+	// Sync the active tab when modal opens
+	$effect(() => {
+		if ($activeModal) {
+			activeTab = $activeModal;
+			step = 1;
+			signupSuccess = false;
+		}
+	});
 
 	function close() {
 		activeModal.set(null);
@@ -52,7 +55,6 @@
 	function switchTab(tab: 'login' | 'signup') {
 		activeTab = tab;
 		step = 1;
-		errorMsg = '';
 	}
 
 	// Password strength
@@ -60,7 +62,7 @@
 		if (!pw) return { width: '0%', color: 'transparent', label: '' };
 		let score = 0;
 		if (pw.length >= 8) score++;
-		if (/[A-Z]/.test(pw)) score++;;
+		if (/[A-Z]/.test(pw)) score++;
 		if (/[0-9]/.test(pw)) score++;
 		if (/[^A-Za-z0-9]/.test(pw)) score++;
 		const levels = [
@@ -72,7 +74,7 @@
 		return levels[Math.min(score - 1, 3)] || levels[0];
 	}
 
-	$: pwStrength = getPasswordStrength(suPassword);
+	let pwStrength = $derived(getPasswordStrength(suPassword));
 
 	function nextStep() {
 		if (step === 1) {
@@ -80,8 +82,16 @@
 				showToast('⚠️ Required Fields', 'Please fill in all personal information fields.', 'warning');
 				return;
 			}
-			if (suNin.length !== 11) {
+			if (suNin.length !== 11 || !/^\d{11}$/.test(suNin)) {
 				showToast('⚠️ Invalid NIN', 'NIN must be exactly 11 digits.', 'warning');
+				return;
+			}
+			if (suPassword.length < 8) {
+				showToast('⚠️ Weak Password', 'Password must be at least 8 characters.', 'warning');
+				return;
+			}
+			if (suPassword !== suConfirmPassword) {
+				showToast('⚠️ Password Mismatch', 'Passwords do not match. Please try again.', 'warning');
 				return;
 			}
 			step = 2;
@@ -94,7 +104,6 @@
 		}
 	}
 
-
 	async function handleLogin() {
 		if (!loginEmail || !loginPassword) {
 			showToast('⚠️ Missing Fields', 'Please enter your email and password.', 'warning');
@@ -104,10 +113,10 @@
 		const result = await signInWithEmail(loginEmail, loginPassword);
 		loading = false;
 		if (result.success) {
-			showToast('✅ Welcome Back', 'Logged in successfully.', 'success');
+			showToast('✅ Welcome Back', 'Signed in successfully.', 'success');
 			close();
 		} else {
-			showToast('❌ Login Failed', result.error || 'Check your credentials.', 'error');
+			showToast('❌ Sign In Failed', result.error || 'Check your credentials.', 'error');
 		}
 	}
 
@@ -117,7 +126,8 @@
 			return;
 		}
 		loading = true;
-		
+
+		// Flat profile shape matching Convex schema (no nested academicProfile)
 		const profileData = {
 			dob: suDob,
 			nin: suNin,
@@ -127,14 +137,12 @@
 			stateOfResidence: suStateRes,
 			lga: suLga,
 			address: suAddress,
-			academicProfile: {
-				institutionType: suInstType,
-				institutionName: suInstName,
-				faculty: suFaculty,
-				department: suDept,
-				level: suLevel,
-				matricNumber: suMatric
-			}
+			institutionType: suInstType,
+			institutionName: suInstName,
+			faculty: suFaculty,
+			department: suDept,
+			level: suLevel,
+			matricNumber: suMatric
 		};
 
 		const result = await signUpWithEmail(suEmail, suPassword, suFullName, profileData);
@@ -143,10 +151,9 @@
 			showToast('✨ Account Created', 'Welcome to CollegeCBT!', 'success');
 			signupSuccess = true;
 		} else {
-			showToast('❌ Signup Failed', result.error || 'Please try again.', 'error');
+			showToast('❌ Sign Up Failed', result.error || 'Please try again.', 'error');
 		}
 	}
-
 </script>
 
 {#if $activeModal}
@@ -154,14 +161,15 @@
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center p-4"
 		style="background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);"
-		on:click|self={close}
-		on:keydown={handleBackdropKey}
+		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
+		onkeydown={handleBackdropKey}
 		role="dialog"
 		aria-modal="true"
 		aria-label="Authentication dialog"
 		tabindex="-1"
 		transition:fade={{ duration: 200 }}
 	>
+
 		<div
 			class="w-full max-w-lg"
 			transition:scale={{ duration: 250, start: 0.95 }}
@@ -169,27 +177,25 @@
 			<!-- Tab switcher -->
 			<div class="flex gap-2 mb-4 p-1.5 rounded-2xl border border-white/10 bg-black/25">
 				<button
-					on:click={() => switchTab('signup')}
+					onclick={() => switchTab('signup')}
 					class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
-					class:bg-violet-DEFAULT={activeTab === 'signup'}
-					class:text-white={activeTab === 'signup'}
-					class:text-white-60={activeTab !== 'signup'}
+					class:tab-active={activeTab === 'signup'}
+					class:tab-inactive={activeTab !== 'signup'}
 				>
 					Create Account
 				</button>
 				<button
-					on:click={() => switchTab('login')}
+					onclick={() => switchTab('login')}
 					class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
-					class:bg-violet-DEFAULT={activeTab === 'login'}
-					class:text-white={activeTab === 'login'}
-					class:text-white-60={activeTab !== 'login'}
+					class:tab-active={activeTab === 'login'}
+					class:tab-inactive={activeTab !== 'login'}
 				>
 					Sign In
 				</button>
 			</div>
 
 			<!-- Card -->
-			<div class="glass-card p-6 relative overflow-hidden max-h-[85vh] overflow-y-auto">
+			<div class="glass-card p-6 relative overflow-hidden max-h-[85vh] overflow-y-auto modal-scroll">
 				<!-- Top accent bar -->
 				<div class="absolute top-0 left-0 right-0 h-0.5" style="background:linear-gradient(90deg,#7c3aed,#84cc16);"></div>
 
@@ -198,7 +204,6 @@
 					<h2 class="font-display text-2xl mb-1">Welcome Back</h2>
 					<p class="text-white/50 text-sm mb-6">Sign in to your CollegeCBT account to continue.</p>
 
-
 					<div class="space-y-4 mb-6">
 						<div>
 							<label for="login-email" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1">Email Address</label>
@@ -206,16 +211,16 @@
 						</div>
 						<div>
 							<label for="login-password" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-1">Password</label>
-							<input id="login-password" type="password" bind:value={loginPassword} class="form-input" placeholder="Your password" autocomplete="current-password" on:keydown={(e) => e.key === 'Enter' && handleLogin()} />
+							<input id="login-password" type="password" bind:value={loginPassword} class="form-input" placeholder="Your password" autocomplete="current-password" onkeydown={(e) => e.key === 'Enter' && handleLogin()} />
 						</div>
 					</div>
 
-					<button on:click={handleLogin} disabled={loading} class="btn-violet w-full py-3 justify-center">
-						{#if loading}<span class="spinner w-5 h-5 border-2"></span>{:else}🔑 Sign In{/if}
+					<button onclick={handleLogin} disabled={loading} class="btn-violet w-full py-3 flex justify-center items-center gap-2">
+						{#if loading}<span class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>{:else}🔑 Sign In{/if}
 					</button>
 
 					<p class="text-center text-xs text-white/40 mt-4">
-						Don't have an account? <button on:click={() => switchTab('signup')} class="text-violet-light hover:underline">Create one free →</button>
+						Don't have an account? <button onclick={() => switchTab('signup')} class="text-violet-light hover:underline">Create one free →</button>
 					</p>
 				{/if}
 
@@ -225,31 +230,30 @@
 						<div class="text-center py-4">
 							<div class="text-6xl mb-4">🎉</div>
 							<h2 class="font-display text-2xl mb-2">Welcome to CollegeCBT!</h2>
-							<p class="text-white/50 text-sm mb-6">Your account is ready. Start practising and track your results.</p>
+							<p class="text-white/50 text-sm mb-6">Your account is ready. Check your email to verify, then start practising.</p>
 							<div class="flex gap-3 justify-center flex-wrap">
-								<a href="/exam-lab" on:click={close} class="btn-violet px-6 py-2.5 text-sm">🤖 Go to Exam Lab →</a>
-								<a href="/dashboard" on:click={close} class="btn-ghost px-5 py-2.5 text-sm">📊 Dashboard</a>
+								<a href="/exam-lab" onclick={close} class="btn-violet px-6 py-2.5 text-sm">🤖 Go to Exam Lab →</a>
+								<a href="/dashboard" onclick={close} class="btn-ghost px-5 py-2.5 text-sm">📊 My Dashboard</a>
 							</div>
 						</div>
 					{:else}
 						<!-- Step indicator -->
 						<div class="flex items-center gap-0 mb-6">
-							{#each [1,2,3] as s, i}
+							{#each [1, 2, 3] as s, i}
 								<div class="flex flex-col items-center">
 									<div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all"
 										style="border-color:{step > s ? '#84cc16' : step === s ? '#7c3aed' : 'rgba(255,255,255,0.1)'};background:{step > s ? 'rgba(132,204,22,0.15)' : step === s ? '#7c3aed' : 'transparent'};color:{step > s ? '#84cc16' : '#fff'};">
 										{step > s ? '✓' : s}
 									</div>
-									<span class="text-[11px] text-white/40 mt-1">{['Personal','Contact','Academic'][i]}</span>
+									<span class="text-[11px] text-white/40 mt-1">{['Personal', 'Contact', 'Academic'][i]}</span>
 								</div>
 								{#if i < 2}
-									<div class="flex-1 h-0.5 mx-1 mb-4 rounded-full transition-all" style="background:{step > s + 1 || (step === s + 1) ? '#84cc16' : 'rgba(255,255,255,0.08)'};"></div>
+									<div class="flex-1 h-0.5 mx-1 mb-4 rounded-full transition-all" style="background:{step > s + 1 || step === s + 1 ? '#84cc16' : 'rgba(255,255,255,0.08)'};"></div>
 								{/if}
 							{/each}
 						</div>
 
-
-						<!-- Step 1 -->
+						<!-- Step 1: Personal Info -->
 						{#if step === 1}
 							<h2 class="font-display text-xl mb-1">Create Your Account</h2>
 							<p class="text-white/40 text-xs mb-4">Step 1 of 3 — Personal Information</p>
@@ -271,7 +275,7 @@
 									<input id="su-nin" type="text" inputmode="numeric" bind:value={suNin} class="form-input" placeholder="11-digit NIN" maxlength="11" />
 									<p class="text-[11px] text-white/30 mt-1">Used for identity verification only.</p>
 								</div>
-								<div class="sm:col-span-2">
+								<div>
 									<label for="su-password" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Password *</label>
 									<input id="su-password" type="password" bind:value={suPassword} class="form-input" placeholder="Create a strong password" autocomplete="new-password" />
 									{#if suPassword}
@@ -281,11 +285,20 @@
 										<p class="text-[11px] mt-1" style="color:{pwStrength.color};">{pwStrength.label} password</p>
 									{/if}
 								</div>
+								<div>
+									<label for="su-confirm-password" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Confirm Password *</label>
+									<input id="su-confirm-password" type="password" bind:value={suConfirmPassword} class="form-input" placeholder="Repeat your password" autocomplete="new-password" />
+									{#if suConfirmPassword && suPassword !== suConfirmPassword}
+										<p class="text-[11px] mt-1 text-rose-400">Passwords do not match</p>
+									{:else if suConfirmPassword && suPassword === suConfirmPassword}
+										<p class="text-[11px] mt-1 text-lime-400">✓ Passwords match</p>
+									{/if}
+								</div>
 							</div>
-							<button on:click={nextStep} class="btn-violet w-full py-3 justify-center">Continue to Step 2 →</button>
+							<button onclick={nextStep} class="btn-violet w-full py-3 flex justify-center items-center">Continue to Step 2 →</button>
 						{/if}
 
-						<!-- Step 2 -->
+						<!-- Step 2: Contact & Location -->
 						{#if step === 2}
 							<h2 class="font-display text-xl mb-1">Contact & Location</h2>
 							<p class="text-white/40 text-xs mb-4">Step 2 of 3 — How to reach you</p>
@@ -313,21 +326,21 @@
 									</select>
 								</div>
 								<div>
-									<label for="su-lga" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">LGA *</label>
+									<label for="su-lga" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Local Government Area *</label>
 									<input id="su-lga" type="text" bind:value={suLga} class="form-input" placeholder="Your LGA" />
 								</div>
 								<div>
-									<label for="su-address" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Home Address *</label>
+									<label for="su-address" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Home Address</label>
 									<input id="su-address" type="text" bind:value={suAddress} class="form-input" placeholder="Street, City" autocomplete="street-address" />
 								</div>
 							</div>
 							<div class="flex gap-3">
-								<button on:click={() => step = 1} class="btn-ghost flex-1 py-3 text-sm">← Back</button>
-								<button on:click={nextStep} class="btn-violet flex-1 py-3 text-sm justify-center">Continue to Step 3 →</button>
+								<button onclick={() => step = 1} class="btn-ghost flex-1 py-3 text-sm">← Back</button>
+								<button onclick={nextStep} class="btn-violet flex-1 py-3 text-sm flex justify-center items-center">Continue to Step 3 →</button>
 							</div>
 						{/if}
 
-						<!-- Step 3 -->
+						<!-- Step 3: Academic Profile -->
 						{#if step === 3}
 							<h2 class="font-display text-xl mb-1">Academic Profile</h2>
 							<p class="text-white/40 text-xs mb-4">Step 3 of 3 — Institution & course details</p>
@@ -358,7 +371,7 @@
 										{#if suInstType && LEVELS[suInstType as InstitutionType]}
 											{#each LEVELS[suInstType as InstitutionType] as lvl}<option value={lvl}>{lvl}</option>{/each}
 										{:else}
-											{#each ['100 Level','200 Level','300 Level','400 Level','500/600 Level'] as lvl}<option value={lvl}>{lvl}</option>{/each}
+											{#each ['100 Level', '200 Level', '300 Level', '400 Level', '500/600 Level'] as lvl}<option value={lvl}>{lvl}</option>{/each}
 										{/if}
 									</select>
 								</div>
@@ -368,13 +381,13 @@
 								</div>
 							</div>
 							<label class="flex items-start gap-3 mb-4 cursor-pointer">
-								<input type="checkbox" bind:checked={suTerms} class="mt-0.5 accent-violet-DEFAULT flex-shrink-0" />
+								<input type="checkbox" bind:checked={suTerms} class="mt-0.5 accent-violet-600 flex-shrink-0 w-4 h-4" />
 								<span class="text-xs text-white/40">I agree to the <a href="/terms" class="text-violet-light hover:underline">Terms of Service</a> and <a href="/privacy" class="text-violet-light hover:underline">Privacy Policy</a>. My NIN is used solely for identity verification.</span>
 							</label>
 							<div class="flex gap-3">
-								<button on:click={() => step = 2} class="btn-ghost flex-1 py-3 text-sm">← Back</button>
-								<button on:click={handleSignup} disabled={loading} class="btn-violet flex-1 py-3 text-sm justify-center">
-									{#if loading}<span class="spinner w-4 h-4 border-2"></span>{:else}🎓 Create My Account →{/if}
+								<button onclick={() => step = 2} class="btn-ghost flex-1 py-3 text-sm">← Back</button>
+								<button onclick={handleSignup} disabled={loading} class="btn-violet flex-1 py-3 text-sm flex justify-center items-center gap-2">
+									{#if loading}<span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>{:else}🎓 Create My Account →{/if}
 								</button>
 							</div>
 						{/if}
@@ -386,6 +399,10 @@
 {/if}
 
 <style>
-	.bg-violet-DEFAULT { background-color: #7c3aed; }
-	.text-white-60 { color: rgba(255,255,255,0.6); }
+	.tab-active { background-color: #7c3aed; color: white; }
+	.tab-inactive { color: rgba(255,255,255,0.6); }
+	.tab-inactive:hover { color: white; background: rgba(255,255,255,0.05); }
+	.modal-scroll::-webkit-scrollbar { width: 4px; }
+	.modal-scroll::-webkit-scrollbar-track { background: transparent; }
+	.modal-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
 </style>

@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { useQuery } from 'convex-svelte';
 	import { api } from '$lib/services/convexClient';
-	import { fade, slide } from 'svelte/transition';
-	import { onMount } from 'svelte';
 
-	const health = useQuery(api.admin.getSystemHealth, {});
-	const recentLogs = useQuery(api.admin.getRecentActivity, { limit: 20 });
+	const healthQuery = useQuery(api.admin.getSystemHealth, {});
+	const recentLogsQuery = useQuery(api.admin.getRecentActivity, { limit: 20 });
+
+	let health = $derived(healthQuery.data);
+	let recentLogs = $derived(recentLogsQuery.data);
 
 	const services = [
 		{ name: 'Convex Database', status: 'Operational', latency: '12ms', color: '#84cc16' },
-		{ name: 'Firebase Execution', status: 'Optimal', latency: '45ms', color: '#22d3ee' },
+		{ name: 'Firebase Auth', status: 'Optimal', latency: '45ms', color: '#22d3ee' },
 		{ name: 'Edge Worker (LON-01)', status: 'Active', latency: '8ms', color: '#a78bfa' },
-		{ name: 'Internal SvelteKit Stack', status: 'Stable', latency: '3ms', color: '#fcd34d' }
+		{ name: 'SvelteKit Stack', status: 'Stable', latency: '3ms', color: '#fcd34d' }
 	];
 
 	function formatTime(ts: number) {
@@ -24,7 +25,7 @@
 	<!-- ── Header ── -->
 	<div class="flex items-end justify-between">
 		<div>
-			<h1 class="font-display text-3xl text-white mb-2">System Observability</h1>
+			<h1 class="font-display text-3xl text-white mb-2">System Monitoring</h1>
 			<p class="text-white/40 text-sm italic">High-fidelity telemetry across the Edge and distributed clusters.</p>
 		</div>
 		<div class="px-5 py-2.5 rounded-full bg-lime-500/5 border border-lime-500/20 text-[10px] font-black text-lime-500 tracking-widest uppercase animate-pulse">
@@ -40,7 +41,7 @@
 				
 				<div class="flex items-center justify-between mb-4">
 					<div class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em]">{s.name}</div>
-					<div class="w-1.5 h-1.5 rounded-full" style="background:{s.color}; shadow: 0 0 10px {s.color}66;"></div>
+					<div class="w-1.5 h-1.5 rounded-full" style="background:{s.color};"></div>
 				</div>
 
 				<div class="flex items-end justify-between">
@@ -59,7 +60,7 @@
 
 	<div class="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
 		
-		<!-- ── Throughput Heatmap ── -->
+		<!-- ── Throughput Visualization ── -->
 		<div class="glass-card flex flex-col min-h-[500px]">
 			<div class="h-16 px-8 border-b border-white/5 flex items-center justify-between">
 				<h4 class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">Network Throughput Visualization</h4>
@@ -70,7 +71,6 @@
 			</div>
 
 			<div class="flex-1 p-8 flex items-center justify-center relative bg-black/20 overflow-hidden">
-				<!-- High Performance Grid Visualization -->
 				<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image:radial-gradient(rgba(124,58,237,0.2) 1px, transparent 0); background-size: 24px 24px;"></div>
 				
 				<div class="w-full h-48 flex items-end gap-2 px-4 relative z-10">
@@ -80,7 +80,7 @@
 				</div>
 
 				<div class="absolute bottom-8 left-8 text-left">
-					<div class="text-4xl font-display text-white mb-1 tracking-tight">{$health?.throughput || 0} Req</div>
+					<div class="text-4xl font-display text-white mb-1 tracking-tight">{health?.throughput || 0} Req</div>
 					<div class="text-[10px] text-white/20 uppercase tracking-widest font-black leading-tight">Requests per hour · Node Active</div>
 				</div>
 			</div>
@@ -94,8 +94,12 @@
 			</div>
 
 			<div class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
-				{#if $recentLogs}
-					{#each $recentLogs as log}
+				{#if recentLogsQuery.isLoading}
+					<div class="flex items-center justify-center h-40">
+						<div class="text-white/20 animate-pulse">Fetching signal...</div>
+					</div>
+				{:else if recentLogs && recentLogs.length > 0}
+					{#each recentLogs as log}
 						<div class="p-3 rounded-xl bg-white/[0.02] border border-white/5 space-y-1 group hover:border-violet-500/30 transition-all cursor-default">
 							<div class="flex items-center justify-between">
 								<span class="text-[9px] font-black uppercase tracking-widest {log.status === 'success' ? 'text-lime-500' : 'text-rose-500'}">
@@ -111,6 +115,10 @@
 							</div>
 						</div>
 					{/each}
+				{:else}
+					<div class="flex items-center justify-center h-40">
+						<div class="text-white/20">No logs yet</div>
+					</div>
 				{/if}
 			</div>
 		</div>
@@ -120,7 +128,7 @@
 	<!-- ── Component Load Details ── -->
 	<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 		<div class="glass-card p-6 bg-white/[0.01]">
-			<div class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">WebSocket Health</div>
+			<div class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">Connection Health</div>
 			<div class="flex items-center gap-3">
 				<div class="w-12 h-12 rounded-2xl bg-black/60 border border-white/5 flex items-center justify-center text-2xl">🔗</div>
 				<div>
@@ -130,7 +138,7 @@
 			</div>
 		</div>
 		<div class="glass-card p-6 bg-white/[0.01]">
-			<div class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">Encryption Logic</div>
+			<div class="text-[10px] font-black text-white/20 uppercase tracking-[0.2em] mb-4">Encryption</div>
 			<div class="flex items-center gap-3">
 				<div class="w-12 h-12 rounded-2xl bg-black/60 border border-white/5 flex items-center justify-center text-2xl">🛡️</div>
 				<div>

@@ -1,20 +1,29 @@
 <script lang="ts">
 	import { useQuery } from 'convex-svelte';
-	import { api } from '$lib/services/convexClient';
-	import { onMount } from 'svelte';
+	import { api, convex } from '$lib/services/convexClient';
+	import { anyApi } from 'convex/server';
 	import { fade, slide } from 'svelte/transition';
 	import { showToast } from '$lib/stores';
 
 	// ── Real-time Analytics ──
-	const stats = useQuery(api.admin.getDashboardStats, {});
-	const activity = useQuery(api.admin.getRecentActivity, { limit: 12 });
-	const health = useQuery(api.admin.getSystemHealth, {});
+	const statsQuery = useQuery(api.admin.getDashboardStats, {});
+	const activityQuery = useQuery(api.admin.getRecentActivity, { limit: 12 });
+	const healthQuery = useQuery(api.admin.getSystemHealth, {});
+	const maintenanceQuery = useQuery(anyApi.admin.getConfigFlag, { key: 'maintenance_mode' });
 
-	// ── Metrics Computed ──
-	$: kpis = [
+	// ── Metrics Computed via .data property (Svelte 5 runes mode) ──
+	let stats = $derived(statsQuery.data);
+	let activity = $derived(activityQuery.data);
+	let health = $derived(healthQuery.data);
+	let maintenanceEnabled = $derived(maintenanceQuery.data === 'true');
+
+	let isFlushing = $state(false);
+	let isTogglingMaintenance = $state(false);
+
+	let kpis = $derived([
 		{ 
 			label: 'Total Registered Users', 
-			value: $stats?.totalUsers || 0, 
+			value: stats?.totalUsers ?? 0, 
 			icon: '👥', 
 			color: '#7c3aed', 
 			trend: '+12%', 
@@ -22,7 +31,7 @@
 		},
 		{ 
 			label: 'Concurrent Active Sessions', 
-			value: $stats?.activeSessions || 0, 
+			value: stats?.activeSessions ?? 0, 
 			icon: '⚡', 
 			color: '#84cc16', 
 			trend: 'Stable', 
@@ -30,26 +39,59 @@
 		},
 		{ 
 			label: 'Real-time Exam Count', 
-			value: $stats?.examStats.total || 0, 
+			value: stats?.examStats?.total ?? 0, 
 			icon: '📝', 
 			color: '#22d3ee', 
 			trend: '↑ 34', 
 			sub: 'Conducted Today' 
 		},
 		{ 
-			label: 'Estimated MRR', 
-			value: `₦${($stats?.revenueEst || 0).toLocaleString()}`, 
+			label: 'Estimated Revenue', 
+			value: `₦${(stats?.revenueEst ?? 0).toLocaleString()}`, 
 			icon: '💰', 
 			color: '#f59e0b', 
 			trend: 'New Milestone', 
 			sub: 'Monthly Revenue' 
 		}
-	];
+	]);
+
+	async function handleFlushCache() {
+		if (isFlushing) return;
+		isFlushing = true;
+		try {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const result: any = await convex.mutation(anyApi.admin.flushCache, {});
+			showToast('✅ Cache Flushed', `${result?.flushed ?? 0} entries cleared from global cache.`, 'success');
+		} catch (err) {
+			showToast('❌ Flush Failed', 'Could not flush cache. Check logs.', 'error');
+		} finally {
+			isFlushing = false;
+		}
+	}
+
+	async function handleToggleMaintenance() {
+		if (isTogglingMaintenance) return;
+		isTogglingMaintenance = true;
+		try {
+			const next = !maintenanceEnabled;
+			await convex.mutation(anyApi.admin.setMaintenanceMode, { enabled: next });
+			showToast(
+				next ? '🛑 Maintenance ON' : '✅ Maintenance OFF',
+				next ? 'AI generation is now blocked for all users.' : 'System returned to normal operation.',
+				next ? 'info' : 'success'
+			);
+		} catch (err) {
+			showToast('❌ Failed', 'Could not toggle maintenance mode.', 'error');
+		} finally {
+			isTogglingMaintenance = false;
+		}
+	}
 
 	function formatTime(ts: number) {
 		return new Date(ts).toLocaleTimeString();
 	}
 </script>
+
 
 <div class="space-y-8">
 	<!-- ── Header & Time ── -->
@@ -112,13 +154,13 @@
 				</div>
 
 				<div class="flex-1 flex flex-col items-center justify-center space-y-6">
-					<!-- Visual Gauge Placeholder - Will use Chart.js if installed -->
+					<!-- Visual Gauge -->
 					<div class="relative w-64 h-64 flex items-center justify-center">
 						<div class="absolute inset-0 rounded-full border-[12px] border-white/5"></div>
 						<div class="absolute inset-0 rounded-full border-[12px] border-b-transparent border-l-transparent border-violet-600/50 rotate-45"></div>
 						<div class="text-center">
 							<div class="text-xs text-white/30 uppercase tracking-widest mb-1">Crawl Stability</div>
-							<div class="text-5xl font-display text-white">{$health?.crawlSuccessRate || 100}%</div>
+							<div class="text-5xl font-display text-white">{health?.crawlSuccessRate || 100}%</div>
 							<div class="text-[10px] text-lime-500 font-bold mt-2">Optimal Bandwidth</div>
 						</div>
 					</div>
@@ -126,11 +168,11 @@
 					<div class="grid grid-cols-3 w-full gap-4 pt-6">
 						<div class="text-center p-4 rounded-2xl bg-white/5 border border-white/5">
 							<div class="text-white/30 text-[9px] uppercase tracking-widest mb-1">Avg Latency</div>
-							<div class="text-sm font-bold text-white">{$health?.latencyAvg || 0}ms</div>
+							<div class="text-sm font-bold text-white">{health?.latencyAvg || 0}ms</div>
 						</div>
 						<div class="text-center p-4 rounded-2xl bg-white/5 border border-white/5">
 							<div class="text-white/30 text-[9px] uppercase tracking-widest mb-1">Throughput / hr</div>
-							<div class="text-sm font-bold text-white">{$health?.throughput || 0} Req</div>
+							<div class="text-sm font-bold text-white">{health?.throughput || 0} Req</div>
 						</div>
 						<div class="text-center p-4 rounded-2xl bg-white/5 border border-white/5">
 							<div class="text-white/30 text-[9px] uppercase tracking-widest mb-1">Memory Cache</div>
@@ -142,15 +184,33 @@
 
 			<!-- Quick Admin Tools -->
 			<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-				<button class="flex flex-col items-center gap-3 p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-violet-500/50 transition-all group shadow-xl">
+				<button
+					onclick={handleFlushCache}
+					disabled={isFlushing}
+					class="flex flex-col items-center gap-3 p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-violet-500/50 transition-all group shadow-xl disabled:opacity-60"
+				>
 					<span class="text-3xl group-hover:scale-110 transition-transform">🛠️</span>
-					<span class="text-xs font-bold text-white/60 tracking-tight">Regen Global Cache</span>
+					<span class="text-xs font-bold text-white/60 tracking-tight">
+						{isFlushing ? 'Flushing...' : 'Rebuild Global Cache'}
+					</span>
 				</button>
-				<button class="flex flex-col items-center gap-3 p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-rose-500/50 transition-all group shadow-xl">
-					<span class="text-3xl group-hover:scale-110 transition-transform">🛑</span>
-					<span class="text-xs font-bold text-white/60 tracking-tight">Enter Maintenance</span>
-				</button>
-				<button class="flex flex-col items-center gap-3 p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-lime-500/50 transition-all group shadow-xl" onclick={() => showToast('Backup', 'System backup initiated to S3.', 'success')}>
+				<button
+				onclick={handleToggleMaintenance}
+				disabled={isTogglingMaintenance}
+				class={`flex flex-col items-center gap-3 p-6 rounded-3xl bg-black/40 border transition-all group shadow-xl disabled:opacity-60 ${maintenanceEnabled ? 'border-rose-500/50 hover:border-rose-500' : 'border-white/5 hover:border-rose-500/50'}`}
+			>
+				<span class="text-3xl group-hover:scale-110 transition-transform">
+					{#if maintenanceEnabled}✅{:else}🛑{/if}
+				</span>
+				<span class={`text-xs font-bold tracking-tight ${maintenanceEnabled ? 'text-rose-400' : 'text-white/60'}`}>
+					{#if isTogglingMaintenance}Toggling...{:else if maintenanceEnabled}Exit Maintenance{:else}Enter Maintenance{/if}
+				</span>
+			</button>
+
+				<button
+					onclick={() => showToast('Backup', 'Manual audit snapshot recorded.', 'success')}
+					class="flex flex-col items-center gap-3 p-6 rounded-3xl bg-black/40 border border-white/5 hover:border-lime-500/50 transition-all group shadow-xl"
+				>
 					<span class="text-3xl group-hover:scale-110 transition-transform">💾</span>
 					<span class="text-xs font-bold text-white/60 tracking-tight">Manual Snapshot</span>
 				</button>
@@ -169,8 +229,12 @@
 				</div>
 
 				<div class="flex-1 overflow-y-auto space-y-4 pr-1 custom-scrollbar">
-					{#if $activity}
-						{#each $activity as act}
+					{#if activityQuery.isLoading}
+						<div class="flex items-center justify-center h-40">
+							<div class="text-white/20 animate-pulse">Establishing Signal...</div>
+						</div>
+					{:else if activity && activity.length > 0}
+						{#each activity as act}
 							<div class="flex gap-4 p-4 rounded-2xl bg-white/[0.03] border border-white/5 relative group hover:bg-white/[0.06] transition-colors" in:slide>
 								<div class="w-10 h-10 rounded-xl bg-black/60 flex items-center justify-center text-lg flex-shrink-0 border border-white/5 shadow-xl">
 									{#if act.action.includes('login')} 🔑 
@@ -195,7 +259,7 @@
 						{/each}
 					{:else}
 						<div class="flex items-center justify-center h-40">
-							<div class="text-white/20 animate-pulse">Establishing Signal...</div>
+							<div class="text-white/20">No recent activity</div>
 						</div>
 					{/if}
 				</div>

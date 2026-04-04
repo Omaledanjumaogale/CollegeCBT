@@ -163,6 +163,14 @@ export default defineSchema({
     .index('by_key', ['key'])
     .index('by_expiry', ['expiresAt']),
 
+  // ── Infrastructure: System Configuration Flags ───────────────────────────
+  configFlags: defineTable({
+    key: v.string(),          // e.g. 'maintenance_mode', 'ai_enabled'
+    value: v.string(),        // string representation: 'true'/'false' or JSON
+    description: v.optional(v.string()),
+    updatedAt: v.number(),
+  }).index('by_key', ['key']),
+
   // ── Infrastructure: Workflow Orchestration ────────────────────────────────
   workflows: defineTable({
     name: v.string(), // e.g., 'onboarding_sequence', 'exam_cleanup'

@@ -61,3 +61,26 @@ export const cleanupSessions = internalMutation({
     }
   },
 });
+
+/**
+ * Enterprise Audit Logger.
+ * Records all mission-critical events (Role change, user deletion, payment gateway notifications).
+ */
+export const logAudit = mutation({
+  args: {
+    userId: v.optional(v.string()), // Firebase UID or "system"
+    action: v.string(), // e.g. "payment_webhook", "role_override"
+    status: v.union(v.literal('success'), v.literal('failure')),
+    metadata: v.string(), // JSON blob for detailed tracking
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert('auditLogs', {
+      userId: args.userId,
+      action: args.action,
+      status: args.status,
+      metadata: args.metadata,
+      timestamp: Date.now(),
+    });
+  },
+});
+

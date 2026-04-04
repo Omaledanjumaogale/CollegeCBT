@@ -6,6 +6,7 @@
 </script>
 
 <div 
+	role="group"
 	class="relative inline-flex items-center gap-1 group"
 	onmouseenter={() => isHovered = true}
 	onmouseleave={() => isHovered = false}

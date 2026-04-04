@@ -77,8 +77,8 @@ export const requestCrawl = mutation({
         throw new Error('Rate limit exceeded for this tenant');
     }
 
-    // 3. Cache Check (48h TTL)
-    const urlHash = Buffer.from(args.url).toString('base64'); // Simple hash for demo, would use crypto in action
+    // 3. Cache Check (48h TTL) — Edge-compatible URL hash (no Buffer)
+    const urlHash = btoa(encodeURIComponent(args.url)).replace(/[+/=]/g, (c) => ({'+':'_','/':'-','=':''})[c] ?? c);
     const cached = await ctx.db
       .query('crawlCache')
       .withIndex('by_url_hash', (q) => q.eq('urlHash', urlHash))
@@ -143,6 +143,7 @@ export const executeCrawlAction = internalAction({
     const startTime = Date.now();
     const apiUrl = process.env.CRAWL4AI_API_URL;
     const apiSecret = process.env.CRAWL4AI_API_SECRET;
+    const serviceId = process.env.CRAWL4AI_SERVICE_ID;
 
     if (!apiUrl) {
       console.error('CRAWL4AI_API_URL not configured');
@@ -156,19 +157,30 @@ export const executeCrawlAction = internalAction({
     try {
       // 1. Render Sleep Handling (Wake Request)
       // Small timeout to just wake it if it's sleeping
-      try {
-          await fetch(apiUrl + '/health', { method: 'GET', signal: AbortSignal.timeout(5000) });
-      } catch (e) {
-          console.log('Render service might be waking up...');
+      if (serviceId) {
+        try {
+            await fetch(apiUrl + '/health', { 
+              method: 'GET', 
+              headers: { 'X-Render-Service-Id': serviceId },
+              signal: AbortSignal.timeout(10000) 
+            });
+        } catch (e) {
+            console.log(`Render service might be waking up (${serviceId})...`);
+        }
       }
 
       // 2. Perform Crawl
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiSecret}`,
+      };
+      if (serviceId) {
+        headers['X-Render-Service-Id'] = serviceId;
+      }
+
       const response = await fetch(apiUrl + '/crawl', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiSecret}`
-        },
+        headers,
         body: JSON.stringify({ url: job.url }),
       });
 
@@ -290,5 +302,48 @@ export const prepRetry = internalMutation({
       retries: job.retries + 1,
       updatedAt: Date.now(),
     });
+  },
+});
+
+// ── Public Queries ────────────────────────────────────────────────────────────
+
+/**
+ * Public query so client-side can poll job status without needing internal access.
+ */
+export const getCrawlJob = query({
+  args: { jobId: v.id('crawlJobs') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.jobId);
+  },
+});
+
+export const getTenantCrawlStats = query({
+  args: { apiKey: v.string() },
+  handler: async (ctx, args) => {
+    const tenant = await ctx.db
+      .query('crawlTenants')
+      .withIndex('by_api_key', (q) => q.eq('apiKey', args.apiKey))
+      .unique();
+    if (!tenant) return null;
+
+    const logs = await ctx.db
+      .query('crawlLogs')
+      .withIndex('by_tenant', (q) => q.eq('tenantId', tenant._id))
+      .order('desc')
+      .take(100);
+
+    const successCount = logs.filter((l) => l.statusLabel === 'success').length;
+    const cacheHits = logs.filter((l) => l.statusLabel === 'cached').length;
+    const avgLatency = logs.length > 0
+      ? Math.round(logs.reduce((a, l) => a + l.responseTimeMs, 0) / logs.length)
+      : 0;
+
+    return {
+      totalRequests: tenant.usageCount,
+      successRate: logs.length > 0 ? Math.round((successCount / logs.length) * 100) : 100,
+      cacheHitRate: logs.length > 0 ? Math.round((cacheHits / logs.length) * 100) : 0,
+      avgLatencyMs: avgLatency,
+      recentLogs: logs.slice(0, 10),
+    };
   },
 });

@@ -3,10 +3,13 @@
 	import { api } from '$lib/services/convexClient';
 	import DataTable from '$lib/components/admin/DataTable.svelte';
 
-	const logs = useQuery(api.admin.getAuditLogs, { limit: 100 });
+	const logsQuery = useQuery(api.admin.getAuditLogs, { limit: 100 });
+
+	let logs = $derived(logsQuery.data ?? []);
+	let loadingLogs = $derived(logsQuery.isLoading);
 
 	const columns = [
-		{ key: 'timestamp', label: 'Time Registry', width: '20%', render: (row: any) => timeSnippet(row.timestamp) },
+		{ key: 'timestamp', label: 'Time', width: '20%', render: (row: any) => timeSnippet(row.timestamp) },
 		{ key: 'userId', label: 'Subject', width: '20%', render: (row: any) => userSnippet(row.userId) },
 		{ key: 'action', label: 'Operation', width: '25%', render: (row: any) => actionSnippet(row.action) },
 		{ key: 'status', label: 'Outcome', width: '15%', render: (row: any) => statusSnippet(row.status) },
@@ -57,19 +60,19 @@
 	<!-- ── Header ── -->
 	<div class="flex items-end justify-between">
 		<div>
-			<h1 class="font-display text-3xl text-white mb-2">Audit Registry</h1>
-			<p class="text-white/40 text-sm italic">Immutable record of high-sensitivity operation signals.</p>
+			<h1 class="font-display text-3xl text-white mb-2">Audit Logs</h1>
+			<p class="text-white/40 text-sm italic">Immutable record of all platform activity and security events.</p>
 		</div>
 		<button class="px-6 h-12 rounded-xl bg-white/5 border border-white/5 text-[11px] font-bold text-white/30 uppercase tracking-widest hover:text-white transition-all shadow-xl">
-			Download Immutable CSV
+			Download CSV
 		</button>
 	</div>
 
 	<!-- ── Logs Table ── -->
 	<DataTable 
 		{columns} 
-		data={$logs} 
-		loading={$logs === undefined} 
+		data={logs} 
+		loading={loadingLogs} 
 	/>
 
 </div>

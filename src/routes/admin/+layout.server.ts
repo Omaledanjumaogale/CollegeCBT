@@ -16,7 +16,6 @@ export const load: LayoutServerLoad = async ({ url, cookies }) => {
 	}
 
 	return {
-		isAdmin: true,
-		sessionSecret: ADMIN_SESSION_SECRET
+		isAdmin: true
 	};
 };

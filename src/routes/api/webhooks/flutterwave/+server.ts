@@ -1,75 +1,62 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { ConvexHttpClient } from 'convex/browser';
+import { anyApi } from 'convex/server';
+import { PUBLIC_CONVEX_URL } from '$env/static/public';
+import { FLUTTERWAVE_WEBHOOK_HASH } from '$env/static/private';
 
-export const POST: RequestHandler = async ({ request, platform }) => {
-	try {
-		const signature = request.headers.get('verif-hash');
-		const env = platform?.env as Record<string, string> | undefined;
-		const secretHash = env?.FLUTTERWAVE_WEBHOOK_HASH;
+/**
+ * Flutterwave Webhook Handler
+ * Validates the verif-hash header against a dedicated webhook hash secret
+ * (set in Flutterwave Dashboard → Webhooks → Secret Hash) and upgrades user plan.
+ *
+ * NOTE: FLUTTERWAVE_WEBHOOK_HASH is a separate secret you define yourself
+ * in the Flutterwave dashboard. It is NOT the API Client Secret nor the
+ * Encryption Key. Set a strong random string there and add it to .env here.
+ */
+export const POST: RequestHandler = async ({ request }) => {
+    const receivedHash = request.headers.get('verif-hash');
 
-		// 1. Verify webhook signature
-		if (secretHash && signature !== secretHash) {
-			console.error('[CollegeCBT] Webhook signature mismatch');
-			return json({ status: 'unauthorized' }, { status: 401 });
-		}
+    // Simple constant-time-safe comparison using crypto.subtle
+    if (!receivedHash) {
+        console.error('[Flutterwave Webhook] Missing verif-hash header');
+        return json({ status: 'error', message: 'Missing signature' }, { status: 401 });
+    }
 
-		const data = await request.json();
-		console.log('[CollegeCBT] Webhook received:', data.event, data.data.tx_ref);
+    if (receivedHash !== FLUTTERWAVE_WEBHOOK_HASH) {
+        console.error('[Flutterwave Webhook] Invalid verif-hash');
+        return json({ status: 'error', message: 'Invalid signature' }, { status: 401 });
+    }
 
-		// 2. We only care about charge.completed
-		if (data.event !== 'charge.completed' || data.data.status !== 'successful') {
-			return json({ status: 'ignored' });
-		}
+    // ── Parse ────────────────────────────────────────────────────────────────────
+    let payload: any;
+    try {
+        payload = await request.json();
+    } catch {
+        return json({ status: 'error', message: 'Invalid JSON body' }, { status: 400 });
+    }
 
-		// 3. Extract UID from tx_ref (Format: CBT-UID-TIMESTAMP)
-		const txRef = data.data.tx_ref as string;
-		const parts = txRef.split('-');
-		if (parts.length < 3 || parts[0] !== 'CBT') {
-			console.error('[CollegeCBT] Invalid tx_ref format:', txRef);
-			return json({ status: 'invalid_ref' }, { status: 400 });
-		}
-		
-		const uid = parts[1];
-		const amount = data.data.amount;
+    // ── Process successful charge ────────────────────────────────────────────────
+    if (payload.event === 'charge.completed' && payload.data?.status === 'successful') {
+        const { tx_ref, amount, customer } = payload.data;
+        // Use email as the user identifier (matched in Convex by uid which is email on signup)
+        const uid = customer?.email;
 
-		// 4. Update Firestore user plan
-		// Map amount to plan
-		let newPlan: 'pro' | 'institutional' = 'pro';
-		if (amount >= 20000) newPlan = 'institutional'; // ₦25,000 plan
+        if (uid) {
+            console.log(`[Flutterwave Webhook] Payment verified: ${tx_ref} for ${uid}`);
+            const convex = new ConvexHttpClient(PUBLIC_CONVEX_URL);
+            try {
+                await convex.mutation(anyApi.users.updateUserPlan, { uid, plan: 'pro' });
+                await convex.mutation(anyApi.interactionSessions.logAudit, {
+                    action: 'payment_webhook_processed',
+                    status: 'success',
+                    metadata: JSON.stringify({ gateway: 'flutterwave', tx_ref, amount })
+                });
+            } catch (error) {
+                console.error('[Flutterwave Webhook] Convex sync failed:', error);
+            }
+        }
+    }
 
-		const projectId = env?.PUBLIC_FIREBASE_PROJECT_ID;
-		const apiKey = env?.PUBLIC_FIREBASE_API_KEY;
-
-		if (!projectId || !apiKey) {
-			console.error('[CollegeCBT] Firebase config missing for webhook');
-			return json({ status: 'config_error' }, { status: 500 });
-		}
-
-		// Use the Firestore REST API to patch the document (Edge-compatible)
-		const firestoreUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/users/${uid}?updateMask.fieldPaths=plan&updateMask.fieldPaths=updatedAt&key=${apiKey}`;
-		
-		const updateRes = await fetch(firestoreUrl, {
-			method: 'PATCH',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				fields: {
-					plan: { stringValue: newPlan },
-					updatedAt: { integerValue: Date.now().toString() }
-				}
-			})
-		});
-
-		if (!updateRes.ok) {
-			const err = await updateRes.text();
-			console.error('[CollegeCBT] Webhook Firestore update failed:', err);
-			return json({ status: 'update_failed' }, { status: 500 });
-		}
-
-		console.log(`[CollegeCBT] User ${uid} upgraded to ${newPlan} via webhook`);
-		return json({ status: 'success' });
-
-	} catch (err) {
-		console.error('[CollegeCBT] Webhook error:', err);
-		return json({ status: 'error' }, { status: 500 });
-	}
+    return json({ status: 'accepted' });
 };

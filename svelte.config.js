@@ -5,6 +5,11 @@ import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 const config = {
 	preprocess: vitePreprocess(),
 	kit: {
+		prerender: {
+			entries: ['*', '/sitemap.xml', '/robots.txt'],
+			handleHttpError: 'warn',
+			handleUnseenRoutes: 'ignore'
+		},
 		adapter: adapter({
 			routes: {
 				include: ['/*'],

@@ -124,26 +124,33 @@ export const getSystemHealth = query({
   args: {},
   handler: async (ctx) => {
     const lastHour = Date.now() - 3600000;
-    const sessions = await ctx.db
-      .query('sessions')
-      .withIndex('by_user') // Dummy check, would ideally have timestamp index
-      .collect();
-    
-    const recentSessions = sessions.filter(s => s.timestamp > lastHour);
-    
+
+    // Collect all sessions, filter in memory (no timestamp index yet)
+    const sessions = await ctx.db.query('sessions').collect();
+    const recentSessions = sessions.filter((s) => s.timestamp > lastHour);
+
     const crawls = await ctx.db.query('crawlLogs').collect();
-    const recentCrawls = crawls.filter(c => c.timestamp > lastHour);
-    const crawlSuccess = recentCrawls.length > 0 
-      ? Math.round((recentCrawls.filter(c => c.statusLabel === 'success').length / recentCrawls.length) * 100)
-      : 100;
+    const recentCrawls = crawls.filter((c) => c.timestamp > lastHour);
+    const crawlSuccess =
+      recentCrawls.length > 0
+        ? Math.round(
+            (recentCrawls.filter((c) => c.statusLabel === 'success').length /
+              recentCrawls.length) *
+              100
+          )
+        : 100;
 
     return {
       status: 'Healthy',
       throughput: recentSessions.length,
       crawlSuccessRate: crawlSuccess,
-      latencyAvg: recentCrawls.length > 0
-        ? Math.round(recentCrawls.reduce((acc, c) => acc + c.responseTimeMs, 0) / recentCrawls.length)
-        : 0,
+      latencyAvg:
+        recentCrawls.length > 0
+          ? Math.round(
+              recentCrawls.reduce((acc, c) => acc + c.responseTimeMs, 0) /
+                recentCrawls.length
+            )
+          : 0,
     };
   },
 });
@@ -158,3 +165,85 @@ export const getAuditLogs = query({
       .take(args.limit);
   },
 });
+
+// ── Cache & Infrastructure Controls ──────────────────────────────────────────
+
+/**
+ * Admin: Flush all active API cache entries.
+ * Logs the action for audit trail.
+ */
+export const flushCache = mutation({
+  args: {},
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handler: async (ctx: any) => {
+    const allCache = await ctx.db.query('apiCache').collect();
+    let flushed = 0;
+    for (const entry of allCache) {
+      await ctx.db.delete(entry._id);
+      flushed++;
+    }
+    await ctx.db.insert('auditLogs', {
+      userId: 'SYSTEM',
+      action: 'cache_flush',
+      status: 'success',
+      metadata: JSON.stringify({ entriesFlushed: flushed, triggeredAt: Date.now() }),
+      timestamp: Date.now(),
+    });
+    return { success: true, flushed };
+  },
+});
+
+/**
+ * Admin: Toggle maintenance mode via a global config flag.
+ * When enabled, new AI question generation requests are blocked.
+ */
+export const setMaintenanceMode = mutation({
+  args: { enabled: v.boolean() },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handler: async (ctx: any, args: { enabled: boolean }) => {
+    const existing = await ctx.db
+      .query('configFlags')
+      .withIndex('by_key', (q: any) => q.eq('key', 'maintenance_mode'))
+      .unique();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        value: args.enabled ? 'true' : 'false',
+        updatedAt: Date.now(),
+      });
+    } else {
+      await ctx.db.insert('configFlags', {
+        key: 'maintenance_mode',
+        value: args.enabled ? 'true' : 'false',
+        description: 'Global maintenance mode flag — blocks AI generation endpoints',
+        updatedAt: Date.now(),
+      });
+    }
+
+    await ctx.db.insert('auditLogs', {
+      userId: 'SYSTEM',
+      action: args.enabled ? 'maintenance_mode_on' : 'maintenance_mode_off',
+      status: 'success',
+      metadata: JSON.stringify({ enabled: args.enabled }),
+      timestamp: Date.now(),
+    });
+
+    return { success: true, enabled: args.enabled };
+  },
+});
+
+/**
+ * Read a global config flag value.
+ */
+export const getConfigFlag = query({
+  args: { key: v.string() },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handler: async (ctx: any, args: { key: string }) => {
+    const flag = await ctx.db
+      .query('configFlags')
+      .withIndex('by_key', (q: any) => q.eq('key', args.key))
+      .unique();
+    return flag ? flag.value : null;
+  },
+});
+

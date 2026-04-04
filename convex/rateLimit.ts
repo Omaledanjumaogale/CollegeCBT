@@ -95,7 +95,7 @@ export const rateLimitQuery = query({
 export const rateLimitMutation = mutation({
   args: { key: v.string(), burst: v.number(), rate: v.number() },
   handler: async (ctx, args) => {
-    return await checkRateLimit.handler(ctx, args);
+    return await checkRateLimitInternal(ctx, args);
   },
 });
 

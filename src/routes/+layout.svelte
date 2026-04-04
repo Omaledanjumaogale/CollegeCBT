@@ -6,7 +6,6 @@
 	import AppPreferencesProvider from '$lib/components/AppPreferencesProvider.svelte';
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
 	import Toast from '$lib/components/Toast.svelte';
-
 	import AuthModal from '$lib/components/AuthModal.svelte';
 	import BgMesh from '$lib/components/BgMesh.svelte';
 	import NetworkMonitor from '$lib/components/NetworkMonitor.svelte';
@@ -14,6 +13,12 @@
 	import { onMount } from 'svelte';
 	import { authLoading } from '$lib/stores';
 	import { browser } from '$app/environment';
+	import { setupConvex } from 'convex-svelte';
+
+	// ── Initialize Convex real-time WebSocket client ──
+	// This must run during component init (not onMount) so setContext works
+	const CONVEX_URL = 'https://different-warthog-453.eu-west-1.convex.cloud';
+	setupConvex(CONVEX_URL);
 
 	onMount(async () => {
 		if (!browser) return;
@@ -34,7 +39,6 @@
 					scope: '/',
 					updateViaCache: 'none'
 				});
-				
 				console.log('[CollegeCBT] Service Worker registered:', registration.scope);
 
 				if ('PushManager' in window) {
@@ -48,7 +52,6 @@
 			}
 		}
 	});
-
 
 	const appName = "CollegeCBT";
 	const appUrl = "https://collegecbt.dev";

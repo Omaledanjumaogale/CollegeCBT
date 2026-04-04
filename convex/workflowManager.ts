@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query, internalMutation, internalAction } from './_generated/server';
+import { mutation, query, internalMutation, internalAction, internalQuery } from './_generated/server';
 import { internal } from './_generated/api';
 
 /**
@@ -38,7 +38,7 @@ export const runWorkflowAction = internalAction({
       status: 'in_progress' 
     });
 
-    const workflow = await ctx.runQuery(internal.workflowManager.getWorkflow, { workflowId: args.workflowId });
+    const workflow = await ctx.runQuery(internal.workflowManager.getWorkflowInternal, { workflowId: args.workflowId });
     if (!workflow) return;
 
     for (let i = 0; i < workflow.steps.length; i++) {
@@ -66,7 +66,16 @@ export const runWorkflowAction = internalAction({
 
 // ── Internal Mutations ──
 
+// Public query for client-facing reads
 export const getWorkflow = query({
+  args: { workflowId: v.id('workflows') },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.workflowId);
+  },
+});
+
+// Internal query used within actions
+export const getWorkflowInternal = internalQuery({
   args: { workflowId: v.id('workflows') },
   handler: async (ctx, args) => {
     return await ctx.db.get(args.workflowId);

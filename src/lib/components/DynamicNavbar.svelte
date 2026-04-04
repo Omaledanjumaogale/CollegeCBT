@@ -3,13 +3,20 @@
 	import { signOut } from '$lib/services/firebase';
 	import { page } from '$app/stores';
 
-	const navLinks = [
+	const publicLinks = [
 		{ href: '/#features', label: 'Features' },
-		{ href: '/#curriculum', label: 'Curriculum' },
+		{ href: '/#curriculum', label: 'Subjects' },
 		{ href: '/exam-lab', label: '🤖 Exam Lab' },
 		{ href: '/pricing', label: 'Pricing' },
-		{ href: '/dashboard', label: 'Dashboard' }
 	];
+
+	const authLinks = [
+		...publicLinks,
+		{ href: '/dashboard', label: '📊 My Dashboard' },
+	];
+
+	// Show authenticated nav if user is signed in
+	let navLinks = $derived($currentUser ? authLinks : publicLinks);
 
 	function toggleMenu() {
 		mobileMenuOpen.update((v) => !v);
@@ -61,13 +68,18 @@
 			<!-- CTA Buttons -->
 			<div class="hidden md:flex items-center gap-2 flex-shrink-0">
 				{#if $currentUser}
-					<span class="text-sm text-white/60 truncate max-w-[120px]">{$currentUser.displayName}</span>
-					<button on:click={signOut} class="btn-ghost text-sm px-4 py-2">
-						Sign Out
-					</button>
+					<div class="flex items-center gap-3">
+						<div class="text-right hidden xl:block">
+							<div class="text-xs font-bold text-white truncate max-w-[120px]">{$currentUser.displayName}</div>
+							<div class="text-[10px] text-white/30 truncate max-w-[120px]">{$currentUser.email}</div>
+						</div>
+						<button onclick={signOut} class="btn-ghost text-sm px-4 py-2">
+							Sign Out
+						</button>
+					</div>
 				{:else}
-					<button on:click={openLogin} class="btn-ghost text-sm px-4 py-2">Sign In</button>
-					<button on:click={openSignup} class="btn-violet text-sm px-5 py-2 shadow-violet">
+					<button onclick={openLogin} class="btn-ghost text-sm px-4 py-2">Sign In</button>
+					<button onclick={openSignup} class="btn-violet text-sm px-5 py-2 shadow-violet">
 						Get Started →
 					</button>
 				{/if}
@@ -75,7 +87,7 @@
 
 			<!-- Hamburger -->
 			<button
-				on:click={toggleMenu}
+				onclick={toggleMenu}
 				class="md:hidden flex flex-col justify-center items-center h-[44px] w-[44px] rounded-lg border border-white/10 bg-white/5 flex-shrink-0 relative"
 				aria-label="Toggle menu"
 			>
@@ -94,11 +106,11 @@
 
 <!-- Mobile Drawer Backdrop -->
 {#if $mobileMenuOpen}
-	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<!-- svelte-ignore a11y-no-static-element-interactions -->
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div 
 		class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm md:hidden"
-		on:click|self={closeMenu}
+		onclick={(e) => { if (e.target === e.currentTarget) closeMenu(); }}
 	>
 		<!-- Slide-in Drawer -->
 		<div
@@ -109,7 +121,7 @@
 		>
 			<div class="h-[68px] flex items-center justify-between px-6 border-b border-white/10">
 				<span class="font-display text-xl text-white">Menu</span>
-				<button on:click={closeMenu} class="h-[44px] w-[44px] flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white transition-colors" aria-label="Close menu">
+				<button onclick={closeMenu} class="h-[44px] w-[44px] flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white transition-colors" aria-label="Close menu">
 					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"></path></svg>
 				</button>
 			</div>
@@ -118,7 +130,7 @@
 				{#each navLinks as link}
 					<a
 						href={link.href}
-						on:click={closeMenu}
+						onclick={closeMenu}
 						class="flex items-center min-h-[44px] px-4 rounded-xl text-sm font-medium transition-all"
 						class:nav-active={isActive(link.href)}
 						class:nav-inactive={!isActive(link.href)}
@@ -131,12 +143,12 @@
 			<div class="p-6 border-t border-white/10 flex flex-col gap-3 bg-black/20">
 				{#if $currentUser}
 					<div class="text-sm text-white/60 px-2 font-medium truncate">{$currentUser.email}</div>
-					<button on:click={() => { signOut(); closeMenu(); }} class="btn-ghost flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl border border-white/10 bg-white/5">
+					<button onclick={() => { signOut(); closeMenu(); }} class="btn-ghost flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl border border-white/10 bg-white/5">
 						Sign Out
 					</button>
 				{:else}
-					<button on:click={openLogin} class="btn-ghost flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl border border-white/10 bg-white/5 mb-2">Sign In</button>
-					<button on:click={openSignup} class="btn-violet flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl shadow-violet">Get Started Free →</button>
+					<button onclick={openLogin} class="btn-ghost flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl border border-white/10 bg-white/5 mb-2">Sign In</button>
+					<button onclick={openSignup} class="btn-violet flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl shadow-violet">Get Started Free →</button>
 				{/if}
 			</div>
 		</div>
