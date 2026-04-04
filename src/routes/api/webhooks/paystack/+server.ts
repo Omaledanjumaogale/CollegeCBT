@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { ConvexHttpClient } from 'convex/browser';
 import { anyApi } from 'convex/server';
 import { PUBLIC_CONVEX_URL } from '$env/static/public';
-import { PAYSTACK_SECRET_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 /**
  * Paystack Webhook Handler
@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
     // ── Signature Verification ──────────────────────────────────────────────────
     let isValid = false;
     try {
-        isValid = await verifyHmacSha512(PAYSTACK_SECRET_KEY, payloadText, signature);
+        isValid = await verifyHmacSha512(env.PAYSTACK_SECRET_KEY!, payloadText, signature);
     } catch (err) {
         console.error('[Paystack Webhook] Verification failed:', err);
         return json({ status: 'error', message: 'Verification error' }, { status: 500 });

@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { ConvexHttpClient } from 'convex/browser';
 import { anyApi } from 'convex/server';
 import { PUBLIC_CONVEX_URL } from '$env/static/public';
-import { FLUTTERWAVE_WEBHOOK_HASH } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 /**
  * Flutterwave Webhook Handler
@@ -23,7 +23,7 @@ export const POST: RequestHandler = async ({ request }) => {
         return json({ status: 'error', message: 'Missing signature' }, { status: 401 });
     }
 
-    if (receivedHash !== FLUTTERWAVE_WEBHOOK_HASH) {
+    if (receivedHash !== env.FLUTTERWAVE_WEBHOOK_HASH) {
         console.error('[Flutterwave Webhook] Invalid verif-hash');
         return json({ status: 'error', message: 'Invalid signature' }, { status: 401 });
     }

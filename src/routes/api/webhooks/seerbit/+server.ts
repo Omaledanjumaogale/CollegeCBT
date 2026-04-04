@@ -3,7 +3,7 @@ import type { RequestHandler } from './$types';
 import { ConvexHttpClient } from 'convex/browser';
 import { anyApi } from 'convex/server';
 import { PUBLIC_CONVEX_URL } from '$env/static/public';
-import { SEERBIT_SECRET_KEY } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 /**
  * Seerbit Webhook Handler
@@ -36,7 +36,7 @@ export const POST: RequestHandler = async ({ request }) => {
     // ── Signature Verification ──────────────────────────────────────────────────
     let isValid = false;
     try {
-        isValid = await verifyHmacSha256(SEERBIT_SECRET_KEY, payloadText, signature);
+        isValid = await verifyHmacSha256(env.SEERBIT_SECRET_KEY!, payloadText, signature);
     } catch (err) {
         console.error('[Seerbit Webhook] Verification failed:', err);
         return json({ status: 'error', message: 'Verification error' }, { status: 500 });
