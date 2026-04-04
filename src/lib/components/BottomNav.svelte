@@ -36,9 +36,7 @@
 			{:else}
 				<a 
 					href={link.href}
-					class="flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition-all"
-					class:text-white={isActive(link.href)}
-					class:text-white/40={!isActive(link.href)}
+					class="flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition-all {isActive(link.href) ? 'text-white' : 'text-white/40'}"
 				>
 					<span class="text-xl">{link.icon}</span>
 					<span>{link.label}</span>
