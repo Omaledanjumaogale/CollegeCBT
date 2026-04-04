@@ -7,13 +7,24 @@ export interface User {
 	displayName: string;
 	photoURL?: string;
 	plan: 'free' | 'pro' | 'institutional';
-	academicProfile?: AcademicProfile;
+	role?: 'user' | 'admin';
+	// Personal/Identity
+	dob?: string;
 	nin?: string;
 	phone?: string;
 	whatsapp?: string;
-	dob?: string;
+	// Location
+	stateOfOrigin?: string;
+	stateOfResidence?: string;
 	lga?: string;
 	address?: string;
+	// Academic (Top-level in Convex schema)
+	institutionType?: string;
+	institutionName?: string;
+	faculty?: string;
+	department?: string;
+	level?: string;
+	matricNumber?: string;
 }
 
 export interface AcademicProfile {
@@ -150,10 +161,9 @@ export const readinessScore = writable(78);
 export const isAuthenticated = derived(currentUser, ($user) => $user !== null);
 export const isPro = derived(currentUser, ($user) => $user?.plan === 'pro' || $user?.plan === 'institutional');
 
-// ── Toast helper ──
-let toastTimer: ReturnType<typeof setTimeout>;
-export function showToast(title: string, message: string, type: 'success' | 'error' | 'info' = 'info') {
-	clearTimeout(toastTimer);
-	toastMessage.set({ title, message, type });
-	toastTimer = setTimeout(() => toastMessage.set(null), 3500);
+// ── Notification Helper (Delegates to Svelte 5 Reactive Manager) ──
+export async function showToast(title: string, message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') {
+	const { notifications } = await import('./toast.svelte');
+	return notifications.show({ title, message, type });
 }
+

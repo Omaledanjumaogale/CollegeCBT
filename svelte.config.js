@@ -15,7 +15,8 @@ const config = {
 			$lib: './src/lib',
 			$components: './src/lib/components',
 			$stores: './src/lib/stores',
-			$services: './src/lib/services'
+			$services: './src/lib/services',
+			$convex: './convex'
 		}
 	}
 };

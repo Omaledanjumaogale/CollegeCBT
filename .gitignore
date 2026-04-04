@@ -43,3 +43,9 @@ coverage/
 
 # Misc
 build_errors.txt
+
+# Convex Generated
+convex/_generated/
+
+# Local implementation plans
+implementation_plan*

@@ -123,3 +123,53 @@ export function getAIRecommendation(percentage: number): string {
 	if (percentage >= 45) return 'Progress noted, but more practice needed. Review full explanations for wrong answers before retrying.';
 	return 'Intensive revision required. Use the Exam Lab topic-by-topic before attempting another mock.';
 }
+
+// ── Agent Research & Browsing (Crawl4AI Integration) ─────────────────────
+
+/**
+ * Intelligent researching agent:
+ * Decides whether to crawl new data or use cache.
+ */
+export async function browseUrl(url: string, apiKey: string): Promise<any> {
+	const { triggerCrawl, getCrawlJobStatus } = await import('./convexClient');
+	
+	try {
+		const result = await triggerCrawl(apiKey, url);
+		
+		if (result.status === 'cached') {
+			return result.data;
+		}
+
+		if (result.status === 'queued') {
+			// Poll for results (Basic polling strategy)
+			let attempts = 0;
+			const maxAttempts = 30; // 30s max
+			while (attempts < maxAttempts) {
+				const job = await getCrawlJobStatus(result.jobId);
+				if (job?.status === 'completed' && job.result) {
+					return JSON.parse(job.result);
+				}
+				if (job?.status === 'failed') {
+					throw new Error(job.error || 'Job failed');
+				}
+				await new Promise((r) => setTimeout(r, 1000));
+				attempts++;
+			}
+			throw new Error('Crawl job timed out');
+		}
+	} catch (err) {
+		console.error('[AI Agent] Research error:', err);
+		throw err;
+	}
+}
+
+/**
+ * Perform a web search using Crawl4AI pipeline.
+ * Use the orchestrated infrastructure to maintain rate limits.
+ */
+export async function performWebSearch(query: string, apiKey: string) {
+	// Simple query-to-crawl logic for demo
+	// In production, this would call a search endpoint in Crawl4AI service
+	const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+	return browseUrl(searchUrl, apiKey);
+}
