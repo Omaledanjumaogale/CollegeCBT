@@ -23,8 +23,10 @@
 	});
 
 	onDestroy(() => {
-		window.removeEventListener('online', updateStatus);
-		window.removeEventListener('offline', updateStatus);
+		if (typeof window !== 'undefined') {
+			window.removeEventListener('online', updateStatus);
+			window.removeEventListener('offline', updateStatus);
+		}
 	});
 </script>
 
