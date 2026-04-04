@@ -9,11 +9,14 @@
 		<div
 			animate:flip={{ duration: 300 }}
 			class="pointer-events-auto cursor-pointer"
-			role="alert"
-			aria-live="polite"
+			role="button"
+			tabindex="0"
+			aria-label="Dismiss notification"
 			transition:fade={{ duration: 200 }}
 			onclick={() => notifications.dismiss(t.id)}
+			onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') notifications.dismiss(t.id); }}
 		>
+
 
 			<div class="glass-card p-4 shadow-2xl relative overflow-hidden group"
 				class:border-lime-500={t.type === 'success'}

@@ -5,28 +5,42 @@ Enterprise-grade AI Exam Preparation Platform for Nigerian Higher Institution st
 ## 🚀 Recent Improvements & Upgrades
 
 ### 1. Hardened Backend Infrastructure (Convex)
-*   **Token-Bucket Rate Limiter (`rateLimit.ts`):** ACID-compliant logic gating both generic reads and critical writes to ensure system stability.
-*   **Distributed Session Bindings (`sessions.ts`):** Robust tracking linking heartbeat signals to client lifecycles against Google/Firebase UIDs.
-*   **Edge-Ready Type Safety (`validators.ts`):** 100% type-safe edge validators using Zod for payload enforcement.
-*   **Lifecycle Triggers (`triggers.ts`):** Emulated SQL row-level auditing triggers for high-sensitivity operations tracking.
-*   **Autonomous Maintenance (`crons.ts`):** Automated garbage collection for stale sessions and rate limit entries.
+
+* **Token-Bucket Rate Limiter (`rateLimit.ts`):** ACID-compliant logic gating both generic reads and critical writes to ensure system stability.
+* **Distributed Session Bindings (`sessions.ts`):** Robust tracking linking heartbeat signals to client lifecycles against Google/Firebase UIDs.
+* **Edge-Ready Type Safety (`validators.ts`):** 100% type-safe edge validators using Zod for payload enforcement.
+* **Lifecycle Triggers (`triggers.ts`):** Emulated SQL row-level auditing triggers for high-sensitivity operations tracking.
+* **Autonomous Maintenance (`crons.ts`):** Automated garbage collection for stale sessions and rate limit entries.
 
 ### 2. Premium UI & UX (Svelte 5)
-*   **Global Reactive Notifications (`toast.svelte.ts`):** Unified, accessible notification system replacing legacy UI blocks.
-*   **Informational Tooltips (`Tooltip.svelte`):** Beautifully engineered tooltips providing contextual guidance on all key features.
-*   **PWA & Real-time Push:** Successfull integration of service worker hooks and PushManager for real-time market/exam resolution deliveries.
-*   **Online/Offline Resilience:** Automatic connection status tracking with user feedback.
+
+* **Global Reactive Notifications (`toast.svelte.ts`):** Unified, accessible notification system replacing legacy UI blocks.
+* **Informational Tooltips (`Tooltip.svelte`):** Beautifully engineered tooltips providing contextual guidance on all key features.
+* **PWA & Real-time Push:** Successfull integration of service worker hooks and PushManager for real-time market/exam resolution deliveries.
+* **Online/Offline Resilience:** Automatic connection status tracking with user feedback.
+
+### 🌟 v2.1.0 Enterprise UI & UX Details
+
+| Feature | Implementation | Benefit |
+| :--- | :--- | :--- |
+| **Real-time Push** | `PushManager` API sync | Edge-safe notifications for exam reminders. |
+| **ACID Rate Limiting** | Token-Bucket Algorithm | Protects Convex mutations from malicious flooding. |
+| **Heartbeat Sessions** | UUID distributed bindings | Zero-maintenance session hygiene for mobile users. |
+| **Universal Feedbacks** | `ToastProvider` singleton | Consistent feedback across Auth, Dashboard, and Exams. |
+| **Knowledge Sync** | `Tooltip.svelte` wrappers | Instant pedagogical guidance on every interactive element. |
 
 ## 🛠️ Technology Stack
-*   **Frontend:** Svelte 5 (Runes), SvelteKit, TailwindCSS
-*   **Backend:** Convex (Edge Runtime)
-*   **Auth:** Firebase Authentication (tied to Convex Distributed Sessions)
-*   **AI:** Claude AI (via Convex Actions)
-*   **Deployment:** Cloudflare Pages (Edge)
+
+* **Frontend:** Svelte 5 (Runes), SvelteKit, TailwindCSS
+* **Backend:** Convex (Edge Runtime)
+* **Auth:** Firebase Authentication (tied to Convex Distributed Sessions)
+* **AI:** Claude AI (via Convex Actions)
+* **Deployment:** Cloudflare Pages (Edge)
 
 ## 📦 Getting Started
 
 ### Local Development
+
 1. Clone the repository.
 2. Install dependencies: `npm install`
 3. Set up environment variables: `cp .env.example .env`
@@ -34,14 +48,17 @@ Enterprise-grade AI Exam Preparation Platform for Nigerian Higher Institution st
 5. Run Convex: `npx convex dev`
 
 ### Production Build
+
 ```bash
 npm run build
 ```
 
 ## 🔒 Security & Compliance
-*   **NIN Verification:** Used for student identity verification in registration.
-*   **ACID Compliance:** Guaranteed via Convex database transactions.
-*   **Rate Limiting:** Protects all sensitive endpoints.
+
+* **NIN Verification:** Used for student identity verification in registration.
+* **ACID Compliance:** Guaranteed via Convex database transactions.
+* **Rate Limiting:** Protects all sensitive endpoints.
 
 ---
+
 Built with pride for Nigerian Students. Powered by Elite Workforce Impact Nigeria (E-WIN) Project.

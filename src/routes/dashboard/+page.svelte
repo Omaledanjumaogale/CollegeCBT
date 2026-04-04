@@ -5,6 +5,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { updateUserProfile } from '$lib/services/firebase';
+	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	$: if (!$isAuthenticated && typeof window !== 'undefined') {
 		// show login modal if not authenticated
@@ -12,14 +13,16 @@
 	}
 
 	// Provide sane defaults if currentUser is missing some fields
+	// ── Enterprise Profile Resolution ──
+	$: mappedUser = $currentUser as any;
 	$: userProfile = {
-		name: $currentUser?.displayName || 'Student',
-		email: $currentUser?.email || '',
-		plan: $currentUser?.plan || 'Free',
-		institution: 'University of Nigeria, Nsukka',
-		department: 'Computer Science',
-		level: '300L',
-		streak: 14
+		name: mappedUser?.displayName || 'Active Student',
+		email: mappedUser?.email || '',
+		plan: mappedUser?.plan || 'Free Plan',
+		institution: mappedUser?.institutionName || 'Institution Not Linked',
+		department: mappedUser?.department || 'Department Not Set',
+		level: mappedUser?.level || 'Level Not Set',
+		streak: mappedUser?.streak || 0
 	};
 
 	let userSessions: StudySession[] = [];
@@ -113,12 +116,13 @@
 	});
 
 	// Settings form state — bound with proper IDs
-	let settingsName = 'Adaobi Chukwu';
-	let settingsEmail = 'adaobi@unn.edu.ng';
-	let settingsPhone = '08012345678';
-	let settingsInstitution = 'University of Nigeria, Nsukka';
-	let settingsDept = 'Computer Science';
-	let settingsLevel = '300 Level';
+	// Settings form state — derived from current profile
+	let settingsName = $state($currentUser?.displayName || '');
+	let settingsEmail = $state($currentUser?.email || '');
+	let settingsPhone = $state($currentUser?.phone || '');
+	let settingsInstitution = $state($currentUser?.institutionName || '');
+	let settingsDept = $state($currentUser?.department || '');
+	let settingsLevel = $state($currentUser?.level || '100 Level');
 
 	// Certificate Downloader
 	async function downloadCertificate() {

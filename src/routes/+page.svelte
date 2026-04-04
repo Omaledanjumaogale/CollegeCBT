@@ -446,26 +446,26 @@
     <div class="glass-card p-6 mb-6">
       <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
         <div>
-          <label class="text-xs text-white/45 mb-2 block font-semibold">Institution Type</label>
-          <select class="w-full form-input py-2.5 text-sm" disabled>
+          <label for="inst-type" class="text-xs text-white/45 mb-2 block font-semibold">Institution Type</label>
+          <select id="inst-type" class="w-full form-input py-2.5 text-sm" disabled>
             <option>University</option>
           </select>
         </div>
         <div>
-          <label class="text-xs text-white/45 mb-2 block font-semibold">Course / Subject</label>
-          <select class="w-full form-input py-2.5 text-sm" disabled>
+          <label for="course-subject" class="text-xs text-white/45 mb-2 block font-semibold">Course / Subject</label>
+          <select id="course-subject" class="w-full form-input py-2.5 text-sm" disabled>
             <option>Computer Networks</option>
           </select>
         </div>
         <div>
-          <label class="text-xs text-white/45 mb-2 block font-semibold">Question Type</label>
-          <select class="w-full form-input py-2.5 text-sm" disabled>
+          <label for="question-type" class="text-xs text-white/45 mb-2 block font-semibold">Question Type</label>
+          <select id="question-type" class="w-full form-input py-2.5 text-sm" disabled>
             <option>Objective (MCQ)</option>
           </select>
         </div>
         <div>
-          <label class="text-xs text-white/45 mb-2 block font-semibold">Specific Topic</label>
-          <input type="text" placeholder="e.g. OSI Model..." class="w-full form-input py-2.5 text-sm" disabled/>
+          <label for="specific-topic" class="text-xs text-white/45 mb-2 block font-semibold">Specific Topic</label>
+          <input id="specific-topic" type="text" placeholder="e.g. OSI Model..." class="w-full form-input py-2.5 text-sm" disabled/>
         </div>
       </div>
       <div class="mt-5 flex flex-wrap gap-3 items-center">
@@ -847,18 +847,6 @@
 </footer>
 
 <style>
-	.cur-tab {
-		background: #7c3aed;
-		color: #fff;
-		box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4);
-	}
-	.off-tab {
-		color: #94a3b8;
-	}
-	.off-tab:hover {
-		color: #fff;
-		background: rgba(124, 58, 237, 0.15);
-	}
 	.float-badge {
 		animation: floatY 4s ease-in-out infinite;
 	}

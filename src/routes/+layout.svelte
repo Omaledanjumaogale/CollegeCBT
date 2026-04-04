@@ -128,11 +128,7 @@
 			<TooltipProvider>
 				<DynamicNavbar />
 				<main class="relative z-10 pb-20 md:pb-0" id="main-content">
-					{#if children}
-						{@render children()}
-					{:else}
-						<slot />
-					{/if}
+					{@render children?.()}
 				</main>
 				<BottomNav />
 			</TooltipProvider>

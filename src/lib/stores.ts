@@ -25,6 +25,7 @@ export interface User {
 	department?: string;
 	level?: string;
 	matricNumber?: string;
+	streak?: number;
 }
 
 export interface AcademicProfile {
