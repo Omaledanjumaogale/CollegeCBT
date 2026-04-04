@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { currentUser, dashboardPanel, isAuthenticated, activeModal, showToast } from '$lib/stores';
 	import type { StudySession } from '$lib/stores';
-	import { getUserSessions } from '$lib/services/convexClient';
+	import { getUserSessions, getDashboardAnalytics } from '$lib/services/convexClient';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { updateUserProfile } from '$lib/services/firebase';
@@ -26,37 +26,31 @@
 	let loadingSessions = true;
 
 	// Computed stats from real data
-	$: totalAnswered = userSessions.reduce((acc, s) => acc + (s.questionsAnswered || 0), 0) + 342;
-	$: mockExamsCount = userSessions.filter(s => s.mode === 'mock').length + 12;
+	$: totalAnswered = userSessions.length > 0 ? userSessions.reduce((acc, s) => acc + (s.questionsAnswered || 0), 0) : 0;
+	$: mockExamsCount = userSessions.length > 0 ? userSessions.filter(s => s.mode === 'mock').length : 0;
 	$: avgScore = (() => {
 		const mocks = userSessions.filter(s => s.mode === 'mock');
-		if (mocks.length === 0) return 71; 
+		if (mocks.length === 0) return 0; 
 		const total = mocks.reduce((sum, s) => sum + s.score, 0);
 		return Math.round(total / mocks.length);
 	})();
 
 	$: kpis = [
-		{ icon: '📝', value: totalAnswered.toString(), label: 'Questions Answered', change: '↑ Active', color: '#a78bfa' },
-		{ icon: '🏆', value: mockExamsCount.toString(), label: 'Mock Exams Taken', change: 'Keep pushing', color: '#84cc16' },
-		{ icon: '📈', value: `${avgScore}%`, label: 'Average Score', change: 'Based on actual', color: '#f59e0b' },
-		{ icon: '🎯', value: '78', label: 'AI Readiness Score', change: 'Target: 85+', color: '#22d3ee' }
+		{ icon: '📝', value: totalAnswered.toString(), label: 'Questions Answered', change: 'Total', color: '#a78bfa' },
+		{ icon: '🏆', value: mockExamsCount.toString(), label: 'Mock Exams Taken', change: 'Exams', color: '#84cc16' },
+		{ icon: '📈', value: `${avgScore}%`, label: 'Average Score', change: 'Real-time', color: '#f59e0b' },
+		{ icon: '🎯', value: avgScore > 0 ? (avgScore + 5).toString() : '0', label: 'AI Readiness Score', change: 'Target: 85+', color: '#22d3ee' }
 	];
 
-	// Recent activity — blend real + demo data
-	$: recentActivity = [
-		...userSessions.map(s => ({
-			icon: s.mode === 'mock' ? '⏱️' : '🤖',
-			iconBg: s.mode === 'mock' ? 'rgba(132,204,22,0.15)' : 'rgba(124,58,237,0.15)',
-			title: `${s.mode === 'mock' ? 'Mock Exam' : 'Exam Lab'} — ${s.course}`,
-			meta: new Date(s.timestamp).toLocaleString(),
-			badge: s.mode === 'mock' ? `Score: ${Math.round(s.score)}%` : `Correct: ${s.correct}`,
-			badgeColor: s.mode === 'mock' && s.score >= 70 ? 'badge-lime' : 'badge-violet'
-		})).slice(0, 3),
-		{ icon: '✅', iconBg: 'rgba(132,204,22,0.15)', title: 'Mock Exam — Database Management Systems', meta: 'Today, 10:42 AM · 20 questions · 90s/question', badge: 'A1 — 82%', badgeColor: 'badge-lime' },
-		{ icon: '🤖', iconBg: 'rgba(124,58,237,0.15)', title: 'Exam Lab — Computer Networks (MCQ)', meta: 'Yesterday, 7:15 PM · 18 questions answered', badge: '71% correct', badgeColor: 'badge-amber' },
-		{ icon: '⏱️', iconBg: 'rgba(132,204,22,0.15)', title: 'Mock Exam — Data Structures & Algorithms', meta: '2 days ago, 4:20 PM · 15 questions', badge: 'B2 — 73%', badgeColor: 'badge-amber' },
-		{ icon: '🤖', iconBg: 'rgba(124,58,237,0.15)', title: 'Exam Lab — Operating Systems (Theory)', meta: '3 days ago, 9:10 AM · 12 theory questions', badge: '67% correct', badgeColor: 'badge-violet' },
-	].slice(0, 6);
+	// Recent activity — exclusively real data
+	$: recentActivity = userSessions.map(s => ({
+		icon: s.mode === 'mock' ? '⏱️' : '🤖',
+		iconBg: s.mode === 'mock' ? 'rgba(132,204,22,0.15)' : 'rgba(124,58,237,0.15)',
+		title: `${s.mode === 'mock' ? 'Mock Exam' : 'Exam Lab'} — ${s.course}`,
+		meta: new Date(s.timestamp).toLocaleString(),
+		badge: s.mode === 'mock' ? `Score: ${Math.round(s.score)}%` : `Correct: ${s.correct}`,
+		badgeColor: s.mode === 'mock' && s.score >= 70 ? 'badge-lime' : 'badge-violet'
+	})).slice(0, 6);
 
 	const recommendations = [
 		{ icon: '🗄️', title: 'Database Normalization', meta: 'DBMS · 300L · 45% avg', link: '/exam-lab?course=Database+Management+Systems&inst=University' },
@@ -65,22 +59,10 @@
 		{ icon: '🔍', title: 'SQL Query Optimization', meta: 'DBMS · 300L · 58% avg', link: '/exam-lab?course=Database+Management+Systems&inst=University' }
 	];
 
-	// Topic heatmap — 10 topics with correct dynamic color binding
-	const heatmap: { topic: string; pct: number; color: string; label: string }[] = [
-		{ topic: 'Database Normalization', pct: 45, color: '#e11d48', label: 'Needs Work' },
-		{ topic: 'Computer Networks', pct: 64, color: '#f59e0b', label: 'Developing' },
-		{ topic: 'Data Structures', pct: 82, color: '#84cc16', label: 'Strong' },
-		{ topic: 'SQL Queries', pct: 58, color: '#f59e0b', label: 'Developing' },
-		{ topic: 'Algorithm Analysis', pct: 71, color: '#84cc16', label: 'Good' },
-		{ topic: 'Operating Systems', pct: 38, color: '#e11d48', label: 'Needs Work' },
-		{ topic: 'Software Engineering', pct: 76, color: '#84cc16', label: 'Strong' },
-		{ topic: 'Compiler Design', pct: 52, color: '#f59e0b', label: 'Developing' },
-		{ topic: 'Computer Architecture', pct: 68, color: '#f59e0b', label: 'Good' },
-		{ topic: 'Discrete Mathematics', pct: 85, color: '#84cc16', label: 'Strong' }
-	];
-
 	// Bar chart data (mock exam score trajectory)
-	const chartData = [58, 62, 65, 60, 70, 72, 68, 75, 79, 82];
+	let chartData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	let heatmap: { topic: string; pct: number; color: string; label: string }[] = [];
+	
 	const maxVal = 100;
 	const TARGET_LINE = 75;
 
@@ -97,9 +79,17 @@
 	onMount(async () => {
 		if ($isAuthenticated && $currentUser?.uid) {
 			try {
-				userSessions = await getUserSessions($currentUser.uid);
+				const [sessions, analytics] = await Promise.all([
+					getUserSessions($currentUser.uid),
+					getDashboardAnalytics($currentUser.uid)
+				]);
+				userSessions = sessions;
+				if (analytics) {
+					chartData = analytics.chartData;
+					heatmap = analytics.heatmap;
+				}
 			} catch (e) {
-				console.warn('[Dashboard] Could not load sessions:', e);
+				console.warn('[Dashboard] Could not load data:', e);
 			} finally {
 				loadingSessions = false;
 			}
@@ -206,7 +196,7 @@
 					{#each panels as p}
 						<button
 							on:click={() => dashboardPanel.set(p.id)}
-							class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
+							class="w-full flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl text-sm font-medium transition-all"
 							class:dash-btn-active={$dashboardPanel === p.id}
 							class:dash-btn-inactive={$dashboardPanel !== p.id}
 						>
@@ -214,10 +204,10 @@
 						</button>
 					{/each}
 					<hr class="border-white/8 my-2" />
-					<a href="/exam-lab" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all">
+					<a href="/exam-lab" class="w-full flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all">
 						🤖 Go to Exam Lab →
 					</a>
-					<a href="/exam-lab?mode=mock" class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all">
+					<a href="/exam-lab?mode=mock" class="w-full flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all">
 						⏱️ Take Mock Exam →
 					</a>
 				</nav>
@@ -240,7 +230,7 @@
 					</div>
 
 					<!-- KPIs -->
-					<div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+					<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
 						{#each kpis as k}
 							<div class="glass-card p-5 relative overflow-hidden" style="--kpi-color:{k.color};">
 								<div class="absolute top-0 left-0 right-0 h-0.5" style="background:{k.color};"></div>
@@ -374,11 +364,11 @@
 						</p>
 					</div>
 
-					<div class="flex gap-3 flex-wrap">
-						<button on:click={downloadCertificate} class="btn-violet px-5 py-2.5 text-sm">
+					<div class="flex flex-col md:flex-row gap-3">
+						<button on:click={downloadCertificate} class="btn-violet flex justify-center items-center px-5 min-h-[44px] w-full md:w-auto text-sm">
 							📄 Download Certificate
 						</button>
-						<a href="/exam-lab" class="btn-outline-lime px-5 py-2.5 text-sm">🤖 Practice Weak Topics</a>
+						<a href="/exam-lab" class="btn-outline-lime flex justify-center items-center px-5 min-h-[44px] w-full md:w-auto text-sm">🤖 Practice Weak Topics</a>
 					</div>
 				{/if}
 
@@ -416,7 +406,7 @@
 							</div>
 							<div>
 								<label for="s-phone" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Phone Number</label>
-								<input id="s-phone" type="tel" bind:value={settingsPhone} class="form-input" autocomplete="tel" />
+								<input id="s-phone" type="tel" inputmode="tel" bind:value={settingsPhone} class="form-input" autocomplete="tel" />
 							</div>
 							<div>
 								<label for="s-institution" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Institution</label>
@@ -438,12 +428,11 @@
 								if ($currentUser?.uid) {
 									const res = await updateUserProfile($currentUser.uid, {
 										displayName: settingsName,
-										contact: { phoneNumber: settingsPhone },
-										academic: {
-											institutionName: settingsInstitution,
-											department: settingsDept,
-											level: settingsLevel as any
-										}
+										phone: settingsPhone,
+										institutionType: 'University',
+										institutionName: settingsInstitution,
+										department: settingsDept,
+										level: settingsLevel
 									});
 									if (res.success) {
 										showToast('✅ Profile Saved', 'Your settings have been updated.', 'success');
@@ -452,7 +441,7 @@
 									}
 								}
 							}} 
-							class="btn-violet px-5 py-2.5 text-sm mt-4"
+							class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm mt-4"
 						>
 							Save Changes
 						</button>
@@ -474,7 +463,7 @@
 									<div class="text-xs text-white/40 mt-0.5">Limited Practice Access</div>
 								{/if}
 							</div>
-							<a href="/pricing" class="btn-violet px-5 py-2.5 text-sm">Manage Plan</a>
+							<a href="/pricing" class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Manage Plan</a>
 						</div>
 					</div>
 				{/if}

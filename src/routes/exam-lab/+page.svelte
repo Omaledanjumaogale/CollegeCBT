@@ -398,11 +398,11 @@
 						</select>
 					</div>
 				</div>
-				<div class="flex gap-3 flex-wrap">
-					<button on:click={genLabQuestion} disabled={labLoading_} class="btn-violet px-6 py-2.5 text-sm gap-2">
+				<div class="flex flex-col md:flex-row gap-3">
+					<button on:click={genLabQuestion} disabled={labLoading_} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm gap-2">
 						{#if labLoading_}<span class="spinner w-4 h-4 border-2"></span> Generating...{:else}🤖 Generate Question{/if}
 					</button>
-					<button on:click={clearLab} class="btn-outline-lime px-5 py-2.5 text-sm">🔄 Reset Session</button>
+					<button on:click={clearLab} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🔄 Reset Session</button>
 				</div>
 			</div>
 
@@ -469,8 +469,8 @@
 										</div>
 									{/if}
 								</div>
-								<div class="flex gap-3 flex-wrap">
-									<button on:click={genLabQuestion} class="btn-violet px-5 py-2 text-sm">Next Question →</button>
+								<div class="flex flex-col md:flex-row gap-3">
+									<button on:click={genLabQuestion} class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Next Question →</button>
 								</div>
 							{/if}
 						</div>
@@ -494,9 +494,9 @@
 								class="form-input min-h-[120px] resize-y mb-4"
 								placeholder="Type your answer here..."
 							></textarea>
-							<div class="flex gap-3 flex-wrap mb-4">
-								<button on:click={revealTheoryAnswer} class="btn-outline-lime px-5 py-2 text-sm">📖 Show Model Answer</button>
-								<button on:click={genLabQuestion} class="btn-violet px-5 py-2 text-sm">Next →</button>
+							<div class="flex flex-col md:flex-row gap-3 mb-4">
+								<button on:click={revealTheoryAnswer} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">📖 Show Model Answer</button>
+								<button on:click={genLabQuestion} class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Next →</button>
 							</div>
 							{#if theoryAnswerRevealed}
 								<div class="rounded-xl p-4 border" style="background:rgba(132,204,22,0.07);border-color:rgba(132,204,22,0.2);">
@@ -591,7 +591,7 @@
 							</select>
 						</div>
 					</div>
-					<button on:click={startMock} class="btn-violet px-6 py-2.5 text-sm">⏱️ Start Mock Exam</button>
+					<button on:click={startMock} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full text-sm">⏱️ Start Mock Exam</button>
 				</div>
 
 				<!-- WAEC Grade Reference -->
@@ -684,18 +684,18 @@
 						</div>
 					</div>
 
-					<div class="flex gap-3 flex-wrap">
+					<div class="flex flex-col md:flex-row gap-3">
 						{#if !mockAnsweredCurrent}
-							<button on:click={skipMockQ} class="btn-ghost px-5 py-2.5 text-sm">Skip →</button>
+							<button on:click={skipMockQ} class="btn-ghost px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Skip →</button>
 						{:else}
 							<button
 								on:click={nextMockQ}
-								class="btn-violet px-5 py-2.5 text-sm"
+								class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm"
 							>
 								{mockCurrentQ >= mockTotal - 1 ? '🏁 View Results' : 'Next Question →'}
 							</button>
 						{/if}
-						<button on:click={showMockResults} class="btn-outline-lime px-5 py-2.5 text-sm">🏁 Finish Exam</button>
+						<button on:click={showMockResults} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🏁 Finish Exam</button>
 					</div>
 				{/if}
 			{/if}
@@ -757,11 +757,10 @@
 						</div>
 					</div>
 
-					<!-- Action Buttons -->
-					<div class="flex gap-3 flex-wrap">
-						<button on:click={resetMock} class="btn-violet px-6 py-2.5 text-sm">🔄 Take Another Mock</button>
-						<button on:click={() => activeTab = 'lab'} class="btn-ghost px-5 py-2.5 text-sm">🤖 Practice in Exam Lab</button>
-						<a href="/dashboard" class="btn-outline-lime px-5 py-2.5 text-sm">📊 View Dashboard</a>
+					<div class="flex flex-col md:flex-row gap-3">
+						<button on:click={resetMock} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🔄 Take Another Mock</button>
+						<button on:click={() => activeTab = 'lab'} class="btn-ghost px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🤖 Practice in Exam Lab</button>
+						<a href="/dashboard" class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">📊 View Dashboard</a>
 					</div>
 				</div>
 			{/if}

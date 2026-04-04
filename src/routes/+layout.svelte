@@ -4,7 +4,9 @@
 	import BottomNav from '$lib/components/BottomNav.svelte';
 	import TooltipProvider from '$lib/components/TooltipProvider.svelte';
 	import AppPreferencesProvider from '$lib/components/AppPreferencesProvider.svelte';
+	import ToastProvider from '$lib/components/ToastProvider.svelte';
 	import Toast from '$lib/components/Toast.svelte';
+
 	import AuthModal from '$lib/components/AuthModal.svelte';
 	import BgMesh from '$lib/components/BgMesh.svelte';
 	import { onMount } from 'svelte';
@@ -12,19 +14,53 @@
 	import { browser } from '$app/environment';
 
 	onMount(async () => {
-		// Only initialize Firebase on the client (browser) — never on the edge
 		if (!browser) return;
+
+		// 1. Core Auth Initialization
 		try {
 			const { initAuth } = await import('$lib/services/firebase');
 			await initAuth();
 		} catch (err) {
-			console.warn('[CollegeCBT] Auth init failed, continuing in demo mode:', err);
+			console.warn('[CollegeCBT] Auth init failed:', err);
 			authLoading.set(false);
 		}
+
+		// 2. Progressive Web Push & Offline Logic
+		if ('serviceWorker' in navigator) {
+			try {
+				const registration = await navigator.serviceWorker.register('/sw.js', {
+					scope: '/',
+					updateViaCache: 'none'
+				});
+				
+				console.log('[CollegeCBT] Service Worker registered:', registration.scope);
+
+				// Real-time Push Synchronization
+				if ('PushManager' in window) {
+					const permission = await Notification.requestPermission();
+					if (permission === 'granted') {
+						console.log('[CollegeCBT] Push permission granted.');
+						// Here we would sync the subscription to Convex if needed
+					}
+				}
+			} catch (error) {
+				console.error('[CollegeCBT] PWA/Push initialization failed:', error);
+			}
+		}
+
+		// 3. Online/Offline Status Tracking
+		window.addEventListener('online', () => {
+			import('$lib/toast.svelte').then(m => m.notifications.success('Connection restored. You are back online.'));
+		});
+		window.addEventListener('offline', () => {
+			import('$lib/toast.svelte').then(m => m.notifications.warn('You are currently offline. Some features may be limited.'));
+		});
 	});
+
 
 	const appName = "CollegeCBT";
 	const appUrl = "https://collegecbt.dev";
+	let { children }: { children?: import('svelte').Snippet } = $props();
 </script>
 
 <svelte:head>
@@ -56,8 +92,18 @@
 		"name": appName,
 		"applicationCategory": "EducationalApplication",
 		"operatingSystem": "All",
-		"url": appUrl,
+		"url": "https://collegecbt.ewinproject.org",
 		"description": "Enterprise-grade AI Exam Preparation Platform for Nigerian Students featuring MCQ generation, theory model answers, and grade prediction.",
+		"brand": {
+			"@type": "Brand",
+			"name": "Elite Workforce Impact Nigeria (E-WIN) Project",
+			"alternateName": "E-WIN"
+		},
+		"parentOrganization": {
+			"@type": "Organization",
+			"name": "Elite Workforce Impact Nigeria (E-WIN) Project",
+			"url": "https://ewinproject.org"
+		},
 		"offers": {
 			"@type": "AggregateOffer",
 			"priceCurrency": "NGN",
@@ -67,7 +113,7 @@
 		},
 		"potentialAction": {
 			"@type": "SearchAction",
-			"target": `${appUrl}/exam-lab?course={search_term_string}&mode=mock`,
+			"target": `https://collegecbt.ewinproject.org/exam-lab?course={search_term_string}&mode=mock`,
 			"query-input": "required name=search_term_string"
 		}
 	})}
@@ -78,15 +124,21 @@
 	<BgMesh />
 	
 	<AppPreferencesProvider>
-		<TooltipProvider>
-			<DynamicNavbar />
-			<main class="relative z-10 pb-20 md:pb-0" id="main-content">
-				<slot />
-			</main>
-			<BottomNav />
-		</TooltipProvider>
+		<ToastProvider>
+			<TooltipProvider>
+				<DynamicNavbar />
+				<main class="relative z-10 pb-20 md:pb-0" id="main-content">
+					{#if children}
+						{@render children()}
+					{:else}
+						<slot />
+					{/if}
+				</main>
+				<BottomNav />
+			</TooltipProvider>
+		</ToastProvider>
 	</AppPreferencesProvider>
 
 	<AuthModal />
-	<Toast />
 </div>
+

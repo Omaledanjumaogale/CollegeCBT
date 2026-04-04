@@ -3,23 +3,9 @@
 	import { COURSES, PLATFORM_STATS, INSTITUTION_TYPES, type InstitutionType } from '$lib/data/courseData';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import CurriculumBrowser from '$lib/components/CurriculumBrowser.svelte';
 
-	// ── Curriculum Browser ────────────────────────────────
-	let selectedInst: InstitutionType = 'University';
-	let selectedLevel = '100L';
-	let courseSearch = '';
-
-	const levels = ['100L', '200L', '300L', '400L', '500L', 'PG'];
-
-	$: filteredCourses = COURSES[selectedInst].filter(c =>
-		c.toLowerCase().includes(courseSearch.toLowerCase())
-	);
-
-	function goToLab(course: string, mode: 'lab' | 'mock' = 'lab') {
-		goto(`/exam-lab?course=${encodeURIComponent(course)}&inst=${encodeURIComponent(selectedInst)}&mode=${mode}`);
-	}
-
-	// ── Animated Counters ────────────────────────────────
+	// ── Interactive Demo (Hero MCQ Card) ─────────────────
 	let counters = { institutions: 0, questions: 0, students: 0, passRate: 0 };
 	let hasAnimated = false;
 
@@ -124,122 +110,6 @@
 		}, 1000);
 	}
 
-	// ── Level-tab curriculum data ────────────────────────
-	type UnivLevel = '100L'|'200L'|'300L'|'400L'|'500L'|'PG';
-	type PolyLevel = 'ND'|'HND'|'Post-HND';
-	type CoeLevel = 'NCE'|'B.Ed.';
-
-	let univLevel: UnivLevel = '100L';
-	let polyLevel: PolyLevel = 'ND';
-	let coeLevel: CoeLevel = 'NCE';
-
-	const univCourses: Record<UnivLevel, {icon:string;name:string;meta:string}[]> = {
-		'100L': [
-			{icon:'💻',name:'Introduction to Computer Science',meta:'Sciences · All Universities'},
-			{icon:'📐',name:'General Mathematics I',meta:'All Faculties'},
-			{icon:'⚛️',name:'General Physics I',meta:'Sciences & Engineering'},
-			{icon:'🧪',name:'General Chemistry I',meta:'Sciences · Health Sciences'},
-			{icon:'📈',name:'Introduction to Economics',meta:'Social Sciences · Arts'},
-			{icon:'📝',name:'Use of English & Communication',meta:'All Faculties'},
-			{icon:'🏛️',name:'Introduction to Political Science',meta:'Social Sciences'},
-			{icon:'🦠',name:'Biology for Life Sciences',meta:'Health Sciences'},
-			{icon:'⚖️',name:'Introduction to Law',meta:'Faculty of Law'},
-			{icon:'👥',name:'Sociology & Anthropology',meta:'Social Sciences'}
-		],
-		'200L': [
-			{icon:'🌲',name:'Data Structures & Algorithms',meta:'Computer Science'},
-			{icon:'🔧',name:'Object-Oriented Programming',meta:'CS · Engineering'},
-			{icon:'💰',name:'Financial Accounting I',meta:'Business Administration'},
-			{icon:'📜',name:'Law of Contract',meta:'Faculty of Law'},
-			{icon:'🧬',name:'Cell Biology & Genetics',meta:'Biological Sciences'},
-			{icon:'∫',name:'Calculus & Analytical Geometry',meta:'Sciences · Engineering'},
-			{icon:'🫀',name:'Human Physiology I',meta:'Medicine · Pharmacy'},
-			{icon:'📊',name:'Microeconomics',meta:'Economics · Business'}
-		],
-		'300L': [
-			{icon:'🗄️',name:'Database Management Systems',meta:'Computer Science'},
-			{icon:'🌐',name:'Computer Networks',meta:'Computer Science · IT'},
-			{icon:'⚡',name:'Electrical Circuit Theory',meta:'Electrical Engineering'},
-			{icon:'🦴',name:'Human Anatomy',meta:'Medicine · Nursing'},
-			{icon:'🧪',name:'Organic Chemistry',meta:'Chemistry · Pharmacy'},
-			{icon:'⚖️',name:'Constitutional Law',meta:'Faculty of Law'},
-			{icon:'💧',name:'Fluid Mechanics',meta:'Civil Engineering'},
-			{icon:'🌍',name:'Macroeconomics',meta:'Economics'}
-		],
-		'400L': [
-			{icon:'🤖',name:'Artificial Intelligence & ML',meta:'Computer Science'},
-			{icon:'⚙️',name:'Software Engineering',meta:'Computer Science'},
-			{icon:'🏗️',name:'Structural Analysis',meta:'Civil Engineering'},
-			{icon:'💊',name:'Pharmacology',meta:'Pharmacy · Medicine'},
-			{icon:'📉',name:'Econometrics',meta:'Economics'},
-			{icon:'🔨',name:'Criminal Law & Procedure',meta:'Faculty of Law'}
-		],
-		'500L': [
-			{icon:'🔐',name:'Advanced Cyber Security',meta:'Computer Science'},
-			{icon:'🏥',name:'Surgery & Clinical Medicine',meta:'Medicine & Surgery'},
-			{icon:'💉',name:'Clinical Pharmacy',meta:'Pharmacy'},
-			{icon:'🩺',name:'Internal Medicine & Pathology',meta:'Medicine (600L)'}
-		],
-		'PG': [
-			{icon:'💼',name:'MBA Strategic Management',meta:'Business School'},
-			{icon:'🔭',name:'M.Sc. Research Methodology',meta:'All Postgraduate'},
-			{icon:'💻',name:'M.Sc. Computer Science',meta:'Sciences & Technology'},
-			{icon:'⚖️',name:'LLM Commercial Law',meta:'Faculty of Law'},
-			{icon:'🎓',name:'Ph.D. Research Design',meta:'Doctoral Programs'}
-		]
-	};
-
-	const polyCourses: Record<PolyLevel, {icon:string;name:string;meta:string}[]> = {
-		'ND': [
-			{icon:'💻',name:'Computer Science',meta:'ND · Science/IT'},
-			{icon:'📒',name:'Accountancy',meta:'ND · Business'},
-			{icon:'⚡',name:'Electrical Engineering',meta:'ND · Engineering'},
-			{icon:'🏗️',name:'Civil Engineering',meta:'ND · Engineering'},
-			{icon:'💼',name:'Business Administration',meta:'ND · Business'},
-			{icon:'🏠',name:'Architectural Technology',meta:'ND · Environmental'}
-		],
-		'HND': [
-			{icon:'💻',name:'Computer Science',meta:'HND · Science/IT'},
-			{icon:'📒',name:'Accountancy',meta:'HND · Business'},
-			{icon:'🏗️',name:'Civil Engineering',meta:'HND · Engineering'},
-			{icon:'🏦',name:'Banking & Finance',meta:'HND · Business'}
-		],
-		'Post-HND': [
-			{icon:'💼',name:'Business Management',meta:'Post-HND'},
-			{icon:'🖥️',name:'Information Technology',meta:'Post-HND'},
-			{icon:'🌐',name:'ICT & Networking',meta:'NID · IEI'}
-		]
-	};
-
-	const coeCourses: Record<CoeLevel, {icon:string;name:string;meta:string}[]> = {
-		'NCE': [
-			{icon:'📚',name:'General Education Studies',meta:'NCE · All COEs'},
-			{icon:'📐',name:'Mathematics Education',meta:'NCE · Sciences'},
-			{icon:'✍️',name:'English Language Education',meta:'NCE · Arts'},
-			{icon:'👶',name:'Early Childhood Education',meta:'NCE · Education'},
-			{icon:'🔬',name:'Integrated Science Education',meta:'NCE · Sciences'},
-			{icon:'🌍',name:'Social Studies Education',meta:'NCE · Social Sciences'}
-		],
-		'B.Ed.': [
-			{icon:'🏫',name:'B.Ed. Primary Education',meta:'B.Ed. Affiliated'},
-			{icon:'♿',name:'B.Ed. Special Education',meta:'B.Ed. Affiliated'},
-			{icon:'⚗️',name:'B.Ed. Science Education',meta:'B.Ed. Affiliated'}
-		]
-	};
-
-	const ieiCourses = [
-		{icon:'🌐',name:'ICT & Computer Networking',meta:'NID · NIIT/Afrihub'},
-		{icon:'🛢️',name:'Oil & Gas Technology',meta:'NID · Laser Petroleum'},
-		{icon:'🎬',name:'Film Production & Media',meta:'NID · PEFTI'},
-		{icon:'✈️',name:'Aircraft Engineering Technology',meta:'NID · Air Force Institute'},
-		{icon:'⚓',name:'Marine Engineering',meta:'NID · Maritime Academy'},
-		{icon:'🪚',name:'Carpentry & Joinery',meta:'Technical College'}
-	];
-
-	$: levelCourses = selectedInst === 'University' ? univCourses[univLevel] :
-		selectedInst === 'Polytechnic' ? polyCourses[polyLevel] :
-		selectedInst === 'College of Education' ? coeCourses[coeLevel] : ieiCourses;
-
 	onMount(() => {
 		const observer = new IntersectionObserver((entries) => {
 			entries.forEach(e => { if (e.isIntersecting) animateCounters(); });
@@ -266,6 +136,20 @@
 
 <!-- ═══════════════════════════ HERO ═══════════════════════════ -->
 <section class="pt-[100px] pb-24 relative overflow-hidden" aria-labelledby="hero-heading">
+	<!-- E-WIN Ecosystem Banner (Enterprise SEO) -->
+	<div 
+		class="w-full mb-10 py-3 px-4 border-y border-[#6cd973]/10 flex items-center justify-center gap-3 animate-pulse-subtle group"
+		style="background: rgba(108, 217, 115, 0.08);"
+		itemscope 
+		itemtype="https://schema.org/Organization"
+	>
+		<meta itemprop="name" content="Elite Workforce Impact Nigeria (E-WIN) Project" />
+		<div class="w-2 h-2 rounded-full bg-[#6cd973] shadow-[0_0_10px_#6cd973]"></div>
+		<span class="text-[#6cd973] text-xs sm:text-sm font-bold tracking-wide uppercase text-center">
+			A platform under the <span class="underline underline-offset-4 decoration-[#6cd973]/30">Elite Workforce Impact Nigeria (E-WIN)</span> Project Ecosystem
+		</span>
+	</div>
+
 	<div class="page-container">
 		<div class="grid lg:grid-cols-2 gap-14 items-center">
 			<!-- Left: Copy -->
@@ -539,84 +423,11 @@
 			{/each}
 		</div>
 
-		<!-- Institution Type Tabs -->
-		<div class="flex gap-2 mb-5 p-1.5 rounded-2xl border border-white/10 bg-black/20 overflow-x-auto">
-			{#each INSTITUTION_TYPES as inst}
-				<button
-					on:click={() => { selectedInst = inst; }}
-					class="flex-1 min-w-max py-2.5 px-4 rounded-xl text-sm font-semibold transition-all whitespace-nowrap"
-					class:cur-tab={selectedInst === inst}
-					class:off-tab={selectedInst !== inst}
-					aria-pressed={selectedInst === inst}
-				>
-					{inst}
-				</button>
-			{/each}
-		</div>
-
-		<!-- Level Sub-Tabs (University) -->
-		{#if selectedInst === 'University'}
-			<div class="flex gap-2 mb-6 overflow-x-auto pb-1">
-				{#each (['100L','200L','300L','400L','500L','PG'] as const) as lvl}
-					<button on:click={() => univLevel = lvl}
-						class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all"
-						style="{univLevel === lvl ? 'background:#7c3aed;color:#fff;box-shadow:0 4px 16px rgba(124,58,237,0.4)' : 'background:rgba(255,255,255,0.05);color:#94a3b8;border:1px solid rgba(255,255,255,0.08);'}"
-					>{lvl}</button>
-				{/each}
-			</div>
-		{/if}
-
-		<!-- Level Sub-Tabs (Polytechnic) -->
-		{#if selectedInst === 'Polytechnic'}
-			<div class="flex gap-2 mb-6 overflow-x-auto pb-1">
-				{#each (['ND','HND','Post-HND'] as const) as lvl}
-					<button on:click={() => polyLevel = lvl}
-						class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all"
-						style="{polyLevel === lvl ? 'background:#f59e0b;color:#030712;box-shadow:0 4px 16px rgba(245,158,11,0.4)' : 'background:rgba(255,255,255,0.05);color:#94a3b8;border:1px solid rgba(255,255,255,0.08);'}"
-					>{lvl}</button>
-				{/each}
-			</div>
-		{/if}
-
-		<!-- Level Sub-Tabs (COE) -->
-		{#if selectedInst === 'College of Education'}
-			<div class="flex gap-2 mb-6 overflow-x-auto pb-1">
-				{#each (['NCE','B.Ed.'] as const) as lvl}
-					<button on:click={() => coeLevel = lvl}
-						class="px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all"
-						style="{coeLevel === lvl ? 'background:#22d3ee;color:#030712;box-shadow:0 4px 16px rgba(34,211,238,0.4)' : 'background:rgba(255,255,255,0.05);color:#94a3b8;border:1px solid rgba(255,255,255,0.08);'}"
-					>{lvl}</button>
-				{/each}
-			</div>
-		{/if}
-
-		<!-- Icon-Rich Course Cards Grid -->
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
-			{#each levelCourses as course}
-				<div class="glass-card p-4 flex items-center gap-3 hover:border-violet-DEFAULT/50 transition-all group">
-					<div class="text-2xl flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(124,58,237,0.12);">{course.icon}</div>
-					<div class="flex-1 min-w-0">
-						<div class="text-sm font-semibold text-white/90 group-hover:text-white transition-colors truncate">{course.name}</div>
-						<div class="text-xs text-white/40 mt-0.5">{course.meta}</div>
-					</div>
-					<div class="flex gap-1.5 flex-shrink-0">
-						<button
-							on:click={() => goToLab(course.name, 'lab')}
-							class="text-violet-light hover:text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-all"
-							style="background:rgba(124,58,237,0.12)"
-						>Practise</button>
-						<button
-							on:click={() => goToLab(course.name, 'mock')}
-							class="text-lime-DEFAULT hover:text-white text-xs font-bold px-2.5 py-1.5 rounded-lg transition-all"
-							style="background:rgba(132,204,22,0.1)"
-						>Mock</button>
-					</div>
-				</div>
-			{/each}
-		</div>
+		<CurriculumBrowser />
 
 	</div>
 </section>
+
 
 <!-- ══════════════════════════════════════════════════════
   EXAM LAB — AI QUESTION GENERATOR (Extracted Preview)

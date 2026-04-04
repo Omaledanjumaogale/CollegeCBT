@@ -75,44 +75,45 @@
 	$: pwStrength = getPasswordStrength(suPassword);
 
 	function nextStep() {
-		errorMsg = '';
 		if (step === 1) {
 			if (!suFullName.trim() || !suEmail.trim() || !suPassword.trim() || !suNin.trim()) {
-				errorMsg = 'Please fill in all required fields.';
+				showToast('⚠️ Required Fields', 'Please fill in all personal information fields.', 'warning');
 				return;
 			}
 			if (suNin.length !== 11) {
-				errorMsg = 'NIN must be exactly 11 digits.';
+				showToast('⚠️ Invalid NIN', 'NIN must be exactly 11 digits.', 'warning');
 				return;
 			}
 			step = 2;
 		} else if (step === 2) {
 			if (!suPhone.trim() || !suStateOrigin || !suStateRes || !suLga.trim()) {
-				errorMsg = 'Please fill in all required contact fields.';
+				showToast('⚠️ Required Fields', 'Please fill in all contact and location fields.', 'warning');
 				return;
 			}
 			step = 3;
 		}
 	}
 
+
 	async function handleLogin() {
 		if (!loginEmail || !loginPassword) {
-			errorMsg = 'Please enter your email and password.';
+			showToast('⚠️ Missing Fields', 'Please enter your email and password.', 'warning');
 			return;
 		}
 		loading = true;
 		const result = await signInWithEmail(loginEmail, loginPassword);
 		loading = false;
 		if (result.success) {
+			showToast('✅ Welcome Back', 'Logged in successfully.', 'success');
 			close();
 		} else {
-			errorMsg = result.error || 'Login failed.';
+			showToast('❌ Login Failed', result.error || 'Check your credentials.', 'error');
 		}
 	}
 
 	async function handleSignup() {
 		if (!suInstType || !suDept || !suLevel || !suTerms) {
-			errorMsg = 'Please complete all fields and accept the terms.';
+			showToast('⚠️ Missing Information', 'Please complete all required fields and accept the terms.', 'warning');
 			return;
 		}
 		loading = true;
@@ -139,11 +140,13 @@
 		const result = await signUpWithEmail(suEmail, suPassword, suFullName, profileData);
 		loading = false;
 		if (result.success) {
+			showToast('✨ Account Created', 'Welcome to CollegeCBT!', 'success');
 			signupSuccess = true;
 		} else {
-			errorMsg = result.error || 'Signup failed.';
+			showToast('❌ Signup Failed', result.error || 'Please try again.', 'error');
 		}
 	}
+
 </script>
 
 {#if $activeModal}
@@ -195,9 +198,6 @@
 					<h2 class="font-display text-2xl mb-1">Welcome Back</h2>
 					<p class="text-white/50 text-sm mb-6">Sign in to your CollegeCBT account to continue.</p>
 
-					{#if errorMsg}
-						<div class="badge badge-rose w-full justify-start p-3 rounded-xl mb-4 text-sm">{errorMsg}</div>
-					{/if}
 
 					<div class="space-y-4 mb-6">
 						<div>
@@ -248,9 +248,6 @@
 							{/each}
 						</div>
 
-						{#if errorMsg}
-							<div class="p-3 rounded-xl mb-4 text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20">{errorMsg}</div>
-						{/if}
 
 						<!-- Step 1 -->
 						{#if step === 1}
@@ -271,7 +268,7 @@
 								</div>
 								<div>
 									<label for="su-nin" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">NIN *</label>
-									<input id="su-nin" type="text" bind:value={suNin} class="form-input" placeholder="11-digit NIN" maxlength="11" />
+									<input id="su-nin" type="text" inputmode="numeric" bind:value={suNin} class="form-input" placeholder="11-digit NIN" maxlength="11" />
 									<p class="text-[11px] text-white/30 mt-1">Used for identity verification only.</p>
 								</div>
 								<div class="sm:col-span-2">
@@ -295,11 +292,11 @@
 							<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
 								<div>
 									<label for="su-phone" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Phone Number *</label>
-									<input id="su-phone" type="tel" bind:value={suPhone} class="form-input" placeholder="080x xxx xxxx" autocomplete="tel" />
+									<input id="su-phone" type="tel" inputmode="tel" bind:value={suPhone} class="form-input" placeholder="080x xxx xxxx" autocomplete="tel" />
 								</div>
 								<div>
 									<label for="su-whatsapp" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">WhatsApp Number</label>
-									<input id="su-whatsapp" type="tel" bind:value={suWhatsapp} class="form-input" placeholder="Same or different number" />
+									<input id="su-whatsapp" type="tel" inputmode="tel" bind:value={suWhatsapp} class="form-input" placeholder="Same or different number" />
 								</div>
 								<div>
 									<label for="su-state-origin" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">State of Origin *</label>

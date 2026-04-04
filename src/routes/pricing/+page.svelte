@@ -175,7 +175,7 @@
 
 					<button
 						on:click={() => handlePayment(plan)}
-						class="w-full py-3.5 rounded-xl font-bold text-sm transition-all {plan.ctaStyle === 'violet' ? 'btn-violet shadow-violet' : plan.ctaStyle === 'lime' ? 'btn-outline-lime' : 'btn-ghost'}"
+						class="w-full min-h-[44px] flex justify-center items-center py-3 rounded-xl font-bold text-sm transition-all {plan.ctaStyle === 'violet' ? 'btn-violet shadow-violet' : plan.ctaStyle === 'lime' ? 'btn-outline-lime' : 'btn-ghost'}"
 					>
 						{plan.cta}
 					</button>
@@ -198,7 +198,7 @@
 			</div>
 			<button
 				on:click={() => handlePayment(plans[1])}
-				class="btn-violet px-6 py-3 text-sm flex-shrink-0"
+				class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full sm:w-auto text-sm flex-shrink-0"
 			>
 				Pay ₦8,500/year →
 			</button>

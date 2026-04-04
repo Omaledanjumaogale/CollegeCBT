@@ -75,8 +75,8 @@ p, span, div {
   }
   .glass-nav {
     background: rgba(13, 8, 32, 0.92);
-    backdrop-filter: blur(28px);
     -webkit-backdrop-filter: blur(28px);
+    backdrop-filter: blur(28px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   }
   
@@ -161,11 +161,11 @@ p, span, div {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(124, 58, 237, 0.08);
   }
   
-  /* ── FORM INPUTS ── */
   .form-input {
     @apply w-full px-4 py-3 rounded-xl text-white text-sm font-body transition-all duration-200;
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid var(--glass-border);
+    min-height: 44px;
   }
   .form-input:focus {
     outline: none;
@@ -181,6 +181,7 @@ p, span, div {
     background: rgba(0, 0, 0, 0.2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
     border: 1px solid var(--glass-border);
     padding-right: 2.5rem;
+    min-height: 44px;
   }
   .form-select:focus {
     outline: none;
@@ -344,6 +345,14 @@ p, span, div {
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: translateY(0) scale(1); }
+  50% { opacity: 0.8; transform: translateY(1px) scale(0.998); }
+}
+.animate-pulse-subtle {
+  animation: pulse-subtle 3.5s ease-in-out infinite;
 }
 
 /* ── MOBILE OVERFLOW guards ── */
