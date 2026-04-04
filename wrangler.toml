@@ -1,0 +1,8 @@
+name = "collegecbt"
+compatibility_date = "2024-04-03"
+pages_build_output_dir = ".svelte-kit/cloudflare"
+
+[vars]
+# Add your environment variables here in production
+# ANTHROPIC_API_KEY = "..."
+# FLUTTERWAVE_WEBHOOK_HASH = "..."
