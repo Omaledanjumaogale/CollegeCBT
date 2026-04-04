@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { generateQuestionSchema } from '$lib/data/schemas';
 
 // ─── Edge-compatible in-memory rate limiter ───────────────────────────────────
 // Uses a Map keyed by IP or UID, pruned every 10 minutes to prevent memory leaks.
@@ -52,21 +53,17 @@ async function getUserPlanFromFirestore(
 // ─── Request Handler ──────────────────────────────────────────────────────────
 export const POST: RequestHandler = async ({ request, platform }) => {
 	try {
-		const body = await request.json() as {
-			course?: string;
-			level?: string;
-			institutionType?: string;
-			topic?: string;
-			difficulty?: string;
-			type?: string;
-			uid?: string;       // Firebase UID sent by the client (optional)
-		};
+		const rawBody = await request.json();
+		const validation = generateQuestionSchema.safeParse(rawBody);
 
-		const { course, level, institutionType, topic, difficulty, type, uid } = body;
-
-		if (!course || !institutionType) {
-			return json({ error: 'Course and institution type are required' }, { status: 400 });
+		if (!validation.success) {
+			return json({ 
+				error: 'Invalid request parameters', 
+				details: validation.error.format() 
+			}, { status: 400 });
 		}
+
+		const { course, level, institutionType, topic, difficulty, type, uid } = validation.data;
 
 		// Get Cloudflare env bindings
 		const env = platform?.env as Record<string, string> | undefined;
@@ -184,8 +181,12 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		}
 
 	} catch (err) {
-		console.error('[CollegeCBT] Question generation error:', err);
-		return json(getDemoMCQ('General'), { status: 200 });
+		console.error('[CollegeCBT] Question generation fatal error:', err);
+		return json({ 
+			error: 'Engine failure. Reverting to backup protocols.', 
+			fallback: true,
+			data: getDemoMCQ('General')
+		}, { status: 500 });
 	}
 };
 

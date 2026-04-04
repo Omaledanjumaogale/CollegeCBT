@@ -5,7 +5,7 @@
 /* ── ROOT CSS VARIABLES ── */
 :root {
   --bg: #0d0820;
-  --bg2: #120e2e;
+  --bg-alt: #120e2e;
   --violet: #7c3aed;
   --violet-light: #a78bfa;
   --lime: #84cc16;
@@ -15,10 +15,27 @@
   --glass: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.10);
   --text: #ffffff;
-  --muted: #94a3b8;
+  --text-muted: #94a3b8;
   --card: #1a1535;
-  /* Overflow protection */
+  --ring: rgba(124, 58, 237, 0.5);
   --max-content: 1280px;
+}
+
+[data-theme="light"] {
+  --bg: #f8fafc;
+  --bg-alt: #ffffff;
+  --violet: #6d28d9;
+  --violet-light: #8b5cf6;
+  --lime: #65a30d;
+  --lime-light: #84cc16;
+  --amber: #d97706;
+  --rose: #dc2626;
+  --glass: rgba(0, 0, 0, 0.05);
+  --glass-border: rgba(0, 0, 0, 0.10);
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --card: #ffffff;
+  --ring: rgba(109, 40, 217, 0.3);
 }
 
 /* ── GLOBAL ANTI-OVERFLOW RULES ── */
@@ -39,6 +56,7 @@ body {
   overflow-x: hidden;
   line-height: 1.6;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Prevent all text and icons from overflowing */
@@ -71,21 +89,69 @@ p, span, div {
     @apply bg-white/5 backdrop-blur-2xl border border-white/10;
   }
   .glass-card {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
-  }
-  .glass-nav {
-    background: rgba(13, 8, 32, 0.92);
+    background: var(--glass);
     -webkit-backdrop-filter: blur(28px);
     backdrop-filter: blur(28px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
+  .section-tag {
+    @apply inline-flex items-center px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.25em] mb-4;
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    color: var(--violet-light);
+  }
+  
+  .shadow-violet {
+    box-shadow: 0 10px 40px -10px rgba(124, 58, 237, 0.5);
+  }
+  
+  .shadow-large {
+    box-shadow: 0 20px 80px -20px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* ── MCQ OPTIONS ── */
+  .mcq-option {
+    @apply w-full flex items-center p-4 rounded-2xl text-left text-sm font-bold transition-all duration-300 border border-white/5 bg-white/5;
+  }
+  .mcq-option:hover:not(:disabled) {
+    @apply bg-white/10 border-white/20 -translate-x-1;
+  }
+  .mcq-option:disabled {
+    @apply cursor-not-allowed opacity-80;
+  }
+  .mcq-option.correct {
+    background: rgba(132, 204, 22, 0.15) !important;
+    border-color: rgba(132, 204, 22, 0.4) !important;
+    color: #bef264 !important;
+  }
+  .mcq-option.wrong {
+    background: rgba(225, 29, 72, 0.15) !important;
+    border-color: rgba(225, 29, 72, 0.4) !important;
+    color: #fda4af !important;
+  }
+
+  .nav-active {
+    color: var(--violet-light);
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+  }
+  .nav-inactive {
+    color: var(--text-muted);
+    border: 1px solid transparent;
+  }
+  .nav-inactive:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
   /* ── BUTTONS ── */
   .btn-violet {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all duration-300;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-black uppercase tracking-widest text-white transition-all duration-300 btn-micro-feedback;
     background: var(--violet);
     border: 1px solid rgba(124, 58, 237, 0.5);
-    box-shadow: 0 0 30px rgba(124, 58, 237, 0.35);
   }
   .btn-violet:hover {
     background: #6d28d9;
@@ -94,7 +160,7 @@ p, span, div {
   }
   
   .btn-lime {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-ink-dark transition-all duration-300;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-[#0d0820] transition-all duration-300 btn-micro-feedback;
     background: linear-gradient(135deg, #a3e635, #84cc16);
     box-shadow: 0 4px 24px rgba(163, 230, 53, 0.3);
   }
@@ -342,17 +408,44 @@ p, span, div {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(0.995); }
 }
 
-@keyframes pulse-subtle {
-  0%, 100% { opacity: 1; transform: translateY(0) scale(1); }
-  50% { opacity: 0.8; transform: translateY(1px) scale(0.998); }
+/* ── SKELETON LOADER ── */
+@keyframes skeleton-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
-.animate-pulse-subtle {
-  animation: pulse-subtle 3.5s ease-in-out infinite;
+
+.skeleton {
+  background: linear-gradient(90deg, 
+    var(--glass-border) 25%, 
+    rgba(255, 255, 255, 0.08) 50%, 
+    var(--glass-border) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite linear;
+  border-radius: 8px;
+}
+
+/* ── MICRO-FEEDBACK (HAPTIC-LIKE) ── */
+.btn-micro-feedback {
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-micro-feedback:active {
+  transform: scale(0.96);
+}
+
+/* ── ACCESSIBILITY: REDUCED MOTION ── */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ── MOBILE OVERFLOW guards ── */

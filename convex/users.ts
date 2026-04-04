@@ -2,6 +2,7 @@ import { mutation, query } from './_generated/server';
 import type { MutationCtx, QueryCtx } from './_generated/server';
 import { v } from 'convex/values';
 import type { Doc, Id } from './_generated/dataModel';
+import { checkRateLimitInternal } from './rateLimit';
 
 // ── Identity Verification Mutation ──────────────────────────────────────────
 
@@ -20,6 +21,14 @@ export const storeUser = mutation({
     if (!identity) {
       throw new Error("Unauthenticated identity in platform sync. Check Firebase ID Token.");
     }
+
+    // ── Rate Limit Check ──
+    const rl = await checkRateLimitInternal(ctx, { 
+      key: `sync:${identity.subject}`, 
+      burst: 5, 
+      rate: 0.1 // 1 refill every 10 seconds
+    });
+    if (!rl.ok) throw new Error(rl.message);
 
     const existing = await ctx.db
       .query('users')
@@ -170,8 +179,25 @@ export const adminOverridePlan = mutation({
     plan: v.union(v.literal('free'), v.literal('pro'), v.literal('institutional')),
   },
   handler: async (ctx, args) => {
-    return await withAdminAuth(ctx, async () => {
+    return await withAdminAuth(ctx, async (admin) => {
+      const user = await ctx.db.get(args.userId);
+      if (!user) throw new Error("User not found");
+
+      const oldPlan = user.plan;
       await ctx.db.patch(args.userId, { plan: args.plan, updatedAt: Date.now() });
+
+      // ── Audit Log ──
+      await ctx.db.insert('auditLogs', {
+        userId: admin.uid,
+        action: 'admin_plan_override',
+        status: 'success',
+        metadata: JSON.stringify({
+          targetUid: user.uid,
+          oldPlan,
+          newPlan: args.plan
+        }),
+        timestamp: Date.now()
+      });
     });
   },
 });

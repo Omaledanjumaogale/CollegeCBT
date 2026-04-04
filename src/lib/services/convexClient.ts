@@ -1,7 +1,10 @@
 import { ConvexHttpClient } from 'convex/browser';
 import { anyApi } from 'convex/server';
+import { api } from '$convex/_generated/api';
 import { env } from '$env/dynamic/public';
 import type { StudySession } from '$lib/stores';
+
+export { api };
 
 // Edge-compatible Convex client using $env/dynamic/public (resolved safely at runtime).
 // No process.env usage — fully safe for Cloudflare Workers edge runtime.

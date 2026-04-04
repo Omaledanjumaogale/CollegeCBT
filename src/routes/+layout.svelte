@@ -9,6 +9,8 @@
 
 	import AuthModal from '$lib/components/AuthModal.svelte';
 	import BgMesh from '$lib/components/BgMesh.svelte';
+	import NetworkMonitor from '$lib/components/NetworkMonitor.svelte';
+	import Footer from '$lib/components/Footer.svelte';
 	import { onMount } from 'svelte';
 	import { authLoading } from '$lib/stores';
 	import { browser } from '$app/environment';
@@ -35,26 +37,16 @@
 				
 				console.log('[CollegeCBT] Service Worker registered:', registration.scope);
 
-				// Real-time Push Synchronization
 				if ('PushManager' in window) {
 					const permission = await Notification.requestPermission();
 					if (permission === 'granted') {
 						console.log('[CollegeCBT] Push permission granted.');
-						// Here we would sync the subscription to Convex if needed
 					}
 				}
 			} catch (error) {
 				console.error('[CollegeCBT] PWA/Push initialization failed:', error);
 			}
 		}
-
-		// 3. Online/Offline Status Tracking
-		window.addEventListener('online', () => {
-			import('$lib/toast.svelte').then(m => m.notifications.success('Connection restored. You are back online.'));
-		});
-		window.addEventListener('offline', () => {
-			import('$lib/toast.svelte').then(m => m.notifications.warn('You are currently offline. Some features may be limited.'));
-		});
 	});
 
 
@@ -131,10 +123,12 @@
 					{@render children?.()}
 				</main>
 				<BottomNav />
+				<Footer />
 			</TooltipProvider>
 		</ToastProvider>
 	</AppPreferencesProvider>
 
 	<AuthModal />
+	<NetworkMonitor />
 </div>
 

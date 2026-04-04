@@ -19,15 +19,22 @@ Enterprise-grade AI Exam Preparation Platform for Nigerian Higher Institution st
 * **PWA & Real-time Push:** Successfull integration of service worker hooks and PushManager for real-time market/exam resolution deliveries.
 * **Online/Offline Resilience:** Automatic connection status tracking with user feedback.
 
-### 🌟 v2.1.0 Enterprise UI & UX Details
 
-| Feature | Implementation | Benefit |
-| :--- | :--- | :--- |
-| **Real-time Push** | `PushManager` API sync | Edge-safe notifications for exam reminders. |
-| **ACID Rate Limiting** | Token-Bucket Algorithm | Protects Convex mutations from malicious flooding. |
-| **Heartbeat Sessions** | UUID distributed bindings | Zero-maintenance session hygiene for mobile users. |
-| **Universal Feedbacks** | `ToastProvider` singleton | Consistent feedback across Auth, Dashboard, and Exams. |
-| **Knowledge Sync** | `Tooltip.svelte` wrappers | Instant pedagogical guidance on every interactive element. |
+### [v2.2.0] — Super Admin & Institutional Gateway (CURRENT)
+
+* **World-Class Admin Portal**: 100% Mobile-responsive dashboard with collapsible sidebar & glassmorphism.
+* **Identity Registry**: Real-time User & RBAC management via Convex subscriptions.
+* **System Observability**: High-fidelity telemetry Dashboard (Latency, Throughput, Health).
+* **Audit Registry**: Immutable log of sensitive admin operations.
+* **PWA & Push Resilience**: Service Worker integration for offline recovery and push notifications.
+* **Config Engine**: Centralized feature flags and master environment overrides.
+
+### [v2.1.0] — Enterprise UI & UX Modernization (Legacy Release)
+
+* **Unified Notification System**: Built-in Toast and Tooltip mechanisms for real-time feedback.
+* **Accessibility Hardening**: WCAG 2.2 AA compliant components with ARIA enhancement.
+* **Svelte 5 Snippets**: Migration to the newest reactive syntax for cleaner modular code.
+* **Performance**: Optimized metadata and zero-layout shift.
 
 ## 🛠️ Technology Stack
 

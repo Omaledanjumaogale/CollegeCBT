@@ -1,0 +1,21 @@
+
+> collegecbt@0.1.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding SSR bundle for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 36 modules transformed.
+x Build failed in 5.46s
+error during build:
+[vite-plugin-svelte] [plugin vite-plugin-svelte] src/routes/admin/+layout.svelte (37:1): src/routes/admin/+layout.svelte:37:1 `$:` is not allowed in runes mode, use `$derived` or `$effect` instead
+https://svelte.dev/e/legacy_reactive_statement_invalid
+file: C:/Users/OMALE DANJUMA OGALE/Downloads/PLATFORMS IN DEVELOPMENT/Collegecbt.dev/src/routes/admin/+layout.svelte:37:1
+
+ 35 |    ];
+ 36 |  
+ 37 |    $: currentPath = $page.url.pathname;
+                                             ^
+ 38 |    
+ 39 |    // Check if the current page is the login page
+
+

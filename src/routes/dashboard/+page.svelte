@@ -1,21 +1,24 @@
 <script lang="ts">
-	import { currentUser, dashboardPanel, isAuthenticated, activeModal, showToast } from '$lib/stores';
+		import { currentUser, dashboardPanel, isAuthenticated, activeModal, showToast } from '$lib/stores';
 	import type { StudySession } from '$lib/stores';
-	import { getUserSessions, getDashboardAnalytics } from '$lib/services/convexClient';
+	import { api } from '$lib/services/convexClient';
+	import { useQuery } from 'convex-svelte';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { updateUserProfile } from '$lib/services/firebase';
+	import { profileUpdateSchema } from '$lib/data/schemas';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 
-	$: if (!$isAuthenticated && typeof window !== 'undefined') {
-		// show login modal if not authenticated
-		activeModal.set('login');
-	}
+	$effect(() => {
+		if (!$isAuthenticated && typeof window !== 'undefined') {
+			activeModal.set('login');
+		}
+	});
 
 	// Provide sane defaults if currentUser is missing some fields
 	// ── Enterprise Profile Resolution ──
-	$: mappedUser = $currentUser as any;
-	$: userProfile = {
+	let mappedUser = $derived($currentUser as any);
+	let userProfile = $derived({
 		name: mappedUser?.displayName || 'Active Student',
 		email: mappedUser?.email || '',
 		plan: mappedUser?.plan || 'Free Plan',
@@ -23,37 +26,55 @@
 		department: mappedUser?.department || 'Department Not Set',
 		level: mappedUser?.level || 'Level Not Set',
 		streak: mappedUser?.streak || 0
-	};
+	});
 
-	let userSessions: StudySession[] = [];
-	let loadingSessions = true;
+		// ── Real-time Data Sync ──
+	const sessionsQuery = useQuery(api.sessions.getUserSessions, () => ({ userId: $currentUser?.uid || '' }));
+	const analyticsQuery = useQuery(api.sessions.getDashboardAnalytics, () => ({ userId: $currentUser?.uid || '' }));
+
+	let userSessions = $derived(sessionsQuery.data ? (sessionsQuery.data as any[]).map((s) => ({
+		id: s.sessionId,
+		course: s.course,
+		level: s.level,
+		institutionType: s.institutionType,
+		questionsAnswered: s.questionsAnswered,
+		correct: s.correct,
+		wrong: s.wrong,
+		score: s.score,
+		mode: s.mode,
+		grade: s.grade,
+		timestamp: s.timestamp
+	})) : []);
+
+	let loadingSessions = $derived(sessionsQuery.isLoading || analyticsQuery.isLoading);
+	let savingProfile = $state(false);
 
 	// Computed stats from real data
-	$: totalAnswered = userSessions.length > 0 ? userSessions.reduce((acc, s) => acc + (s.questionsAnswered || 0), 0) : 0;
-	$: mockExamsCount = userSessions.length > 0 ? userSessions.filter(s => s.mode === 'mock').length : 0;
-	$: avgScore = (() => {
+	let totalAnswered = $derived(userSessions.length > 0 ? userSessions.reduce((acc, s) => acc + (s.questionsAnswered || 0), 0) : 0);
+	let mockExamsCount = $derived(userSessions.length > 0 ? userSessions.filter(s => s.mode === 'mock').length : 0);
+	let avgScore = $derived((() => {
 		const mocks = userSessions.filter(s => s.mode === 'mock');
 		if (mocks.length === 0) return 0; 
 		const total = mocks.reduce((sum, s) => sum + s.score, 0);
 		return Math.round(total / mocks.length);
-	})();
+	})());
 
-	$: kpis = [
+	let kpis = $derived([
 		{ icon: '📝', value: totalAnswered.toString(), label: 'Questions Answered', change: 'Total', color: '#a78bfa' },
 		{ icon: '🏆', value: mockExamsCount.toString(), label: 'Mock Exams Taken', change: 'Exams', color: '#84cc16' },
 		{ icon: '📈', value: `${avgScore}%`, label: 'Average Score', change: 'Real-time', color: '#f59e0b' },
 		{ icon: '🎯', value: avgScore > 0 ? (avgScore + 5).toString() : '0', label: 'AI Readiness Score', change: 'Target: 85+', color: '#22d3ee' }
-	];
+	]);
 
 	// Recent activity — exclusively real data
-	$: recentActivity = userSessions.map(s => ({
+	let recentActivity = $derived(userSessions.map(s => ({
 		icon: s.mode === 'mock' ? '⏱️' : '🤖',
 		iconBg: s.mode === 'mock' ? 'rgba(132,204,22,0.15)' : 'rgba(124,58,237,0.15)',
 		title: `${s.mode === 'mock' ? 'Mock Exam' : 'Exam Lab'} — ${s.course}`,
 		meta: new Date(s.timestamp).toLocaleString(),
 		badge: s.mode === 'mock' ? `Score: ${Math.round(s.score)}%` : `Correct: ${s.correct}`,
 		badgeColor: s.mode === 'mock' && s.score >= 70 ? 'badge-lime' : 'badge-violet'
-	})).slice(0, 6);
+	})).slice(0, 6));
 
 	const recommendations = [
 		{ icon: '🗄️', title: 'Database Normalization', meta: 'DBMS · 300L · 45% avg', link: '/exam-lab?course=Database+Management+Systems&inst=University' },
@@ -63,8 +84,8 @@
 	];
 
 	// Bar chart data (mock exam score trajectory)
-	let chartData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-	let heatmap: { topic: string; pct: number; color: string; label: string }[] = [];
+	let chartData = $state([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+	let heatmap = $state<{ topic: string; pct: number; color: string; label: string }[]>([]);
 	
 	const maxVal = 100;
 	const TARGET_LINE = 75;
@@ -76,30 +97,18 @@
 		{ id: 'settings', icon: '⚙️', label: 'Settings' }
 	] as const;
 
-	// Gauge animation
-	let gaugeAngle = 0;
-	let gaugeNum = 0;
-	onMount(async () => {
-		if ($isAuthenticated && $currentUser?.uid) {
-			try {
-				const [sessions, analytics] = await Promise.all([
-					getUserSessions($currentUser.uid),
-					getDashboardAnalytics($currentUser.uid)
-				]);
-				userSessions = sessions;
-				if (analytics) {
-					chartData = analytics.chartData;
-					heatmap = analytics.heatmap;
-				}
-			} catch (e) {
-				console.warn('[Dashboard] Could not load data:', e);
-			} finally {
-				loadingSessions = false;
-			}
-		} else {
-			loadingSessions = false;
+		// Gauge animation
+	let gaugeAngle = $state(0);
+	let gaugeNum = $state(0);
+	
+	$effect(() => {
+		if (analyticsQuery.data) {
+			chartData = (analyticsQuery.data as any).chartData || [0,0,0,0,0,0,0,0,0,0];
+			heatmap = (analyticsQuery.data as any).heatmap || [];
 		}
+	});
 
+	onMount(async () => {
 		setTimeout(() => {
 			const target = 78;
 			const duration = 1200;
@@ -199,7 +208,7 @@
 				<nav class="space-y-1">
 					{#each panels as p}
 						<button
-							on:click={() => dashboardPanel.set(p.id)}
+							onclick={() => dashboardPanel.set(p.id)}
 							class="w-full flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl text-sm font-medium transition-all"
 							class:dash-btn-active={$dashboardPanel === p.id}
 							class:dash-btn-inactive={$dashboardPanel !== p.id}
@@ -369,7 +378,7 @@
 					</div>
 
 					<div class="flex flex-col md:flex-row gap-3">
-						<button on:click={downloadCertificate} class="btn-violet flex justify-center items-center px-5 min-h-[44px] w-full md:w-auto text-sm">
+						<button onclick={downloadCertificate} class="btn-violet flex justify-center items-center px-5 min-h-[44px] w-full md:w-auto text-sm">
 							📄 Download Certificate
 						</button>
 						<a href="/exam-lab" class="btn-outline-lime flex justify-center items-center px-5 min-h-[44px] w-full md:w-auto text-sm">🤖 Practice Weak Topics</a>
@@ -427,27 +436,41 @@
 								</select>
 							</div>
 						</div>
-						<button 
-							on:click={async () => {
-								if ($currentUser?.uid) {
-									const res = await updateUserProfile($currentUser.uid, {
-										displayName: settingsName,
-										phone: settingsPhone,
-										institutionType: 'University',
-										institutionName: settingsInstitution,
-										department: settingsDept,
-										level: settingsLevel
-									});
+												<button 
+							onclick={async () => {
+								if (!$currentUser?.uid || savingProfile) return;
+								
+								// 1. Validate with Zod
+								const profileData = {
+									displayName: settingsName,
+									phone: settingsPhone,
+									institutionName: settingsInstitution,
+									department: settingsDept,
+									level: settingsLevel
+								};
+
+								const validation = profileUpdateSchema.safeParse(profileData);
+								if (!validation.success) {
+									showToast('⚠️ Validation Error', 'Please check your inputs.', 'error');
+									return;
+								}
+
+								savingProfile = true;
+								try {
+									const res = await updateUserProfile($currentUser.uid, validation.data);
 									if (res.success) {
 										showToast('✅ Profile Saved', 'Your settings have been updated.', 'success');
 									} else {
 										showToast('❌ Update Failed', res.error || 'Check connection', 'error');
 									}
+								} finally {
+									savingProfile = false;
 								}
 							}} 
 							class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm mt-4"
+							disabled={savingProfile}
 						>
-							Save Changes
+							{savingProfile ? 'Saving...' : 'Save Changes'}
 						</button>
 					</div>
 

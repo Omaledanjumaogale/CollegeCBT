@@ -1,0 +1,29 @@
+{
+  "name": "CollegeCBT — AI Exam Practice",
+  "short_name": "CollegeCBT",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0820",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait-primary",
+  "description": "Unlimited AI-generated exam questions for 550+ Nigerian higher institutions.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Practice Math",
+      "url": "/exam-lab?course=mathematics",
+      "icons": [{ "src": "/favicon.svg", "sizes": "96x96" }]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+
+> collegecbt@0.1.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding SSR bundle for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 38 modules transformed.
+x Build failed in 4.83s
+error during build:
+[vite-plugin-svelte] [plugin vite-plugin-svelte] src/routes/admin/users/+page.svelte (196:20): C:/Users/OMALE DANJUMA OGALE/Downloads/PLATFORMS IN DEVELOPMENT/Collegecbt.dev/src/routes/admin/users/+page.svelte:196:20 Expected token >
+https://svelte.dev/e/expected_token
+
+- Did you forget to add a lang attribute to your style tag?
+- Did you forget to add a lang attribute to your style tag?
+- Did you forget to add a lang attribute to your style tag?
+- Did you forget to add a lang attribute to your style tag?
+- Did you forget to add a lang attribute to your style tag?
+- Did you forget to add a lang attribute to your style tag?
+- Did you forget to add a lang attribute to your style tag?
+- Did you forget to add a lang attribute to your style tag?
+file: C:/Users/OMALE DANJUMA OGALE/Downloads/PLATFORMS IN DEVELOPMENT/Collegecbt.dev/src/routes/admin/users/+page.svelte:196:20
+
+ 194 |            class="w-14 h-8 rounded-full border border-white/10 relative transition-all duration-300"
+ 195 |            class:bg-violet-600={selectedUser?.role === 'admin'}
+ 196 |            class:bg-white/5={selectedUser?.role !== 'admin'}
+                                 ^
+ 197 |          >
+ 198 |            <div 
+
+

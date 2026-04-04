@@ -1,0 +1,116 @@
+
+> collegecbt@0.1.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding SSR bundle for production...[36m[39m
+transforming...
+18:13:59 [vite-plugin-svelte] src/routes/admin/users/+page.svelte:192:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+190:           <div class="text-[10px] text-white/20 uppercase tracking-widest mt-1">Full Edge Access</div>
+191:         </div>
+192:         <button 
+                     ^
+193:           onclick={toggleRole}
+194:           class="w-14 h-8 rounded-full border border-white/10 relative transition-all duration-300 {selectedUser?.role === 'admin' ? 'bg-violet-600' : 'bg-white/5'}"
+18:14:00 [vite-plugin-svelte] src/routes/dashboard/+page.svelte:203:7 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+201:           {#each panels as p}
+202:             <button
+203:               on:click={() => dashboardPanel.set(p.id)}
+                                                            ^
+204:               class="w-full flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl text-sm font-medium transition-all"
+205:               class:dash-btn-active={$dashboardPanel === p.id}
+18:14:00 [vite-plugin-svelte] src/routes/dashboard/+page.svelte:373:14 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+371: 
+372:           <div class="flex flex-col md:flex-row gap-3">
+373:             <button on:click={downloadCertificate} class="btn-violet flex justify-center items-center px-5 min-h-[44px] w-full md:w-auto text-sm">
+                                                       ^
+374:               ­ƒôä Download Certificate
+375:             </button>
+18:14:00 [vite-plugin-svelte] src/routes/dashboard/+page.svelte:432:7 Using `on:click` to listen to the click event is deprecated. Use the event attribute `onclick` instead
+https://svelte.dev/e/event_directive_deprecated
+430:             </div>
+431:             <button 
+432:               on:click={async () => {
+                     ^
+433:                 if ($currentUser?.uid) {
+434:                   const res = await updateUserProfile($currentUser.uid, {
+18:14:00 [vite-plugin-svelte] src/routes/dashboard/+page.svelte:67:5 `chartData` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+65: 
+66:   // Bar chart data (mock exam score trajectory)
+67:   let chartData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+                   ^
+68:   let heatmap: { topic: string; pct: number; color: string; label: string }[] = [];
+69:   
+18:14:00 [vite-plugin-svelte] src/routes/dashboard/+page.svelte:68:5 `heatmap` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+66:   // Bar chart data (mock exam score trajectory)
+67:   let chartData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+68:   let heatmap: { topic: string; pct: number; color: string; label: string }[] = [];
+                                                                                 ^
+69:   
+70:   const maxVal = 100;
+18:14:00 [vite-plugin-svelte] src/routes/dashboard/+page.svelte:81:5 `gaugeAngle` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+79: 
+80:   // Gauge animation
+81:   let gaugeAngle = 0;
+                    ^
+82:   let gaugeNum = 0;
+83:   onMount(async () => {
+18:14:00 [vite-plugin-svelte] src/routes/dashboard/+page.svelte:82:5 `gaugeNum` is updated, but is not declared with `$state(...)`. Changing its value will not correctly trigger updates
+https://svelte.dev/e/non_reactive_update
+80:   // Gauge animation
+81:   let gaugeAngle = 0;
+82:   let gaugeNum = 0;
+                  ^
+83:   onMount(async () => {
+84:     if ($isAuthenticated && $currentUser?.uid) {
+18:14:05 [vite-plugin-svelte] src/lib/components/admin/Drawer.svelte:31:2 Visible, non-interactive elements with a click event must be accompanied by a keyboard event handler. Consider whether an interactive element such as `<button type="button">` or `<a>` might be more appropriate
+https://svelte.dev/e/a11y_click_events_have_key_events
+29:   <div class="fixed inset-0 z-[200] flex justify-end" transition:fade>
+30:     <!-- Backdrop -->
+31:     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick={onClose}></div>
+                                                                                           ^
+32:     
+33:     <!-- Drawer Body -->
+18:14:05 [vite-plugin-svelte] src/lib/components/admin/Drawer.svelte:31:2 `<div>` with a click handler must have an ARIA role
+https://svelte.dev/e/a11y_no_static_element_interactions
+29:   <div class="fixed inset-0 z-[200] flex justify-end" transition:fade>
+30:     <!-- Backdrop -->
+31:     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick={onClose}></div>
+                                                                                           ^
+32:     
+33:     <!-- Drawer Body -->
+18:14:05 [vite-plugin-svelte] src/lib/components/admin/Drawer.svelte:46:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+44:           {/if}
+45:         </div>
+46:         <button 
+                    ^
+47:           onclick={onClose}
+48:           class="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 text-white/40 hover:text-white transition-colors"
+[32mÔ£ô[39m 223 modules transformed.
+x Build failed in 21.23s
+error during build:
+src/routes/admin/users/+page.svelte (2:20): "useMutation" is not exported by "node_modules/convex-svelte/dist/index.js", imported by "src/routes/admin/users/+page.svelte".
+file: C:/Users/OMALE DANJUMA OGALE/Downloads/PLATFORMS IN DEVELOPMENT/Collegecbt.dev/src/routes/admin/users/+page.svelte:2:20
+
+1: <script lang="ts">
+2:   import { useQuery, useMutation } from 'convex-svelte';
+                        ^
+3:   import { api } from '$lib/services/convexClient';
+4:   import { fade, slide } from 'svelte/transition';
+
+    at getRollupError (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/parseAst.js:406:41)
+    at error (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/parseAst.js:402:42)
+    at Module.error (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:17380:16)
+    at Module.traceVariable (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:17813:29)
+    at ModuleScope.findVariable (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:15403:39)
+    at FunctionScope.findVariable (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:5676:38)
+    at FunctionBodyScope.findVariable (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:5676:38)
+    at ReturnValueScope.findVariable (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:5676:38)
+    at FunctionBodyScope.findVariable (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:5676:38)
+    at Identifier.bind (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:5450:40)

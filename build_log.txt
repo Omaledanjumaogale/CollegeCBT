@@ -1,0 +1,21 @@
+
+> collegecbt@0.1.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding SSR bundle for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 12 modules transformed.
+x Build failed in 4.23s
+error during build:
+[vite]: Rollup failed to resolve import "convex-svelte" from "C:/Users/OMALE DANJUMA OGALE/Downloads/PLATFORMS IN DEVELOPMENT/Collegecbt.dev/src/routes/admin/audit-logs/+page.svelte".
+This is most likely unintended because it can break your application at runtime.
+If you do want to externalize this module explicitly add it to
+`build.rollupOptions.external`
+    at viteWarn (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:65855:17)
+    at onwarn (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/@sveltejs/kit/src/exports/vite/index.js:959:10)
+    at onRollupWarning (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:65885:5)
+    at onwarn (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:65550:7)
+    at file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:21383:13
+    at Object.logger [as onLog] (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:23364:9)
+    at ModuleLoader.handleInvalidResolvedId (file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:22108:26)
+    at file:///C:/Users/OMALE%20DANJUMA%20OGALE/Downloads/PLATFORMS%20IN%20DEVELOPMENT/Collegecbt.dev/node_modules/rollup/dist/es/shared/node-entry.js:22066:26

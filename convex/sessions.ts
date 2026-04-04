@@ -1,5 +1,6 @@
 import { mutation, query, internalMutation } from './_generated/server';
 import { v } from 'convex/values';
+import { checkRateLimitInternal } from './rateLimit';
 
 /**
  * Distributed Session Bindings.
@@ -16,6 +17,14 @@ export const withSession = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
+
+    // ── Rate Limit ──
+    const rl = await checkRateLimitInternal(ctx, { 
+      key: `heartbeat:${args.sessionId}`, 
+      burst: 10, 
+      rate: 1 
+    });
+    if (!rl.ok) throw new Error(rl.message);
     
     const existing = await ctx.db
       .query('userSessions')
@@ -65,6 +74,13 @@ export const saveSession = mutation({
     timestamp: v.number(),
   },
   handler: async (ctx, args) => {
+    // ── Rate Limit ──
+    const rl = await checkRateLimitInternal(ctx, { 
+      key: `saveSession:${args.userId}`, 
+      burst: 3, 
+      rate: 0.001 // 1 refill every 1000 seconds (~15 mins)
+    });
+    if (!rl.ok) throw new Error("Please wait before saving another result.");
     await ctx.db.insert('sessions', {
       userId: args.userId,
       sessionId: args.sessionId,

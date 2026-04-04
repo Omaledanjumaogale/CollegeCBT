@@ -1,0 +1,45 @@
+
+> collegecbt@0.1.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding SSR bundle for production...[36m[39m
+transforming...
+18:12:50 [vite-plugin-svelte] src/routes/admin/users/+page.svelte:17:10 This reference only captures the initial value of `searchTerm`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+15:   // ÔöÇÔöÇ Convex Real-time Data ÔöÇÔöÇ
+16:   const users = useQuery(api.admin.getUsers, { 
+17:     search: searchTerm, 
+                          ^
+18:     plan: filterPlan || undefined 
+19:   });
+18:12:50 [vite-plugin-svelte] src/routes/admin/users/+page.svelte:18:8 This reference only captures the initial value of `filterPlan`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+16:   const users = useQuery(api.admin.getUsers, { 
+17:     search: searchTerm, 
+18:     plan: filterPlan || undefined 
+                        ^
+19:   });
+20:   
+18:12:50 [vite-plugin-svelte] src/routes/admin/users/+page.svelte:192:4 Buttons and links should either contain text or have an `aria-label`, `aria-labelledby` or `title` attribute
+https://svelte.dev/e/a11y_consider_explicit_label
+190:           <div class="text-[10px] text-white/20 uppercase tracking-widest mt-1">Full Edge Access</div>
+191:         </div>
+192:         <button 
+                     ^
+193:           onclick={toggleRole}
+194:           class="w-14 h-8 rounded-full border border-white/10 relative transition-all duration-300 {selectedUser?.role === 'admin' ? 'bg-violet-600' : 'bg-white/5'}"
+[32mÔ£ô[39m 38 modules transformed.
+x Build failed in 6.10s
+error during build:
+[vite-plugin-svelte] [plugin vite-plugin-svelte] src/routes/dashboard/+page.svelte (10:1): src/routes/dashboard/+page.svelte:10:1 `$:` is not allowed in runes mode, use `$derived` or `$effect` instead
+https://svelte.dev/e/legacy_reactive_statement_invalid
+file: C:/Users/OMALE DANJUMA OGALE/Downloads/PLATFORMS IN DEVELOPMENT/Collegecbt.dev/src/routes/dashboard/+page.svelte:10:1
+
+  8 |    import Tooltip from '$lib/components/Tooltip.svelte';
+  9 |  
+ 10 |    $: if (!$isAuthenticated && typeof window !== 'undefined') {
+          ^
+ 11 |      // show login modal if not authenticated
+ 12 |      activeModal.set('login');
+
+

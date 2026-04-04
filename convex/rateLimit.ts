@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { mutation, query, internalMutation } from './_generated/server';
+import { mutation, query, internalMutation, type MutationCtx } from './_generated/server';
 
 /**
  * Enterprise Rate Limiting using a Token Bucket algorithm.
@@ -7,60 +7,67 @@ import { mutation, query, internalMutation } from './_generated/server';
  * Seamlessly throttles both generic reads and critical writes.
  */
 
+export const checkRateLimitInternal = async (
+  ctx: MutationCtx,
+  args: { key: string; burst: number; rate: number; cost?: number }
+) => {
+  const now = Date.now();
+  const cost = args.cost ?? 1;
+
+  // Fetch existing bucket state using the unique key
+  let limit = await ctx.db
+    .query('rateLimits')
+    .withIndex('by_key', (q) => q.eq('key', args.key))
+    .unique();
+
+  if (!limit) {
+    // Initialize bucket if first time seeing this key
+    await ctx.db.insert('rateLimits', {
+      key: args.key,
+      tokens: args.burst - cost,
+      lastUpdated: now,
+      burst: args.burst,
+      rate: args.rate,
+    });
+    return { ok: true, remaining: args.burst - cost };
+  }
+
+  // Refill Calculation (Refilled since last update)
+  const elapsedSeconds = (now - limit.lastUpdated) / 1000;
+  const refilledTokens = Math.min(
+    limit.burst,
+    limit.tokens + (elapsedSeconds * limit.rate)
+  );
+
+  // Gate Logic: Check if bucket has enough tokens
+  if (refilledTokens < cost) {
+    const waitSeconds = Math.ceil((cost - refilledTokens) / limit.rate);
+    return { 
+      ok: false, 
+      retryAfter: waitSeconds,
+      message: `Rate limit exceeded. Try again in ${waitSeconds}s.`
+    };
+  }
+
+  // Deduct tokens and update state
+  const newTokens = refilledTokens - cost;
+  await ctx.db.patch(limit._id, {
+    tokens: newTokens,
+    lastUpdated: now,
+  });
+
+  return { ok: true, remaining: Math.floor(newTokens) };
+};
+
 export const checkRateLimit = mutation({
   args: {
-    key: v.string(),     // Unique identifier (e.g., "uid:action" or "ip:route")
-    burst: v.number(),   // Maximum bucket capacity
-    rate: v.number(),    // Refill rate (tokens/sec)
-    cost: v.optional(v.number()), // Tokens to consume (default: 1)
+    key: v.string(),
+    burst: v.number(),
+    rate: v.number(),
+    cost: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const now = Date.now();
-    const cost = args.cost ?? 1;
-
-    // Fetch existing bucket state using the unique key
-    let limit = await ctx.db
-      .query('rateLimits')
-      .withIndex('by_key', (q) => q.eq('key', args.key))
-      .unique();
-
-    if (!limit) {
-      // Initialize bucket if first time seeing this key
-      await ctx.db.insert('rateLimits', {
-        key: args.key,
-        tokens: args.burst - cost,
-        lastUpdated: now,
-        burst: args.burst,
-        rate: args.rate,
-      });
-      return { ok: true, remaining: args.burst - cost };
-    }
-
-    // Refill Calculation (Refilled since last update)
-    const elapsedSeconds = (now - limit.lastUpdated) / 1000;
-    const refilledTokens = Math.min(
-      limit.burst,
-      limit.tokens + (elapsedSeconds * limit.rate)
-    );
-
-    // Gate Logic: Check if bucket has enough tokens
-    if (refilledTokens < cost) {
-      const waitSeconds = Math.ceil((cost - refilledTokens) / limit.rate);
-      return { 
-        ok: false, 
-        retryAfter: waitSeconds,
-        message: `Rate limit exceeded. Try again in ${waitSeconds}s.`
-      };
-    }
-
-    // Deduct tokens and update state
-    const newTokens = refilledTokens - cost;
-    await ctx.db.patch(limit._id, {
-      tokens: newTokens,
-      lastUpdated: now,
-    });
-
-    return { ok: true, remaining: Math.floor(newTokens) };
+    return await checkRateLimitInternal(ctx, args);
   },
 });
 

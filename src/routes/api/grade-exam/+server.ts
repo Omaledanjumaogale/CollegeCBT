@@ -1,30 +1,22 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { gradeExamSchema } from '$lib/data/schemas';
 
 // ── POST /api/grade-exam ──────────────────────────────────────────────────────
 // Receives theory answers, grades them with AI, returns a full analytical report
 export const POST: RequestHandler = async ({ request, platform }) => {
   try {
-    const body = await request.json() as {
-      course?: string;
-      level?: string;
-      institutionType?: string;
-      uid?: string;
-      answers: Array<{
-        question: string;
-        keyPoints: { point: string; marks: number }[];
-        modelAnswer: string;
-        userAnswer: string;
-        maxMarks: number;
-        topic?: string;
-      }>;
-    };
+    const rawBody = await request.json();
+    const validation = gradeExamSchema.safeParse(rawBody);
 
-    const { course, level, institutionType, uid, answers } = body;
-
-    if (!course || !answers || answers.length === 0) {
-      return json({ error: 'Course and answers are required.' }, { status: 400 });
+    if (!validation.success) {
+      return json({ 
+        error: 'Invalid grading parameters', 
+        details: validation.error.format() 
+      }, { status: 400 });
     }
+
+    const { course, level, institutionType, uid, answers } = validation.data;
 
     // Get Cloudflare env bindings
     const env = platform?.env as Record<string, string> | undefined;
