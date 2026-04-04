@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { ConvexHttpClient } from 'convex/browser';
 import { anyApi } from 'convex/server';
-import { PUBLIC_CONVEX_URL } from '$env/static/public';
+import { env as publicEnv } from '$env/dynamic/public';
 import { env } from '$env/dynamic/private';
 
 /**
@@ -44,7 +44,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
         if (uid) {
             console.log(`[Flutterwave Webhook] Payment verified: ${tx_ref} for ${uid}`);
-            const convex = new ConvexHttpClient(PUBLIC_CONVEX_URL);
+            const convex = new ConvexHttpClient(publicEnv.PUBLIC_CONVEX_URL!);
             try {
                 await convex.mutation(anyApi.users.updateUserPlan, { uid, plan: 'pro' });
                 await convex.mutation(anyApi.interactionSessions.logAudit, {
