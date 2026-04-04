@@ -1,11 +1,11 @@
 import { ConvexHttpClient } from 'convex/browser';
 import { anyApi } from 'convex/server';
-import { PUBLIC_CONVEX_URL } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 import type { StudySession } from '$lib/stores';
 
-// Edge-compatible Convex client using $env/static/public (baked in at build time).
+// Edge-compatible Convex client using $env/dynamic/public (resolved safely at runtime).
 // No process.env usage — fully safe for Cloudflare Workers edge runtime.
-const convexUrl = PUBLIC_CONVEX_URL || 'https://different-warthog-453.eu-west-1.convex.cloud';
+const convexUrl = env?.PUBLIC_CONVEX_URL || 'https://different-warthog-453.eu-west-1.convex.cloud';
 
 export const convex = new ConvexHttpClient(convexUrl);
 

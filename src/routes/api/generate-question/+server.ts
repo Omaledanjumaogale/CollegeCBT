@@ -189,11 +189,11 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 	}
 };
 
-// Helper to safely read $env/static/public in edge context
+// Helper to safely read $env/dynamic/public in edge context
 async function importPublicEnv(key: string): Promise<string> {
 	try {
-		const mod = await import('$env/static/public') as Record<string, string>;
-		return mod[key] || '';
+		const { env } = await import('$env/dynamic/public');
+		return (env as Record<string, string>)[key] || '';
 	} catch {
 		return '';
 	}
