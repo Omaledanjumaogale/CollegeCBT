@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as academic from "../academic.js";
 import type * as admin from "../admin.js";
 import type * as agentWorkflow from "../agentWorkflow.js";
 import type * as aiOrchestrator from "../aiOrchestrator.js";
@@ -18,6 +19,7 @@ import type * as gradeReports from "../gradeReports.js";
 import type * as interactionSessions from "../interactionSessions.js";
 import type * as mail from "../mail.js";
 import type * as rateLimit from "../rateLimit.js";
+import type * as seed from "../seed.js";
 import type * as sessions from "../sessions.js";
 import type * as triggers from "../triggers.js";
 import type * as users from "../users.js";
@@ -31,6 +33,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  academic: typeof academic;
   admin: typeof admin;
   agentWorkflow: typeof agentWorkflow;
   aiOrchestrator: typeof aiOrchestrator;
@@ -41,6 +44,7 @@ declare const fullApi: ApiFromModules<{
   interactionSessions: typeof interactionSessions;
   mail: typeof mail;
   rateLimit: typeof rateLimit;
+  seed: typeof seed;
   sessions: typeof sessions;
   triggers: typeof triggers;
   users: typeof users;
