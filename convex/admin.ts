@@ -16,7 +16,6 @@ export const getDashboardStats = query({
     const planStats = {
       free: users.filter((u) => u.plan === 'free').length,
       pro: users.filter((u) => u.plan === 'pro').length,
-      institutional: users.filter((u) => u.plan === 'institutional').length,
     };
 
     const examStats = {
@@ -32,7 +31,7 @@ export const getDashboardStats = query({
       activeSessions: activeHeartbeats.length,
       planStats,
       examStats,
-      revenueEst: planStats.pro * 10000 + planStats.institutional * 50000, // Dummy pricing logic
+      revenueEst: planStats.pro * 10000, 
     };
   },
 });

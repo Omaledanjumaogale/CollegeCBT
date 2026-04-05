@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { COURSES, LEVELS, type InstitutionType } from '$lib/data/courseData';
+	import { NIGERIAN_CURRICULUM, COURSES, LEVELS, type InstitutionType } from '$lib/data/courseData';
 	import { fade, slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { isPro, currentUser } from '$lib/stores';
@@ -12,9 +12,9 @@
 
 	let selectedLevel = $state('');
 	
-	// We'll show a sample of courses
+	// We'll show a sample of courses or structured departments
 	const courseSamples: Record<string, string[]> = {
-		'University': ['Computer Science', 'Medicine & Surgery', 'Law', 'Accounting', 'Mechanical Engineering', 'Mass Communication'],
+		'University': Object.keys(NIGERIAN_CURRICULUM).flatMap(f => Object.keys(NIGERIAN_CURRICULUM[f])),
 		'Polytechnic': ['Computer Science (ND)', 'Business Admin (HND)', 'Civil Engineering', 'Science Laboratory Tech'],
 		'College of Education': ['Early Childhood Education', 'English/Social Studies', 'Primary Education Studies'],
 		'IEI / Technical': ['ICT & Computer Networking (NID)', 'Carpentry & Joinery'],

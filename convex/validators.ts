@@ -48,7 +48,7 @@ export const UserRegistrySchema = z.object({
   email: z.string().email(),
   displayName: z.string().min(2),
   phone: z.string().optional(),
-  plan: z.enum(['free', 'pro', 'institutional']).default('free'),
+  plan: z.enum(['free', 'pro']).default('free'),
 });
 
 export const ExamSessionSchema = z.object({

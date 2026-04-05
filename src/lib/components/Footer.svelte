@@ -19,7 +19,7 @@
 					<div class="font-display font-black text-3xl group-hover:text-violet-light transition-colors text-white tracking-tighter">College<span class="text-lime-500">CBT</span></div>
 				</a>
 				<p class="text-white/40 text-base leading-relaxed font-semibold max-w-sm">
-					Nigeria's #1 AI-powered exam preparation engine for higher institutions. Results-as-a-Service, aligned to NUC, NBTE, and NCCE curriculum.
+					Nigeria's #1 AI-powered exam preparation engine for higher institutions. Aligned to NUC, NBTE, and NCCE curriculum.
 				</p>
 				<div class="flex gap-4">
 					{#each ['Twitter', 'LinkedIn', 'Facebook'] as platform}
@@ -53,7 +53,7 @@
 						{ name: 'Pricing', link: '/pricing' },
 						{ name: 'Terms of Service', link: '/terms' },
 						{ name: 'Privacy Policy', link: '/privacy' },
-						{ name: 'Institutional Access', link: '/pricing' }
+						{ name: 'Contact Us', link: 'mailto:support@collegecbt.dev' }
 					] as link}
 						<li><a href={link.link} class="text-white/40 text-sm font-bold uppercase tracking-wider hover:text-violet-light transition-colors">{link.name}</a></li>
 					{/each}

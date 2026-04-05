@@ -1,13 +1,18 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { generateQuestionSchema } from '$lib/data/schemas';
+import { CONVEX_URL } from '$env/static/private';
+import { ConvexHttpClient } from 'convex/browser';
+import { api } from '$lib/services/convexClient';
+
+const convex = new ConvexHttpClient(CONVEX_URL);
 
 // ─── Edge-compatible in-memory rate limiter ───────────────────────────────────
 // Uses a Map keyed by IP or UID, pruned every 10 minutes to prevent memory leaks.
 const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
 const WINDOW_MS = 60_000; // 1 minute window
 const FREE_LIMIT = 5;     // 5 req/min for free/unauthenticated users
-const PRO_LIMIT  = 60;    // 60 req/min for pro/institutional users
+const PRO_LIMIT  = 60;    // 60 req/min for pro users
 
 // Prune stale entries periodically (edge-safe, no node:timers needed)
 function checkAndPrune(key: string, limit: number): { allowed: boolean; remaining: number } {
@@ -35,14 +40,14 @@ async function getUserPlanFromFirestore(
 	uid: string,
 	projectId: string,
 	apiKey: string
-): Promise<'free' | 'pro' | 'institutional'> {
+): Promise<'free' | 'pro'> {
 	try {
 		const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/users/${uid}?key=${apiKey}`;
 		const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
 		if (!res.ok) return 'free';
 		const doc = await res.json() as { fields?: { plan?: { stringValue?: string } } };
 		const plan = doc.fields?.plan?.stringValue;
-		if (plan === 'pro' || plan === 'institutional') return plan;
+		if (plan === 'pro') return 'pro';
 		return 'free';
 	} catch {
 		// If Firestore is unreachable treat as free — graceful degradation
@@ -72,7 +77,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		const fbProjectId   = env?.PUBLIC_FIREBASE_PROJECT_ID || (await importPublicEnv('PUBLIC_FIREBASE_PROJECT_ID'));
 
 		// ── Plan verification ───────────────────────────────────────────────
-		let userPlan: 'free' | 'pro' | 'institutional' = 'free';
+		let userPlan: 'free' | 'pro' = 'free';
 		if (uid && fbApiKey && fbProjectId) {
 			userPlan = await getUserPlanFromFirestore(uid, fbProjectId, fbApiKey);
 		}
@@ -124,7 +129,39 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			);
 		}
 
-		// ── AI generation or demo fallback ─────────────────────────────────
+		// ── AI generation or Bank lookup with Orchestration ────────────────
+		const questionType = type || 'MCQ';
+		
+		// 1. Attempt to find matching questions in the bank for randomization
+		let existingQuestion = null;
+		try {
+			// Only try to fetch if not a custom "Other" request (those should usually be generated fresh to grow the bank for new topics)
+			if (course !== 'Other' && topic !== 'Other') {
+				existingQuestion = await convex.query(api.academic.getRandomQuestion, {
+					course,
+					level: level || '100 Level',
+					institutionType,
+					topic: (topic && topic !== 'all') ? topic : undefined,
+					type: questionType as 'MCQ' | 'Theory'
+				});
+			}
+		} catch (err) {
+			console.error('[CollegeCBT] Bank lookup failed:', err);
+		}
+
+		// 2. Decide: serve existing or generate new?
+		// We serve existing with a 70% probability if it's a standard request and we HAVE questions.
+		// We ALWAYS generate if it's an "Other" request or we have no bank matches.
+		// User specifically wants to grow the bank, so we still generate 30% of the time even if found.
+		const shouldGenerate = !existingQuestion || Math.random() < 0.3 || course === 'Other' || topic === 'Other';
+
+		if (!shouldGenerate && existingQuestion) {
+			// Record usage and return
+			await convex.mutation(api.academic.incrementQuestionHit, { id: (existingQuestion as any)._id });
+			return json(JSON.parse((existingQuestion as any).content), { headers: responseHeaders });
+		}
+
+		// 3. AI Generation (hitting token limits to grow the bank)
 		if (!apiKey || apiKey.includes('placeholder') || !apiKey.startsWith('sk-ant-')) {
 			return json(
 				questionType === 'Theory' ? getDemoTheory(course) : getDemoMCQ(course),
@@ -133,10 +170,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		}
 
 		const prompt = questionType === 'Theory'
-			? buildTheoryPrompt(course, level || '300 Level', institutionType, topic, difficulty)
-			: buildMCQPrompt(course, level || '300 Level', institutionType, topic, difficulty);
+			? buildTheoryPrompt(course, level || '100 Level', institutionType, topic, difficulty)
+			: buildMCQPrompt(course, level || '100 Level', institutionType, topic, difficulty);
 
-		const response = await fetch('https://api.anthropic.com/v1/messages', {
+		const aiResponse = await fetch('https://api.anthropic.com/v1/messages', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -148,32 +185,44 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				max_tokens: questionType === 'Theory' ? 1500 : 1200,
 				messages: [{ role: 'user', content: prompt }]
 			}),
-			signal: AbortSignal.timeout(20_000) // 20s edge timeout
+			signal: AbortSignal.timeout(20_000)
 		});
 
-		if (!response.ok) {
-			console.error('[CollegeCBT] Anthropic API error:', response.status);
+		if (!aiResponse.ok) {
+			console.error('[CollegeCBT] Anthropic API error:', aiResponse.status);
+			// Fallback to bank if possible before demo
+			if (existingQuestion) return json(JSON.parse((existingQuestion as any).content), { headers: responseHeaders });
 			return json(
 				questionType === 'Theory' ? getDemoTheory(course) : getDemoMCQ(course),
 				{ headers: responseHeaders }
 			);
 		}
 
-		const data = await response.json() as {
-			content: { type: string; text?: string }[];
-		};
-
-		const rawText = data.content
-			.filter((b) => b.type === 'text')
-			.map((b) => b.text || '')
-			.join('');
+		const data = await aiResponse.json() as { content: { type: string; text?: string }[] };
+		const rawText = data.content.filter((b) => b.type === 'text').map((b) => b.text || '').join('');
 
 		try {
 			const cleaned = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
 			const parsed = JSON.parse(cleaned);
+
+			// 4. Archive into the Question Bank for future randomization
+			// We do this in a fire-and-forget or awaited mutation to grow the bank.
+			await convex.mutation(api.academic.saveGeneratedQuestion, {
+				course: parsed.course || course,
+				level: level || '100 Level',
+				institutionType,
+				topic: parsed.topic || topic || 'General',
+				difficulty: difficulty || 'mixed',
+				type: questionType as 'MCQ' | 'Theory',
+				content: JSON.stringify(parsed),
+				provider: 'claude-3-5-haiku',
+				isOther: course === 'Other' || topic === 'Other',
+				userId: uid
+			});
+
 			return json(parsed, { headers: responseHeaders });
 		} catch {
-			console.warn('[CollegeCBT] JSON parse failed, using demo fallback');
+			if (existingQuestion) return json(JSON.parse((existingQuestion as any).content), { headers: responseHeaders });
 			return json(
 				questionType === 'Theory' ? getDemoTheory(course) : getDemoMCQ(course),
 				{ headers: responseHeaders }
@@ -212,11 +261,11 @@ function buildMCQPrompt(
 Requirements:
 - Contextual to Nigerian academic curriculum
 - One unambiguously correct answer
-- Three plausible but incorrect distractors based on real student misconceptions
+- Three plausible but incorrect options based on common student mistakes
 - Full explanations for each option
 
 Return ONLY valid JSON (no markdown, no backticks, no extra text):
-{"question":"...","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"A","explanations":{"correct":"Why this is correct.","A":"Why A is right/wrong.","B":"Misconception about B.","C":"Misconception about C.","D":"Misconception about D."},"examiner_note":"What this question tests and a common student error.","topic":"${topic || 'General'}"}`;
+{"question":"...","options":{"A":"...","B":"...","C":"...","D":"..."},"correct":"A","explanations":{"correct":"Why this is correct.","A":"Why A is right/wrong.","B":"Common mistake about B.","C":"Common mistake about C.","D":"Common mistake about D."},"examiner_note":"What this question tests and a common student error.","topic":"${topic || 'General'}"}`;
 }
 
 function buildTheoryPrompt(
@@ -254,7 +303,7 @@ function getDemoMCQ(course: string) {
 			C: 'This describes database normalization, which eliminates data redundancy — not OOP.',
 			D: 'This describes QuickSort or MergeSort performance characteristics — algorithm analysis, not OOP principles.'
 		},
-		examiner_note: 'Candidates commonly confuse encapsulation with abstraction. Abstraction hides complexity conceptually; encapsulation hides it through access modifiers in code.',
+		examiner_note: 'Students commonly confuse encapsulation with abstraction. Abstraction hides complexity conceptually; encapsulation hides it through access modifiers in code.',
 		topic: 'Core Concepts'
 	};
 }
@@ -268,7 +317,7 @@ function getDemoTheory(course: string) {
 			{ point: 'Provide specific, verifiable examples from Nigeria (institutions, industries, or case studies).', marks: 6 },
 			{ point: 'Critically evaluate limitations or challenges faced in the Nigerian operating environment.', marks: 4 }
 		],
-		model_answer: `The field of ${course} encompasses foundational principles that inform both theoretical understanding and practical application within the Nigerian academic and professional landscape. These principles guide practitioners across Nigeria's key sectors including telecommunications, financial services, healthcare, and public administration.\n\nIn Nigeria, these concepts are applied daily within institutions such as the Central Bank of Nigeria, NNPC, NCC, and leading universities. However, practical challenges persist — including inadequate infrastructure, skills gaps in rural areas, and policy inconsistencies. Addressing these through targeted education, institutional reform, and private-sector partnerships remains critical.`,
+		model_answer: `The field of ${course} encompasses foundational principles that inform both theoretical understanding and practical application within the Nigerian academic and professional landscape. These principles guide practitioners across Nigeria's key sectors including telecommunications, financial services, healthcare, and public administration.\n\nIn Nigeria, these concepts are applied daily within organizations such as the Central Bank of Nigeria, NNPC, NCC, and leading universities. However, practical challenges persist — including inadequate infrastructure, skills gaps in rural areas, and policy inconsistencies. Addressing these through targeted education, organizational reform, and private-sector partnerships remains critical.`,
 		examiner_notes: 'Award marks for academic structure, clarity of definition, relevance to Nigerian context, and use of specific local examples. Penalise vague generalities.',
 		mark_scheme: 'Total: 20 marks. Definition & scholarly citation: 4m. Practical applications (3 minimum): 6m. Specific Nigerian examples: 6m. Critical evaluation of limitations: 4m.',
 		topic: 'Applied Concepts & Nigerian Context'

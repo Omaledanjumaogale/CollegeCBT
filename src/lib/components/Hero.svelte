@@ -61,7 +61,7 @@
 			<!-- Left: Copy -->
 			<div class="flex flex-col items-start text-left">
 				<div class="badge badge-lime text-xs mb-5 inline-flex">
-					🇳🇬 Nigeria's #1 AI Exam Prep · Results as a Service
+					🇳🇬 Nigeria's #1 AI Exam Prep · Guaranteed Success
 				</div>
 				<h1 id="hero-heading" class="font-display text-5xl sm:text-6xl lg:text-7xl leading-[1.05] tracking-tight mb-6 text-white" style="letter-spacing:-0.03em;">
 					Pass Any Exam.
@@ -69,7 +69,7 @@
 					<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Guaranteed by AI.</span>
 				</h1>
 				<p class="text-white/60 text-lg sm:text-xl max-w-2xl mb-8 leading-relaxed">
-					CollegeCBT uses Claude AI to generate unlimited, contextual exam questions for every course in Nigerian universities, polytechnics, and colleges of education — with full explanations and WAEC-style grading.
+					CollegeCBT uses AI to create practice questions for every course in Nigerian universities, polytechnics, and colleges. Practice with real exam scenarios and get full explanations for every answer.
 				</p>
 
 				<!-- Accreditation Badges -->
@@ -159,7 +159,7 @@
 							<div class="font-bold mb-1" style="color: {demoCorrect ? '#84cc16' : '#f87171'}">
 								{demoCorrect ? '🎯 Correct!' : '❌ Not Quite Right'}
 							</div>
-							<p class="text-white/65">{demoQ.explanation}</p>
+							<p class="text-white/65">{demoQ.explanation.replace('❌', '\n❌').replace('✅', '✅')}</p>
 						</div>
 						<button onclick={resetDemo} class="w-full btn-ghost py-2.5 text-sm">↩ Try Another Question</button>
 					{:else}

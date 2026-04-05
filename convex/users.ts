@@ -14,7 +14,7 @@ export const storeUser = mutation({
   args: {
     institutionType: v.optional(v.string()),
     institutionName: v.optional(v.string()),
-    plan: v.optional(v.union(v.literal('free'), v.literal('pro'), v.literal('institutional'))),
+    plan: v.optional(v.union(v.literal('free'), v.literal('pro'))),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -123,7 +123,7 @@ export const getUserByUid = query({
 export const updateUserPlan = mutation({
   args: {
     uid: v.string(),
-    plan: v.union(v.literal('free'), v.literal('pro'), v.literal('institutional')),
+    plan: v.union(v.literal('free'), v.literal('pro')),
   },
   handler: async (ctx, args) => {
     const user = await ctx.db
@@ -159,7 +159,7 @@ export const getAdminStats = query({
       const gradeReports = await ctx.db.query('gradeReports').collect();
 
       const totalUsers = users.length;
-      const proUsers = users.filter((u) => u.plan === 'pro' || u.plan === 'institutional').length;
+      const proUsers = users.filter((u) => u.plan === 'pro').length;
       const totalSessions = sessions.length;
       const avgScore =
         sessions.length > 0
@@ -176,7 +176,7 @@ export const getAdminStats = query({
 export const adminOverridePlan = mutation({
   args: {
     userId: v.id('users'),
-    plan: v.union(v.literal('free'), v.literal('pro'), v.literal('institutional')),
+    plan: v.union(v.literal('free'), v.literal('pro')),
   },
   handler: async (ctx, args) => {
     return await withAdminAuth(ctx, async (admin) => {

@@ -95,12 +95,12 @@
 	<div 
 		class="inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border"
 		style="
-			background: {plan === 'pro' ? 'rgba(132,204,22,0.1)' : plan === 'institutional' ? 'rgba(34,211,238,0.1)' : 'rgba(255,255,255,0.05)'};
-			color: {plan === 'pro' ? '#84cc16' : plan === 'institutional' ? '#22d3ee' : 'rgba(255,255,255,0.4)'};
-			border-color: {plan === 'pro' ? 'rgba(132,204,22,0.2)' : plan === 'institutional' ? 'rgba(34,211,238,0.2)' : 'rgba(255,255,255,0.1)'};
+			background: {plan === 'pro' ? 'rgba(132,204,22,0.1)' : 'rgba(255,255,255,0.05)'};
+			color: {plan === 'pro' ? '#84cc16' : 'rgba(255,255,255,0.4)'};
+			border-color: {plan === 'pro' ? 'rgba(132,204,22,0.2)' : 'rgba(255,255,255,0.1)'};
 		"
 	>
-		{plan || 'Free'}
+		{plan === 'pro' ? 'Student Pro' : (plan || 'Free')}
 	</div>
 {/snippet}
 
@@ -147,8 +147,7 @@
 			>
 				<option value="">All Tiers</option>
 				<option value="free">Free Only</option>
-				<option value="pro">Pro Tier</option>
-				<option value="institutional">Institutional</option>
+				<option value="pro">Student Pro</option>
 			</select>
 
 			<button class="btn-violet h-12 px-6 flex items-center gap-2 text-[11px] font-bold shadow-2xl">

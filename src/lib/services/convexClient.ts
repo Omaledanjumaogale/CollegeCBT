@@ -114,7 +114,7 @@ export async function getCrawlJobStatus(jobId: string) {
  * Enterprise sync of the global Firebase identity with this platform's database.
  * This mutation MUST be called with a valid Firebase ID Token active in the Convex client.
  */
-export async function syncPlatformUser(plan: 'free' | 'pro' | 'institutional' = 'free') {
+export async function syncPlatformUser(plan: 'free' | 'pro' = 'free') {
 	try {
 		// storeUser uses ctx.auth to verify the identity server-side
 		return await convex.mutation(anyApi.users.storeUser, { plan });

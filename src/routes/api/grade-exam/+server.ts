@@ -136,7 +136,7 @@ function buildDemoGradeReport(
         ? 'Good attempt. You demonstrated understanding of the core concept but need to include more specific Nigerian context and scholarly citations to achieve full marks.'
         : 'No answer provided. Practice writing structured academic responses with clear definitions, examples, and analysis.',
       missedPoints: [
-        'Specific Nigerian case studies or institutional examples',
+        'Specific Nigerian case studies or real-world organization examples',
         'Academic citations or scholarly definitions',
         'Critical evaluation of limitations',
       ],

@@ -1,8 +1,8 @@
 <script lang="ts">
 	const problems = [
-		{ icon: '📚', title: 'No Practice Questions', desc: 'Old question books are outdated, incomplete, and expensive. Students have no way to practise on-demand for their specific course and level.' },
-		{ icon: '🤯', title: 'No Explanations — Just Answers', desc: 'Even when students find questions, they get bare answers with no explanation of why the correct choice is right or why each wrong option fails.' },
-		{ icon: '📉', title: 'No Real Performance Feedback', desc: "Students don't know where they stand. No grade predictions, no readiness scores, no insight into weak topics before the real exam." }
+		{ icon: '📚', title: 'Hard to Find Questions', desc: 'Old practice books are hard to find and expensive. Students often have no way to practice for their specific course and level.' },
+		{ icon: '🤯', title: 'Bare Answers - No Help', desc: 'Most books only give the answer (A, B, C). They don’t explain WHY it is correct or why other options are wrong.' },
+		{ icon: '📉', title: 'No Way to Track Progress', desc: "Students don't know if they are truly ready. There are no score predictions or insights into which topics need more work." }
 	];
 </script>
 
@@ -16,7 +16,7 @@
 				<span style="background:linear-gradient(135deg,#e11d48,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Struggle in Exams</span>
 			</h2>
 			<p class="text-white/50 max-w-2xl mx-auto text-lg leading-relaxed">
-				The current system is broken. Students have syllabi but no quality practice questions. They are forced to memorise rather than understand.
+				The current way of studying is broken. Students have the syllabus but no quality practice questions. Most end up memorizing rather than understanding.
 			</p>
 		</div>
 
@@ -31,15 +31,15 @@
 			{/each}
 		</div>
 
-		<!-- RaaS Banner -->
-		<div class="rounded-3xl p-8 sm:p-12 md:p-16 flex flex-col md:flex-row items-center gap-10 relative overflow-hidden group shadow-2xl" 
+		<!-- Success Banner -->
+		<div class="rounded-3xl p-8 sm:p-12 md:p-16 flex flex-col md:flex-row items-center gap-10 relative overflow-hidden group shadow-2xl mx-4 md:mx-0" 
 			style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(132, 204, 22, 0.08)); border: 1px solid rgba(124, 58, 237, 0.25);">
 			<div class="absolute inset-x-0 bottom-0 h-px bg-white/10"></div>
 			<div class="text-6xl lg:text-7xl flex-shrink-0 animate-bounce-slow">🎯</div>
 			<div class="text-center md:text-left">
-				<h3 class="font-display font-bold text-2xl lg:text-3xl mb-4 text-white">We Don't Sell Software. We Deliver <br class="hidden sm:block" /> <span style="color:#84cc16;">Results.</span></h3>
-				<p class="text-white/65 text-base sm:text-lg leading-relaxed max-w-3xl">
-					CollegeCBT operates as a <strong class="text-white">Results-as-a-Service (RaaS)</strong> platform. We measure success by one metric only: <span style="color:#84cc16;" class="font-bold underline decoration-white/20 underline-offset-4">your exam score</span>. Our AI tracks your performance trajectory, predicts your readiness, and keeps generating questions until you hit 75%.
+				<h3 class="font-display font-bold text-2xl lg:text-3xl mb-4 text-white">We Focus on Your <br class="hidden sm:block" /> <span style="color:#84cc16;">Final Score.</span></h3>
+				<p class="text-white/65 text-base sm:text-lg leading-relaxed max-w-3xl font-medium">
+					CollegeCBT is built for one thing: <span style="color:#84cc16;" class="font-bold underline decoration-white/20 underline-offset-4">helping you pass your exams</span>. Our AI tracks your progress, tells you exactly when you are ready, and gives you practice questions until you are confident in every topic.
 				</p>
 			</div>
 		</div>

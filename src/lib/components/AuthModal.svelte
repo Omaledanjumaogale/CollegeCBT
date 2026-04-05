@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { activeModal, showToast } from '$lib/stores';
 	import { signUpWithEmail, signInWithEmail } from '$lib/services/firebase';
-	import { NIGERIA_STATES, COURSES, INSTITUTION_TYPES, LEVELS, type InstitutionType } from '$lib/data/courseData';
-	import { fade, scale } from 'svelte/transition';
+	import { NIGERIA_STATES, COURSES, INSTITUTION_TYPES, LEVELS, UNIVERSITIES_LIST, NIGERIAN_CURRICULUM, type InstitutionType } from '$lib/data/courseData';
+	import { fade, scale, slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 
 	let activeTab = $state<'login' | 'signup'>('signup');
@@ -28,12 +28,18 @@
 	let suAddress = $state('');
 	let suInstType = $state<InstitutionType | ''>('');
 	let suInstName = $state('');
+	let suOtherInstName = $state(''); // New field for "Other" institution
 	let suFaculty = $state('');
 	let suDept = $state('');
 	let suLevel = $state('');
 	let suMatric = $state('');
 	let suTerms = $state(false);
 	let signupSuccess = $state(false);
+
+	// Derived lists for structured selection
+	let facultyList = $derived(Object.keys(NIGERIAN_CURRICULUM));
+	let departmentList = $derived(suFaculty ? Object.keys(NIGERIAN_CURRICULUM[suFaculty] || {}) : []);
+	let levelList = $derived(suDept && suFaculty ? Object.keys(NIGERIAN_CURRICULUM[suFaculty][suDept] || {}) : []);
 
 	// Sync the active tab when modal opens
 	$effect(() => {
@@ -120,6 +126,8 @@
 		
 		loading = true;
 
+		const finalInstitutionName = suInstName === 'Other (Please specify)' ? suOtherInstName : suInstName;
+
 		// Flat profile shape matching Convex schema (no nested academicProfile)
 		const profileData = {
 			dob: suDob,
@@ -131,7 +139,7 @@
 			lga: suLga,
 			address: suAddress,
 			institutionType: suInstType,
-			institutionName: suInstName,
+			institutionName: finalInstitutionName,
 			faculty: suFaculty,
 			department: suDept,
 			level: suLevel,
@@ -301,35 +309,56 @@
 								<div>
 									<label for="su-inst-type" class="text-xs text-white/45 mb-1.5 block font-600">Institution Type *</label>
 									<select id="su-inst-type" bind:value={suInstType} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
-										<option value="">Select…</option>
-										{#each INSTITUTION_TYPES as t}
-											<option value={t}>{t}</option>
+										<option value="">Select Type…</option>
+										{#each INSTITUTION_TYPES as type}
+											<option value={type}>{type}</option>
 										{/each}
 									</select>
 								</div>
 								<div>
 									<label for="su-inst-name" class="text-xs text-white/45 mb-1.5 block font-600">Institution Name *</label>
-									<input id="su-inst-name" type="text" bind:value={suInstName} placeholder="University of Lagos, UNILAG" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<select id="su-inst-name" bind:value={suInstName} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+										<option value="">Select Institution…</option>
+										{#each UNIVERSITIES_LIST as uni}
+											<option value={uni}>{uni}</option>
+										{/each}
+									</select>
 								</div>
+								{#if suInstName === 'Other (Please specify)'}
+									<div transition:slide>
+										<label for="su-other-inst" class="text-xs text-white/45 mb-1.5 block font-600">Specify Institution *</label>
+										<input id="su-other-inst" type="text" bind:value={suOtherInstName} placeholder="Enter your institution name" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									</div>
+								{/if}
 								<div>
-									<label for="su-faculty" class="text-xs text-white/45 mb-1.5 block font-600">Faculty / School</label>
-									<input id="su-faculty" type="text" bind:value={suFaculty} placeholder="Science" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-faculty" class="text-xs text-white/45 mb-1.5 block font-600">Faculty / School *</label>
+									<select id="su-faculty" bind:value={suFaculty} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+										<option value="">Select Faculty…</option>
+										{#each facultyList as f}
+											<option value={f}>{f}</option>
+										{/each}
+									</select>
 								</div>
 								<div>
 									<label for="su-dept" class="text-xs text-white/45 mb-1.5 block font-600">Department / Course *</label>
-									<input id="su-dept" type="text" bind:value={suDept} placeholder="Computer Science" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<select id="su-dept" bind:value={suDept} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+										<option value="">Select Department…</option>
+										{#each departmentList as d}
+											<option value={d}>{d}</option>
+										{/each}
+										<option value="Other">Other (Not listed)</option>
+									</select>
 								</div>
 								<div>
 									<label for="su-level" class="text-xs text-white/45 mb-1.5 block font-600">Current Level *</label>
 									<select id="su-level" bind:value={suLevel} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
 										<option value="">Select Level…</option>
-										{#if suInstType && LEVELS[suInstType as InstitutionType]}
-											{#each LEVELS[suInstType as InstitutionType] as lvl}
-												<option value={lvl}>{lvl}</option>
-											{/each}
-										{:else}
-											{#each ['100 Level', '200 Level', '300 Level', '400 Level', '500 Level', '600 Level'] as lvl}
-												<option value={lvl}>{lvl}</option>
+										{#each levelList as l}
+											<option value={l}>{l}</option>
+										{/each}
+										{#if levelList.length === 0}
+											{#each ['100 Level', '200 Level', '300 Level', '400 Level', '500 Level', '600 Level'] as l}
+												<option value={l}>{l}</option>
 											{/each}
 										{/if}
 									</select>

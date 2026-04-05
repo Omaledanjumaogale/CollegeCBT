@@ -24,7 +24,7 @@ export default defineSchema({
     uid: v.string(),            // Firebase UID
     email: v.string(),
     displayName: v.string(),
-    plan: v.union(v.literal('free'), v.literal('pro'), v.literal('institutional')),
+    plan: v.union(v.literal('free'), v.literal('pro')),
     role: v.optional(v.union(v.literal('user'), v.literal('admin'))),
     // Personal
     dob: v.optional(v.string()),
@@ -184,4 +184,44 @@ export default defineSchema({
     payload: v.string(), // JSON context
     timestamp: v.number(),
   }).index('by_status', ['status']),
+
+  // ── Academic Infrastructure ────────────────────────────────────────────────
+  institutions: defineTable({
+    type: v.string(), // e.g., 'University', 'Polytechnic', 'College of Education'
+    category: v.string(), // e.g., 'Federal', 'State', 'Private'
+    name: v.string(),
+    state: v.optional(v.string()),
+    description: v.optional(v.string()),
+  }).index('by_type', ['type'])
+    .index('by_name', ['name']),
+
+  curriculum: defineTable({
+    institutionType: v.string(),
+    faculty: v.string(),
+    department: v.string(),
+    level: v.string(),
+    course: v.string(),
+    topics: v.array(v.string()), // Standard topics for this course
+    metadata: v.optional(v.string()), // JSON for any extra info
+  }).index('by_faculty', ['faculty'])
+    .index('by_department', ['department'])
+    .index('by_course', ['course']),
+
+  questionBank: defineTable({
+    course: v.string(),
+    level: v.string(),
+    institutionType: v.string(),
+    topic: v.string(),
+    difficulty: v.string(),
+    type: v.union(v.literal('MCQ'), v.literal('Theory')),
+    content: v.string(), // JSON stringified question object
+    provider: v.string(), // e.g., 'claude-3-5-sonnet'
+    hitCount: v.number(), // Track randomization frequency
+    isOther: v.boolean(), // Flag for user-inputted "Other" topics/subjects
+    userId: v.optional(v.string()), // Crediting originator if applicable
+    timestamp: v.number(),
+  }).index('by_course', ['course'])
+    .index('by_topic', ['topic'])
+    .index('by_type', ['type'])
+    .index('by_other', ['isOther']),
 });

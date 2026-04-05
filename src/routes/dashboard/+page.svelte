@@ -250,9 +250,7 @@
 				<div class="text-center text-xs text-white/40 mt-0.5">{userProfile.email}</div>
 				<div class="flex justify-center mt-2 mb-4">
 					{#if $currentUser?.plan === 'pro'}
-						<span class="badge badge-lime text-xs">⭐ Pro Plan</span>
-					{:else if $currentUser?.plan === 'institutional'}
-						<span class="badge text-xs" style="background:rgba(34,211,238,0.12);color:#22d3ee;border:1px solid rgba(34,211,238,0.25);">🏛️ Institutional</span>
+						<span class="badge badge-lime text-xs">⭐ Student Pro</span>
 					{:else}
 						<span class="badge badge-violet text-xs">🎓 Free Plan</span>
 					{/if}
@@ -351,16 +349,16 @@
 						<!-- Grade Prediction & AI Analyst -->
 						<div class="glass-card p-5">
 							<div class="flex items-center justify-between mb-1">
-								<div class="font-bold text-sm">🔮 AI Performance Analyst</div>
+								<div class="font-bold text-sm">🔮 AI Performance Analysis</div>
 								<button onclick={analyzePerformance} disabled={aiAnalyzing} class="btn-micro-feedback rounded-lg px-2.5 py-1 text-xs" style="background:rgba(124,58,237,0.15);color:#a855f7;border:1px solid rgba(124,58,237,0.3);">
 									{#if aiAnalyzing}
-										<span class="animate-pulse">🧠 Thinking...</span>
+										<span class="animate-pulse">🧠 Processing...</span>
 									{:else}
-										<span>🤖 Analyze Telemetry</span>
+										<span>🤖 Analyze Progress</span>
 									{/if}
 								</button>
 							</div>
-							<div class="text-xs text-white/40 mb-4">Deep Analytics via Multi-Model Orchestrator</div>
+							<div class="text-xs text-white/40 mb-4">Advanced Insights for Your Success</div>
 							
 							<div class="space-y-2.5">
 								{#if aiPrediction}
@@ -384,7 +382,7 @@
 										<span class="font-title text-2xl" style="color:#84cc16;">B2 — 72%</span>
 									</div>
 									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);">
-										<span class="text-sm">National Rank</span>
+										<span class="text-sm">National Standing</span>
 										<span class="text-sm text-violet-light">Top 27% of 300L CS</span>
 									</div>
 									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);">
@@ -398,7 +396,7 @@
 
 					<!-- Bar Chart -->
 					<div class="glass-card p-5 mb-6">
-						<div class="font-bold text-sm mb-5">📈 Grade Trajectory — Last 10 Mock Exams</div>
+						<div class="font-bold text-sm mb-5">📈 Grade Progress — Last 10 Mock Exams</div>
 						<div class="flex items-end gap-2 h-36 relative">
 							<!-- 75% target line -->
 							<div class="absolute left-0 right-0 border-t border-dashed border-lime-DEFAULT/30"
@@ -437,15 +435,15 @@
 
 				<!-- ‒‒ RESULTS PANEL ‒‒ -->
 				{#if $dashboardPanel === 'results'}
-					<div class="font-display text-2xl mb-1">🎯 Results Intelligence (RaaS)</div>
-					<div class="text-xs text-white/40 mb-6">Outcome tracking — performance trends, topic mastery, and grade forecasting.</div>
+					<div class="font-display text-2xl mb-1">🎯 Performance Results</div>
+					<div class="text-xs text-white/40 mb-6">Track your progress — performance trends, topic mastery, and grade predictions.</div>
 
-					<!-- Heatmap -->
+					<!-- Topic List -->
 					<div class="glass-card p-5 mb-5">
 						<div class="flex items-center justify-between mb-4">
 							<div class="flex items-center gap-2">
-								<div class="font-bold text-sm">📊 Topic Performance Heatmap</div>
-								<Tooltip text="Real-time mastery visualization. Red topics require urgent practice, while green indicates examination readiness." />
+								<div class="font-bold text-sm">📊 Topic Performance Charts</div>
+								<Tooltip text="Real-time success charts. Red topics need practice, while green shows you are ready for your exams." />
 							</div>
 							<div class="flex items-center gap-3 text-xs">
 								<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#e11d48;"></span><span class="text-white/40">Needs Work</span></span>
@@ -469,19 +467,19 @@
 						</div>
 					</div>
 
-					<!-- AI Projection -->
+					<!-- AI Prediction -->
 					<div class="glass-card p-5 mb-5" style="background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.25);">
 						<div class="font-bold text-sm text-violet-light mb-3 flex items-center justify-between">
-							<div class="flex items-center gap-2">🤖 AI Outcome Projection</div>
-							<Tooltip content="This analysis uses a predictive algorithm to forecast your final grade based on current mock exam data and topic mastery." />
+							<div class="flex items-center gap-2">🤖 AI Target Grade</div>
+							<Tooltip text="This predicts your final grade based on your practice scores and subject knowledge." />
 						</div>
 						<p class="text-sm text-white/80 leading-relaxed">
-							Based on your current practice trajectory across DBMS, Computer Networks, and Data Structures, you are on course to achieve a
-							<strong class="text-lime-DEFAULT">B2 grade (70–74%)</strong> in your end-of-semester examinations.
-							To elevate to <strong class="text-lime-DEFAULT">A1 (75%+)</strong>, focus on
-							<strong>Database Normalization</strong> (currently 45%) and SQL Query optimization.
-							Completing 3 more focused practice sessions in these topics within the next 7 days will likely push you above the threshold.
-							<strong class="text-amber-DEFAULT">You are exactly 12 correct answers away from the A1 guarantee.</strong>
+							Based on your current practice progress, you are on track to achieve a
+							<strong class="text-lime-DEFAULT">B2 grade (70–74%)</strong> in your final exams.
+							To get an <strong class="text-lime-DEFAULT">A1 (75%+)</strong>, focus more on
+							<strong>Database Normalization</strong> and SQL optimization.
+							Practicing these topics more will likely push your score higher.
+							<strong class="text-amber-DEFAULT">You are only 12 correct answers away from an A1 grade.</strong>
 						</p>
 					</div>
 
@@ -588,14 +586,11 @@
 							<div>
 								<div class="text-xs text-white/40">Current Plan</div>
 								{#if $currentUser?.plan === 'pro'}
-									<div class="font-bold text-lime-DEFAULT mt-0.5">⭐ Pro Student</div>
-									<div class="text-xs text-white/40 mt-0.5">Active Premium Features</div>
-								{:else if $currentUser?.plan === 'institutional'}
-									<div class="font-bold text-lime-DEFAULT mt-0.5">🏛️ Institutional</div>
-									<div class="text-xs text-white/40 mt-0.5">Managed by Administrator</div>
+									<div class="font-bold text-lime-DEFAULT mt-0.5">⭐ Student Pro</div>
+									<div class="text-xs text-white/40 mt-0.5">Full Access to All Features</div>
 								{:else}
 									<div class="font-bold text-white/80 mt-0.5">Free Forever</div>
-									<div class="text-xs text-white/40 mt-0.5">Limited Practice Access</div>
+									<div class="text-xs text-white/40 mt-0.5">Standard Practice Access</div>
 								{/if}
 							</div>
 							<a href="/pricing" class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Manage Plan</a>

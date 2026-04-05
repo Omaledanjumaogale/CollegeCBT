@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { activeModal, showToast, currentUser } from '$lib/stores';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
 	onMount(() => {
 		// Load Flutterwave script for inline payment
@@ -18,12 +19,12 @@
 				{ included: true, text: '5 AI questions per day' },
 				{ included: true, text: 'Basic answer explanations' },
 				{ included: true, text: '3 mock exams per month' },
-				{ included: true, text: 'Full curriculum browser' },
-				{ included: false, text: 'Distractor misconception analysis' },
-				{ included: false, text: 'Theory questions & model answers' },
+				{ included: true, text: 'Full curriculum selection' },
+				{ included: false, text: 'Detailed AI answer logic' },
+				{ included: false, text: 'Essay questions & model answers' },
 				{ included: false, text: 'AI Readiness Score & grade prediction' },
 				{ included: false, text: 'Performance certificate download' },
-				{ included: false, text: 'National benchmarking' }
+				{ included: false, text: 'Priority support' }
 			],
 			cta: 'Start Free Today',
 			ctaStyle: 'ghost',
@@ -31,45 +32,27 @@
 		},
 		{
 			name: 'Student Pro',
-			price: '5,000',
-			period: 'per semester · or ₦8,500/year (save 15%)',
+			price: '10,000',
+			period: 'per year · Full access for 12 months',
 			badge: '⭐ Most Popular',
-			annualNote: 'Pay ₦8,500/year instead of ₦10,000',
+			annualNote: '₦10,000/year for everything you need to succeed',
 			features: [
 				{ included: true, text: 'Unlimited AI-generated questions' },
-				{ included: true, text: 'Full explanations + distractor analysis' },
-				{ included: true, text: 'Unlimited mock exams with WAEC grades' },
-				{ included: true, text: 'Theory questions with model answers' },
+				{ included: true, text: 'Full explanations + answer logic' },
+				{ included: true, text: 'Unlimited mock exams with official grades' },
+				{ included: true, text: 'Detailed essay questions with model answers' },
 				{ included: true, text: 'AI Readiness Score (0–100)' },
-				{ included: true, text: 'Grade prediction & trajectory chart' },
-				{ included: true, text: 'National benchmarking' },
+				{ included: true, text: 'Grade prediction & progress tracking' },
+				{ included: true, text: 'National student ranking' },
 				{ included: true, text: 'Downloadable performance certificate' },
-				{ included: true, text: 'Topic heatmap & weak-area alerts' }
+				{ included: true, text: 'Custom study focus & question sets' },
+				{ included: true, text: 'Priority AI assistant support' },
+				{ included: true, text: 'Topic success charts' }
 			],
-			cta: 'Pay ₦5,000 → Start Now',
+			cta: 'Get Student Pro →',
 			ctaStyle: 'violet',
 			highlight: true,
 			planId: 'pro'
-		},
-		{
-			name: 'Departmental / Institutional',
-			price: '25,000',
-			period: 'per year · up to 200 students',
-			features: [
-				{ included: true, text: 'All Pro features for up to 200 students' },
-				{ included: true, text: 'Lecturer admin dashboard' },
-				{ included: true, text: 'Department-level analytics' },
-				{ included: true, text: 'Custom question sets per course' },
-				{ included: true, text: 'Cohort performance reports' },
-				{ included: true, text: 'Bulk student onboarding' },
-				{ included: true, text: 'Priority AI support' },
-				{ included: true, text: 'Dedicated account manager' },
-				{ included: false, text: 'Unlimited students (contact for enterprise)' }
-			],
-			cta: 'Pay ₦25,000 → Get Started',
-			ctaStyle: 'lime',
-			highlight: false,
-			planId: 'institutional'
 		}
 	];
 
@@ -85,60 +68,15 @@
 			return;
 		}
 
-		const priceRaw = plan.price.replace(',', '');
-		const amount = parseInt(priceRaw, 10);
-
-		// Initialize Flutterwave
-		const tx_ref = `CBT-${$currentUser.uid}-${Date.now()}`;
-
-		// @ts-ignore
-		if (typeof FlutterwaveCheckout !== 'function') {
-			showToast('❌ Error', 'Payment gateway is still loading. Please try again in a few seconds.', 'error');
-			return;
-		}
-
-		showToast('💳 Payment', `Initializing Flutterwave for ${plan.name}...`, 'info');
-		
-		// Access ENV safely at runtime
-		const flwKey = import.meta.env.VITE_FLUTTERWAVE_PUBLIC_KEY || 'FLWPUBK_TEST-SANDBOXDEMOKEY-X';
-
-		// @ts-ignore
-		FlutterwaveCheckout({
-			public_key: flwKey, 
-			tx_ref: tx_ref,
-			amount: amount,
-			currency: 'NGN',
-			payment_options: 'card, banktransfer, ussd',
-			customer: {
-				email: $currentUser.email,
-				name: $currentUser.displayName || 'Student',
-			},
-			customizations: {
-				title: `CollegeCBT ${plan.name}`,
-				description: plan.period,
-				logo: 'https://collegecbt.dev/favicon.png', 
-			},
-			callback: function (data: any) {
-				console.log('Payment process complete:', data);
-				if (data.status === 'successful' || data.status === 'completed') {
-					showToast('✅ Success', `Payment processed! We are verifying your upgrade now...`, 'success');
-					// The user's plan will be updated automatically via the backend webhook.
-					// We refresh the page to reload the profile state from Firestore.
-					setTimeout(() => window.location.reload(), 3000);
-				} else {
-					showToast('❌ Failed', 'Payment was not successful.', 'error');
-				}
-			},
-			onclose: function() {
-				// Handle payment modal close
-			}
-		});
+		// Clean price for URL
+		const amount = plan.price.replace(',', '');
+		goto(`/checkout?plan=${plan.planId}&amount=${amount}`);
 	}
 </script>
 
 <svelte:head>
 	<title>Pricing — CollegeCBT | Simple Nigerian Naira Pricing</title>
-	<meta name="description" content="Simple, transparent pricing for CollegeCBT. Pay in Nigerian Naira via Flutterwave. Free plan available, Student Pro at ₦5,000/semester, Institutional at ₦25,000/year." />
+	<meta name="description" content="Simple pricing for CollegeCBT. Pay in Nigerian Naira via Flutterwave or Korapay. Free plan available, Student Pro at only ₦10,000/year." />
 </svelte:head>
 
 <div class="pt-[100px] pb-20">
@@ -183,24 +121,34 @@
 			{/each}
 		</div>
 
-		<!-- Payment Strip -->
 		<div class="glass-card p-4 flex flex-wrap items-center justify-center gap-4 mb-8">
-			<div class="font-bold text-xs px-3 py-1.5 rounded-lg" style="background:#00C3F7;color:#fff;">Flutterwave</div>
-			<div class="font-bold text-xs px-3 py-1.5 rounded-lg" style="background:#6d28d9;color:#fff;">KoraPay</div>
-			<p class="text-xs text-white/40">🔒 Secure payments · Card · Bank Transfer · USSD · POS · Nigeria-native infrastructure</p>
+			<div class="flex items-center gap-2">
+				<div class="font-bold text-xs px-3 py-1.5 rounded-lg" style="background:#00C3F7;color:#fff;">Flutterwave</div>
+				<div class="font-bold text-xs px-3 py-1.5 rounded-lg" style="background:#6d28d9;color:#fff;">KoraPay</div>
+			</div>
+			<div class="h-4 w-px bg-white/10 hidden sm:block"></div>
+			<div class="flex items-center gap-2 opacity-30 grayscale">
+				<div class="text-[10px] font-bold uppercase tracking-wider">Coming Soon:</div>
+				<div class="font-bold text-[9px] px-2 py-1 border border-white/20 rounded">Paystack</div>
+				<div class="font-bold text-[9px] px-2 py-1 border border-white/20 rounded">Seerbit</div>
+			</div>
+			<p class="text-xs text-white/40 w-full text-center mt-2">🔒 Secure payments · Card · Bank Transfer · USSD · POS · Nigeria-native infrastructure</p>
 		</div>
 
-		<!-- Annual Banner -->
-		<div class="glass-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4" style="background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(132,204,22,0.08));">
-			<div>
-				<div class="font-bold text-lg mb-1">💡 Annual Plan — Save 15%</div>
-				<p class="text-sm text-white/50">Pay ₦8,500/year instead of ₦10,000 (2×₦5,000 semesters). Best value for serious students.</p>
+		<!-- Secure Payment Banner -->
+		<div class="glass-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4" style="background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(132,204,22,0.08)); border:1px solid rgba(132,204,22,0.25);">
+			<div class="flex items-center gap-4">
+				<div class="text-4xl">🛡️</div>
+				<div>
+					<div class="font-bold text-lg mb-1">Secure & Guaranteed Success</div>
+					<p class="text-sm text-white/50">Your payment is processed through secure, bank-level encryption. Start your journey to A1 grades today.</p>
+				</div>
 			</div>
 			<button
 				onclick={() => handlePayment(plans[1])}
-				class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full sm:w-auto text-sm flex-shrink-0"
+				class="btn-violet px-8 min-h-[44px] flex justify-center items-center w-full sm:w-auto text-sm font-bold flex-shrink-0"
 			>
-				Pay ₦8,500/year →
+				Upgrade Now →
 			</button>
 		</div>
 	</div>

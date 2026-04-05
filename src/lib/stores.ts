@@ -6,7 +6,7 @@ export interface User {
 	email: string;
 	displayName: string;
 	photoURL?: string;
-	plan: 'free' | 'pro' | 'institutional';
+	plan: 'free' | 'pro';
 	role?: 'user' | 'admin';
 	// Personal/Identity
 	dob?: string;
@@ -160,7 +160,7 @@ export const readinessScore = writable(78);
 
 // ── Derived Stores ──
 export const isAuthenticated = derived(currentUser, ($user) => $user !== null);
-export const isPro = derived(currentUser, ($user) => $user?.plan === 'pro' || $user?.plan === 'institutional');
+export const isPro = derived(currentUser, ($user) => $user?.plan === 'pro');
 
 // ── Notification Helper (Delegates to Svelte 5 Reactive Manager) ──
 export async function showToast(title: string, message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') {

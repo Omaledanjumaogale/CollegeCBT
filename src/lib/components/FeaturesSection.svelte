@@ -1,11 +1,11 @@
 <script lang="ts">
 	const features = [
-		{ icon: '🤖', title: 'AI Question Bank', desc: 'Unlimited, fresh, randomized questions generated on-demand by Claude AI for any topic, course, or level across all Nigerian higher institutions. Never repeat a question.', color: '#7c3aed', tag: 'Powered by Claude' },
-		{ icon: '⏱️', title: 'Mock Exam Engine', desc: 'Timed countdown (90s/question), auto-submit, WAEC-style grading (A1–F9). Full exam simulation with performance report and topic heatmap at the end.', color: '#84cc16', tag: 'A1–F9 Grading' },
-		{ icon: '📊', title: 'Results Intelligence', desc: 'AI Readiness Score (0–100), grade prediction, topic-level heatmaps, national benchmarking, and downloadable performance certificates.', color: '#f59e0b', tag: 'RaaS Core' },
-		{ icon: '🎯', title: 'Distractor Analysis', desc: 'Every wrong option explained — understand exactly why your answer was wrong and the specific misconception behind each distractor. Deep learning, not memorisation.', color: '#22d3ee', tag: 'Deep Learning' },
-		{ icon: '🏛️', title: '550+ Institutions', desc: 'Universities (NUC), Polytechnics (NBTE), Colleges of Education (NCCE), and IEIs. Every level, every course — 100L through Postgraduate.', color: '#a855f7', tag: '309+ Universities' },
-		{ icon: '📝', title: 'Theory Questions', desc: 'Essay questions with AI-generated model answers, mark schemes, key points with marks allocation, and examiner notes — exactly as your lecturers expect.', color: '#e11d48', tag: 'Mark Schemes' }
+		{ icon: '🤖', title: 'AI Question Bank', desc: 'Unlimited, fresh questions created on-demand by AI for any topic or course. It learns from your syllabus to give you exactly what you need.', color: '#7c3aed', tag: 'Smart AI Questions' },
+		{ icon: '⏱️', title: 'Mock Exam Engine', desc: 'Real exam simulation with a timed countdown (90 seconds per question) and official grading (A1–F9) so you know exactly how you’d score today.', color: '#84cc16', tag: 'Real Exam Setup' },
+		{ icon: '📊', title: 'Smart Progress Reports', desc: 'See your Exam Readiness Score (0–100), predicted grades, and topic-level charts. Download your performance certificate when you are ready.', color: '#f59e0b', tag: 'Track Success' },
+		{ icon: '🎯', title: 'Detailed Explanations', desc: 'Every wrong option explained — understand exactly why your answer was wrong and learn the logic behind the correct choice.', color: '#22d3ee', tag: 'Understand Better' },
+		{ icon: '🏛️', title: '550+ Institutions', desc: 'Covers Universities, Polytechnics, and Colleges of Education across Nigeria. Every course and every level from 100L up.', color: '#a855f7', tag: 'Built for Nigeria' },
+		{ icon: '📝', title: 'Essay/Theory Practice', desc: 'Essay questions with AI model answers and marking schemes — see exactly how to answer to get full marks from your lecturers.', color: '#e11d48', tag: 'A+ Essay Guide' }
 	];
 </script>
 
@@ -22,7 +22,7 @@
 				<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Excel in Exams</span>
 			</h2>
 			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
-				Six enterprise-grade capabilities working together to guarantee your exam result — not just prepare you for it.
+				Six core features designed to help you master your courses and pass your exams with confidence.
 			</p>
 		</div>
 
