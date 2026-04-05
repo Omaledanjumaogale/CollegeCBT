@@ -24,23 +24,33 @@
 	} = $props<Props>();
 
 	// ── Queries ───────────────────────────────────────────────────────────────
-	const instTypes = useQuery(api.academic.getInstitutionTypes, {});
+	const instTypes = useQuery(api.academic.getInstitutionTypes, () => ({}));
 	
-	const institutions = $derived(institutionType ? useQuery(api.academic.getInstitutionsByType, { type: institutionType }) : { data: [] });
+	const institutions = useQuery(api.academic.getInstitutionsByType, () => 
+		institutionType ? { type: institutionType } : 'skip'
+	);
 	
-	const faculties = $derived(institutionType ? useQuery(api.academic.getFaculties, { institutionType }) : { data: [] });
+	const faculties = useQuery(api.academic.getFaculties, () => 
+		institutionType ? { institutionType } : 'skip'
+	);
 	
-	const departments = $derived(institutionType && faculty && faculty !== 'Other' 
-		? useQuery(api.academic.getDepartments, { institutionType, faculty }) 
-		: { data: [] });
+	const departments = useQuery(api.academic.getDepartments, () => 
+		institutionType && faculty && faculty !== 'Other' 
+			? { institutionType, faculty } 
+			: 'skip'
+	);
 	
-	const levels = $derived(institutionType && faculty && department && faculty !== 'Other' && department !== 'Other'
-		? useQuery(api.academic.getLevels, { institutionType, faculty, department }) 
-		: { data: [] });
+	const levels = useQuery(api.academic.getLevels, () => 
+		institutionType && faculty && department && faculty !== 'Other' && department !== 'Other'
+			? { institutionType, faculty, department } 
+			: 'skip'
+	);
 	
-	const courses = $derived(institutionType && faculty && department && level && faculty !== 'Other' && department !== 'Other' && level !== 'Other'
-		? useQuery(api.academic.getCourses, { institutionType, faculty, department, level }) 
-		: { data: [] });
+	const courses = useQuery(api.academic.getCourses, () => 
+		institutionType && faculty && department && level && faculty !== 'Other' && department !== 'Other' && level !== 'Other'
+			? { institutionType, faculty, department, level } 
+			: 'skip'
+	);
 
 	// ── Other / Custom Inputs ──────────────────────────────────────────────────
 	let otherFaculty = $state('');

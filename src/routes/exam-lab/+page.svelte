@@ -485,7 +485,4 @@
 	.italic-shadow {
 		text-shadow: 6px 6px 0 rgba(139, 92, 246, 0.15);
 	}
-	.form-select {
-		@apply w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-primary transition-all outline-none appearance-none;
-	}
 </style>
