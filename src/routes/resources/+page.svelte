@@ -3,8 +3,8 @@
 
 	type Category = 'All' | 'Exam Tips' | 'Study Guide' | 'Strategy' | 'Subject Deep-Dive' | 'Mock Exam Prep';
 
-	let activeCategory: Category = 'All';
-	let searchQuery = '';
+	let activeCategory = $state<Category>('All');
+	let searchQuery = $state('');
 
 	const articles = [
 		{
@@ -99,11 +99,11 @@
 
 	const categories: Category[] = ['All', 'Exam Tips', 'Study Guide', 'Strategy', 'Subject Deep-Dive', 'Mock Exam Prep'];
 
-	$: filteredArticles = articles.filter(a => {
+	let filteredArticles = $derived(articles.filter(a => {
 		const matchCat = activeCategory === 'All' || a.category === activeCategory;
 		const matchSearch = searchQuery === '' || a.title.toLowerCase().includes(searchQuery.toLowerCase()) || a.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
 		return matchCat && matchSearch;
-	});
+	}));
 </script>
 
 <svelte:head>
@@ -149,7 +149,7 @@
 			<div class="flex gap-2 flex-wrap">
 				{#each categories as cat}
 					<button
-						on:click={() => activeCategory = cat}
+						onclick={() => activeCategory = cat}
 						class="px-4 py-2 rounded-xl text-sm font-semibold transition-all whitespace-nowrap"
 						class:category-active={activeCategory === cat}
 						class:category-off={activeCategory !== cat}
@@ -212,7 +212,7 @@
 				<a href="/exam-lab" class="btn-violet px-8 py-4 text-base shadow-violet">
 					🤖 Start Exam Lab — Free
 				</a>
-				<button on:click={() => activeModal.set('signup')} class="btn-ghost px-7 py-4 text-base">
+				<button onclick={() => activeModal.set('signup')} class="btn-ghost px-7 py-4 text-base">
 					⏱️ Take a Mock Exam →
 				</button>
 			</div>

@@ -5,16 +5,14 @@
 
 	// ── State ─────────────────────────────────────────────────────────────────
 	type Phase = 'config' | 'generating' | 'exam' | 'grading' | 'results';
-	let phase: Phase = 'config';
-
-	// Config
-	let customTopic = '';
-	let customSubject = '';
-	let selectedCourse = '';
-	let selectedInstType: InstitutionType | '' = '';
-	let selectedLevel = '';
-	let numQuestions = 5;
-	let qType: 'MCQ' | 'Theory' | 'Mixed' = 'MCQ';
+	let phase = $state<Phase>('config');
+	let customTopic = $state('');
+	let customSubject = $state('');
+	let selectedCourse = $state('');
+	let selectedInstType = $state<InstitutionType | ''>('');
+	let selectedLevel = $state('');
+	let numQuestions = $state(5);
+	let qType = $state<'MCQ' | 'Theory' | 'Mixed'>('MCQ');
 
 	// Questions & Answers
 	interface MCQ {
@@ -38,20 +36,20 @@
 	}
 	type AnyQuestion = MCQ | Theory;
 
-	let questions: AnyQuestion[] = [];
-	let mcqAnswers: Record<number, string> = {};
-	let theoryAnswers: Record<number, string> = {};
-	let currentQ = 0;
-	let gradeReport: any = null;
-	let generatingMsg = '';
-	let error = '';
+	let questions = $state<AnyQuestion[]>([]);
+	let mcqAnswers = $state<Record<number, string>>({});
+	let theoryAnswers = $state<Record<number, string>>({});
+	let currentQ = $state(0);
+	let gradeReport = $state<any>(null);
+	let generatingMsg = $state('');
+	let error = $state('');
 
 	// ── Derived ───────────────────────────────────────────────────────────────
-	$: userPlan = $currentUser?.plan ?? 'free';
-	$: canUseTheory = $isPro;
-	$: totalMarks = questions
+	let userPlan = $derived($currentUser?.plan ?? 'free');
+	let canUseTheory = $derived($isPro);
+	let totalMarks = $derived(questions
 		.filter((q) => q.type === 'Theory')
-		.reduce((acc, q) => acc + (q as Theory).key_points.reduce((s, kp) => s + kp.marks, 0), 0);
+		.reduce((acc, q) => acc + (q as Theory).key_points.reduce((s, kp) => s + kp.marks, 0), 0));
 
 	// ── Config validation ──────────────────────────────────────────────────────
 	function validateConfig(): string | null {
@@ -224,8 +222,8 @@
 		error = '';
 	}
 
-	$: currentQuestion = questions[currentQ] ?? null;
-	$: progress = questions.length > 0 ? Math.round(((currentQ + 1) / questions.length) * 100) : 0;
+	let currentQuestion = $derived(questions[currentQ] ?? null);
+	let progress = $derived(questions.length > 0 ? Math.round(((currentQ + 1) / questions.length) * 100) : 0);
 </script>
 
 <svelte:head>
@@ -349,7 +347,7 @@
 				</div>
 
 				<button
-					on:click={generateAll}
+					onclick={generateAll}
 					class="btn-violet w-full py-3.5 justify-center text-base font-bold"
 					disabled={phase !== 'config'}
 				>
@@ -411,7 +409,7 @@
 						<div class="space-y-3 mb-6">
 							{#each Object.entries(mq.options) as [key, val]}
 								<button
-									on:click={() => { mcqAnswers[currentQ] = key; }}
+									onclick={() => { mcqAnswers[currentQ] = key; }}
 									class="w-full text-left p-3.5 rounded-xl border transition-all text-sm"
 									style="
 										border-color:{mcqAnswers[currentQ] === key ? '#7c3aed' : 'rgba(255,255,255,0.08)'};
@@ -449,12 +447,12 @@
 					<!-- Navigation -->
 					<div class="flex gap-3">
 						{#if currentQ > 0}
-							<button on:click={prevQuestion} class="btn-ghost flex-1 py-3 text-sm">← Previous</button>
+							<button onclick={prevQuestion} class="btn-ghost flex-1 py-3 text-sm">← Previous</button>
 						{/if}
 						{#if currentQ < questions.length - 1}
-							<button on:click={nextQuestion} class="btn-violet flex-1 py-3 text-sm justify-center">Next →</button>
+							<button onclick={nextQuestion} class="btn-violet flex-1 py-3 text-sm justify-center">Next →</button>
 						{:else}
-							<button on:click={submitExam} class="btn-violet flex-1 py-3 text-sm justify-center font-bold">
+							<button onclick={submitExam} class="btn-violet flex-1 py-3 text-sm justify-center font-bold">
 								✅ Submit for Grading
 							</button>
 						{/if}
@@ -552,7 +550,7 @@
 
 				<!-- Actions -->
 				<div class="flex gap-3 flex-wrap">
-					<button on:click={restart} class="btn-ghost flex-1 py-3 text-sm">🔄 New Custom Exam</button>
+					<button onclick={restart} class="btn-ghost flex-1 py-3 text-sm">🔄 New Custom Exam</button>
 					<a href="/exam-lab" class="btn-violet flex-1 py-3 text-sm text-center justify-center">🎯 Go to Exam Lab</a>
 				</div>
 			</div>

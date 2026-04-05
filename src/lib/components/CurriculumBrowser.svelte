@@ -3,13 +3,14 @@
 	import { fade, slide } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { isPro, currentUser } from '$lib/stores';
+	import Tooltip from './Tooltip.svelte';
 
-	let activeType: InstitutionType | 'JAMB' = 'University';
+	let activeType = $state<InstitutionType | 'JAMB'>('University');
 	
 	// Ensure we don't try to access undefined keys in LEVELS
-	$: availableLevels = activeType === 'JAMB' ? [] : (LEVELS[activeType as InstitutionType] || []);
+	let availableLevels = $derived(activeType === 'JAMB' ? [] : (LEVELS[activeType as InstitutionType] || []));
 
-	let selectedLevel = '';
+	let selectedLevel = $state('');
 	
 	// We'll show a sample of courses
 	const courseSamples: Record<string, string[]> = {
@@ -20,10 +21,10 @@
 		'JAMB': ['Use of English', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'Economics', 'Government']
 	};
 
-	let searchQuery = '';
+	let searchQuery = $state('');
 
-	$: displayedCourses = (courseSamples[activeType] || [])
-		.filter((c: string) => c.toLowerCase().includes(searchQuery.toLowerCase()));
+	let displayedCourses = $derived((courseSamples[activeType] || [])
+		.filter((c: string) => c.toLowerCase().includes(searchQuery.toLowerCase())));
 
 	function launchPractice(course: string) {
 		if (activeType === 'JAMB') {
@@ -52,21 +53,28 @@
 	<!-- Tab Bar -->
 	<div class="flex overflow-x-auto hide-scrollbar border-b border-white/10 p-2 gap-2 bg-black/20">
 		{#each types as t}
-			<button
-				class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all"
-				style="
-					background:{activeType === t.id ? 'rgba(124,58,237,0.2)' : 'transparent'};
-					color:{activeType === t.id ? '#c4b5fd' : 'rgba(255,255,255,0.6)'};
-					border:1px solid {activeType === t.id ? 'rgba(124,58,237,0.3)' : 'transparent'};
-				"
-				on:click={() => {
-					activeType = t.id;
-					selectedLevel = '';
-				}}
-			>
-				<span class="text-lg">{t.icon}</span>
-				{t.label}
-			</button>
+			<div class="flex items-center gap-1">
+				<button
+					class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all"
+					style="
+						background:{activeType === t.id ? 'rgba(124,58,237,0.2)' : 'transparent'};
+						color:{activeType === t.id ? '#c4b5fd' : 'rgba(255,255,255,0.6)'};
+						border:1px solid {activeType === t.id ? 'rgba(124,58,237,0.3)' : 'transparent'};
+					"
+					onclick={() => {
+						activeType = t.id;
+						selectedLevel = '';
+					}}
+				>
+					<span class="text-lg">{t.icon}</span>
+					{t.label}
+				</button>
+				{#if t.id === 'JAMB'}
+					<Tooltip text="Subject-specific questions following the official JAMB syllabus for university and polytechnic entrance." />
+				{:else if t.id === 'University'}
+					<Tooltip text="Curriculum-based practice for federally and state-accredited Nigerian universities." />
+				{/if}
+			</div>
 		{/each}
 	</div>
 
@@ -103,7 +111,7 @@
 				{#each displayedCourses as course}
 					<button
 						class="text-left p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-violet-500/30 transition-all group relative overflow-hidden"
-						on:click={() => launchPractice(course)}
+						onclick={() => launchPractice(course)}
 					>
 						<div class="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0">
 							<span class="text-violet-400">→</span>
@@ -124,7 +132,10 @@
 		
 		<div class="mt-6 flex justify-between items-center p-4 bg-violet-900/20 border border-violet-500/20 rounded-xl">
 			<div>
-				<h4 class="font-bold text-violet-100 text-sm mb-1">Custom Exam Need?</h4>
+				<div class="flex items-center gap-2 mb-1">
+					<h4 class="font-bold text-violet-100 text-sm">Custom Exam Need?</h4>
+					<Tooltip text="Use our advanced AI generator to create questions for any specific module or topic not listed here." />
+				</div>
 				<p class="text-xs text-violet-300/70">Can't find your specific topic or module? Use the AI orchestrator.</p>
 			</div>
 			<a href="/dashboard/custom-exam" class="btn-violet px-4 py-2 text-xs whitespace-nowrap">Build Custom →</a>

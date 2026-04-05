@@ -174,7 +174,7 @@
 					</div>
 
 					<button
-						on:click={() => handlePayment(plan)}
+						onclick={() => handlePayment(plan)}
 						class="w-full min-h-[44px] flex justify-center items-center py-3 rounded-xl font-bold text-sm transition-all {plan.ctaStyle === 'violet' ? 'btn-violet shadow-violet' : plan.ctaStyle === 'lime' ? 'btn-outline-lime' : 'btn-ghost'}"
 					>
 						{plan.cta}
@@ -197,7 +197,7 @@
 				<p class="text-sm text-white/50">Pay ₦8,500/year instead of ₦10,000 (2×₦5,000 semesters). Best value for serious students.</p>
 			</div>
 			<button
-				on:click={() => handlePayment(plans[1])}
+				onclick={() => handlePayment(plans[1])}
 				class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full sm:w-auto text-sm flex-shrink-0"
 			>
 				Pay ₦8,500/year →

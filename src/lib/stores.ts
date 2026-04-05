@@ -164,7 +164,7 @@ export const isPro = derived(currentUser, ($user) => $user?.plan === 'pro' || $u
 
 // ── Notification Helper (Delegates to Svelte 5 Reactive Manager) ──
 export async function showToast(title: string, message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') {
-	const { notifications } = await import('./toast.svelte');
-	return notifications.show({ title, message, type });
+	const { toast } = await import('./toast.svelte');
+	return toast.show({ title, message, type });
 }
 

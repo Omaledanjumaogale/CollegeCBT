@@ -7,31 +7,32 @@
 	import { currentUser } from '$lib/stores';
 	import { COURSES, INSTITUTION_TYPES, LEVELS, DIFFICULTIES, WAEC_GRADES, type InstitutionType } from '$lib/data/courseData';
 	import type { Question, TheoryQuestion } from '$lib/stores';
+	import Tooltip from '$lib/components/Tooltip.svelte';
 
 	// ── TAB STATE ──
-	let activeTab: 'lab' | 'mock' = 'lab';
+	let activeTab = $state<'lab' | 'mock'>('lab');
 
 	// ── LAB STATE (persisted per session) ──
-	let labSession = {
+	let labSession = $state({
 		questionsCount: 0, correct: 0, wrong: 0, score: 0, streak: 0, answered: false
-	};
-	let labQuestion: Question | null = null;
-	let labTheory: TheoryQuestion | null = null;
-	let labShowScorebar = false;
-	let labLoading_ = false;
-	let theoryAnswerRevealed = false;
-	let userTheoryAnswer = '';
+	});
+	let labQuestion = $state<Question | null>(null);
+	let labTheory = $state<TheoryQuestion | null>(null);
+	let labShowScorebar = $state(false);
+	let labLoading_ = $state(false);
+	let theoryAnswerRevealed = $state(false);
+	let userTheoryAnswer = $state('');
 
 	// ── LAB CONFIG ──
-	let labInstType: InstitutionType | '' = '';
-	let labCourse = '';
-	let labLevel = '300 Level';
-	let labQtype = 'MCQ';
-	let labTopic = '';
-	let labDiff = 'mixed';
+	let labInstType = $state<InstitutionType | ''>('');
+	let labCourse = $state('');
+	let labLevel = $state('300 Level');
+	let labQtype = $state('MCQ');
+	let labTopic = $state('');
+	let labDiff = $state('mixed');
 
-	$: labCourses = labInstType ? (COURSES[labInstType] ?? []) : [];
-	$: labLevels = labInstType ? (LEVELS[labInstType] ?? ['100 Level','200 Level','300 Level','400 Level']) : ['100 Level','200 Level','300 Level','400 Level'];
+	let labCourses = $derived(labInstType ? (COURSES[labInstType] ?? []) : []);
+	let labLevels = $derived(labInstType ? (LEVELS[labInstType] ?? ['100 Level','200 Level','300 Level','400 Level']) : ['100 Level','200 Level','300 Level','400 Level']);
 	
 	// ── URL params pre-load ──
 	onMount(() => {
@@ -91,8 +92,8 @@
 		}
 	}
 
-	let selectedOption: string | null = null;
-	let answerResult: 'correct' | 'wrong' | null = null;
+	let selectedOption = $state<string | null>(null);
+	let answerResult = $state<'correct' | 'wrong' | null>(null);
 
 	async function answerLab(key: string) {
 		if (labSession.answered || !labQuestion) return;
@@ -163,30 +164,30 @@
 	}
 
 	// ── MOCK EXAM ──
-	let mockInstType: InstitutionType | '' = '';
-	let mockCourse = '';
-	let mockLevel = '300 Level';
-	let mockQcount = 10;
-	let mockTimePerQ = 90;
-	let mockDiff = 'mixed';
-	$: mockCourses = mockInstType ? (COURSES[mockInstType] ?? []) : [];
-	$: mockLevels = mockInstType ? (LEVELS[mockInstType] ?? ['100 Level','200 Level','300 Level','400 Level']) : ['100 Level','200 Level','300 Level','400 Level'];
+	let mockInstType = $state<InstitutionType | ''>('');
+	let mockCourse = $state('');
+	let mockLevel = $state('300 Level');
+	let mockQcount = $state(10);
+	let mockTimePerQ = $state(90);
+	let mockDiff = $state('mixed');
+	let mockCourses = $derived(mockInstType ? (COURSES[mockInstType] ?? []) : []);
+	let mockLevels = $derived(mockInstType ? (LEVELS[mockInstType] ?? ['100 Level','200 Level','300 Level','400 Level']) : ['100 Level','200 Level','300 Level','400 Level']);
 
 	type MockScreen = 'config' | 'active' | 'results';
-	let mockScreen: MockScreen = 'config';
+	let mockScreen = $state<MockScreen>('config');
 
 	// Active mock data
-	let mockCurrentQ = 0;
-	let mockTotal = 10;
-	let mockTimeLeft = 90;
+	let mockCurrentQ = $state(0);
+	let mockTotal = $state(10);
+	let mockTimeLeft = $state(90);
 	let mockTimer: ReturnType<typeof setInterval> | null = null;
-	let mockQuestions: (Question | null)[] = [];
-	let mockAnswers: ({ chosen: string | null; correct: string; ok: boolean; skipped: boolean } | null)[] = [];
-	let mockLoading = false;
-	let mockQloading = false;
-	let mockCorrect = 0;
-	let mockWrong = 0;
-	let mockSkipped = 0;
+	let mockQuestions = $state<(Question | null)[]>([]);
+	let mockAnswers = $state<({ chosen: string | null; correct: string; ok: boolean; skipped: boolean } | null)[]>([]);
+	let mockLoading = $state(false);
+	let mockQloading = $state(false);
+	let mockCorrect = $state(0);
+	let mockWrong = $state(0);
+	let mockSkipped = $state(0);
 
 	async function startMock() {
 		if (!mockCourse || !mockInstType) {
@@ -229,8 +230,8 @@
 		startMockTimer(idx);
 	}
 
-	let mockSelectedOption: string | null = null;
-	let mockAnsweredCurrent = false;
+	let mockSelectedOption = $state<string | null>(null);
+	let mockAnsweredCurrent = $state(false);
 
 	function answerMock(key: string) {
 		if (mockAnsweredCurrent || !mockQuestions[mockCurrentQ]) return;
@@ -305,16 +306,16 @@
 		if (mockTimer) { clearInterval(mockTimer); mockTimer = null; }
 	}
 
-	$: mockPct = mockTotal > 0 ? Math.round((mockCorrect / mockTotal) * 100) : 0;
-	$: mockGrade = getWaecGrade(mockPct);
-	$: mockGradeClass = getGradeClass(mockGrade);
-	$: mockRecommendation = getAIRecommendation(mockPct);
+	let mockPct = $derived(mockTotal > 0 ? Math.round((mockCorrect / mockTotal) * 100) : 0);
+	let mockGrade = $derived(getWaecGrade(mockPct));
+	let mockGradeClass = $derived(getGradeClass(mockGrade));
+	let mockRecommendation = $derived(getAIRecommendation(mockPct));
 
-	$: timerPct = (mockTimeLeft / mockTimePerQ) * 100;
-	$: timerClass = mockTimeLeft <= 10 ? 'text-rose-400' : mockTimeLeft <= 20 ? 'text-amber-400' : 'text-lime-DEFAULT';
-	$: timerCircleColor = mockTimeLeft <= 10 ? '#e11d48' : mockTimeLeft <= 20 ? '#f59e0b' : '#84cc16';
-	$: timerDisplay = `${Math.floor(mockTimeLeft / 60)}:${(mockTimeLeft % 60).toString().padStart(2,'0')}`;
-	$: timerDashOffset = 263.9 * (1 - mockTimeLeft / mockTimePerQ);
+	let timerPct = $derived((mockTimeLeft / mockTimePerQ) * 100);
+	let timerClass = $derived(mockTimeLeft <= 10 ? 'text-rose-400' : mockTimeLeft <= 20 ? 'text-amber-400' : 'text-lime-DEFAULT');
+	let timerCircleColor = $derived(mockTimeLeft <= 10 ? '#e11d48' : mockTimeLeft <= 20 ? '#f59e0b' : '#84cc16');
+	let timerDisplay = $derived(`${Math.floor(mockTimeLeft / 60)}:${(mockTimeLeft % 60).toString().padStart(2,'0')}`);
+	let timerDashOffset = $derived(263.9 * (1 - mockTimeLeft / mockTimePerQ));
 </script>
 
 <svelte:head>
@@ -337,15 +338,16 @@
 		<!-- Main Tabs -->
 		<div class="flex gap-2 p-1.5 rounded-2xl border border-white/10 bg-black/20 mb-8">
 			<button
-				on:click={() => activeTab = 'lab'}
-				class="flex-1 py-3 rounded-xl font-bold text-sm transition-all"
+				onclick={() => activeTab = 'lab'}
+				class="flex-1 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2"
 				class:tab-active={activeTab === 'lab'}
 				class:tab-inactive={activeTab !== 'lab'}
 			>
-				🤖 AI Exam Lab
+				<span>🤖 AI Exam Lab</span>
+				<Tooltip text="Practice individual topics at your own pace with instant AI feedback and explanations." />
 			</button>
 			<button
-				on:click={() => activeTab = 'mock'}
+				onclick={() => activeTab = 'mock'}
 				class="flex-1 py-3 rounded-xl font-bold text-sm transition-all"
 				class:tab-active={activeTab === 'mock'}
 				class:tab-inactive={activeTab !== 'mock'}
@@ -399,10 +401,10 @@
 					</div>
 				</div>
 				<div class="flex flex-col md:flex-row gap-3">
-					<button on:click={genLabQuestion} disabled={labLoading_} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm gap-2">
+					<button onclick={genLabQuestion} disabled={labLoading_} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm gap-2">
 						{#if labLoading_}<span class="spinner w-4 h-4 border-2"></span> Generating...{:else}🤖 Generate Question{/if}
 					</button>
-					<button on:click={clearLab} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🔄 Reset Session</button>
+					<button onclick={clearLab} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🔄 Reset Session</button>
 				</div>
 			</div>
 
@@ -431,10 +433,18 @@
 						<!-- Header -->
 						<div class="p-5 border-b border-white/8">
 							<div class="flex flex-wrap gap-2 mb-3">
-								<span class="badge badge-violet">🎓 {labCourse}</span>
+								<div class="flex items-center gap-1.5">
+									<span class="badge badge-violet">🎓 {labCourse}</span>
+									<Tooltip text="Current course being practiced. Questions are AI-generated based on Nigerian higher education curricula." />
+								</div>
 								<span class="badge badge-lime">MCQ · {labLevel}</span>
 								<span class="badge badge-amber font-mono">Q{labSession.questionsCount}</span>
-								{#if labQuestion.topic}<span class="badge badge-violet">{labQuestion.topic}</span>{/if}
+								{#if labQuestion.topic}
+									<div class="flex items-center gap-1.5">
+										<span class="badge badge-violet">{labQuestion.topic}</span>
+										<Tooltip text="The specific sub-topic identified for this question." />
+									</div>
+								{/if}
 							</div>
 							<p class="text-base text-white/90 font-medium leading-relaxed">{labQuestion.question}</p>
 						</div>
@@ -443,7 +453,7 @@
 							<div class="space-y-3 mb-5">
 								{#each ['A','B','C','D'] as key}
 									<button
-										on:click={() => answerLab(key)}
+										onclick={() => answerLab(key)}
 										disabled={labSession.answered}
 										class="mcq-option"
 										class:correct={labSession.answered && key === labQuestion.correct}
@@ -470,7 +480,7 @@
 									{/if}
 								</div>
 								<div class="flex flex-col md:flex-row gap-3">
-									<button on:click={genLabQuestion} class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Next Question →</button>
+									<button onclick={genLabQuestion} class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Next Question →</button>
 								</div>
 							{/if}
 						</div>
@@ -495,8 +505,8 @@
 								placeholder="Type your answer here..."
 							></textarea>
 							<div class="flex flex-col md:flex-row gap-3 mb-4">
-								<button on:click={revealTheoryAnswer} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">📖 Show Model Answer</button>
-								<button on:click={genLabQuestion} class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Next →</button>
+								<button onclick={revealTheoryAnswer} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">📖 Show Model Answer</button>
+								<button onclick={genLabQuestion} class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Next →</button>
 							</div>
 							{#if theoryAnswerRevealed}
 								<div class="rounded-xl p-4 border" style="background:rgba(132,204,22,0.07);border-color:rgba(132,204,22,0.2);">
@@ -591,7 +601,7 @@
 							</select>
 						</div>
 					</div>
-					<button on:click={startMock} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full text-sm">⏱️ Start Mock Exam</button>
+					<button onclick={startMock} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full text-sm">⏱️ Start Mock Exam</button>
 				</div>
 
 				<!-- WAEC Grade Reference -->
@@ -663,7 +673,7 @@
 						<div class="p-5 space-y-3">
 							{#each ['A','B','C','D'] as key}
 								<button
-									on:click={() => answerMock(key)}
+									onclick={() => answerMock(key)}
 									disabled={mockAnsweredCurrent}
 									class="mcq-option"
 									class:correct={mockAnsweredCurrent && key === q.correct}
@@ -686,16 +696,16 @@
 
 					<div class="flex flex-col md:flex-row gap-3">
 						{#if !mockAnsweredCurrent}
-							<button on:click={skipMockQ} class="btn-ghost px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Skip →</button>
+							<button onclick={skipMockQ} class="btn-ghost px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">Skip →</button>
 						{:else}
 							<button
-								on:click={nextMockQ}
+								onclick={nextMockQ}
 								class="btn-violet px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm"
 							>
 								{mockCurrentQ >= mockTotal - 1 ? '🏁 View Results' : 'Next Question →'}
 							</button>
 						{/if}
-						<button on:click={showMockResults} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🏁 Finish Exam</button>
+						<button onclick={showMockResults} class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🏁 Finish Exam</button>
 					</div>
 				{/if}
 			{/if}
@@ -758,8 +768,8 @@
 					</div>
 
 					<div class="flex flex-col md:flex-row gap-3">
-						<button on:click={resetMock} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🔄 Take Another Mock</button>
-						<button on:click={() => activeTab = 'lab'} class="btn-ghost px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🤖 Practice in Exam Lab</button>
+						<button onclick={resetMock} class="btn-violet px-6 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🔄 Take Another Mock</button>
+						<button onclick={() => activeTab = 'lab'} class="btn-ghost px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">🤖 Practice in Exam Lab</button>
 						<a href="/dashboard" class="btn-outline-lime px-5 min-h-[44px] flex justify-center items-center w-full md:w-auto text-sm">📊 View Dashboard</a>
 					</div>
 				</div>

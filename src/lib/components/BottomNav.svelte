@@ -27,7 +27,7 @@
 		{#each bottomLinks as link}
 			{#if link.href === '/dashboard' && !$currentUser}
 				<button 
-					on:click={handleUserClick}
+					onclick={handleUserClick}
 					class="flex flex-col items-center justify-center gap-1 text-[10px] font-bold text-white/40 transition-all hover:text-white/60"
 				>
 					<span class="text-xl">👤</span>

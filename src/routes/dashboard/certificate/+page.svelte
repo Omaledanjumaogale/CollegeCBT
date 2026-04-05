@@ -31,7 +31,6 @@
             <div class="relative z-10 w-full flex justify-center">
 			    <CertificateDownloader 
                     studentName={sampleCertificate.studentName}
-                    courseName={sampleCertificate.courseName}
                     date={sampleCertificate.date}
                 />
             </div>

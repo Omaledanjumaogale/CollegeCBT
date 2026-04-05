@@ -9,6 +9,7 @@
 	import { profileUpdateSchema } from '$lib/data/schemas';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 	import { triggerAgentTask } from '$lib/services/convexClient';
+	import { subscribeToPush } from '$lib/services/pushManager';
 
 	$effect(() => {
 		if (!$isAuthenticated && typeof window !== 'undefined') {
@@ -161,6 +162,13 @@
 			};
 			requestAnimationFrame(animate);
 		}, 300);
+
+		// ── Enterprise Push Subscription ──
+		// Triggers permission request and VAPID binding after a short delay
+		// ensuring user is warmed up and session is stable.
+		setTimeout(() => {
+			subscribeToPush();
+		}, 2000);
 	});
 
 	// Settings form state — bound with proper IDs
@@ -294,7 +302,29 @@
 								<div class="absolute top-0 left-0 right-0 h-0.5" style="background:{k.color};"></div>
 								<div class="text-2xl mb-2">{k.icon}</div>
 								<div class="font-title text-3xl" style="color:{k.color};">{k.value}</div>
-								<div class="text-xs text-white/40 mt-0.5">{k.label}</div>
+								{#if k.label === 'AI Readiness Score'}
+									<div class="flex items-center gap-1.5 mt-0.5">
+										<div class="text-xs text-white/40">{k.label}</div>
+										<Tooltip text="Our proprietary AI-driven projection of your likely performance in an actual examination setting, based on mastery and consistency." />
+									</div>
+								{:else if k.label === 'Average Score'}
+									<div class="flex items-center gap-1.5 mt-0.5">
+										<div class="text-xs text-white/40">{k.label}</div>
+										<Tooltip text="Your cumulative average percentage across all mock exams taken on the platform." />
+									</div>
+								{:else if k.label === 'Questions Answered'}
+									<div class="flex items-center gap-1.5 mt-0.5">
+										<div class="text-xs text-white/40">{k.label}</div>
+										<Tooltip text="The total number of AI-generated and curriculum-based questions you have attempted in the Exam Lab." />
+									</div>
+								{:else if k.label === 'Mock Exams Taken'}
+									<div class="flex items-center gap-1.5 mt-0.5">
+										<div class="text-xs text-white/40">{k.label}</div>
+										<Tooltip text="Number of full-length timed mock exams completed under exam conditions." />
+									</div>
+								{:else}
+									<div class="text-xs text-white/40 mt-0.5">{k.label}</div>
+								{/if}
 								<div class="text-xs mt-1" style="color:{k.color};">{k.change}</div>
 							</div>
 						{/each}
@@ -413,7 +443,10 @@
 					<!-- Heatmap -->
 					<div class="glass-card p-5 mb-5">
 						<div class="flex items-center justify-between mb-4">
-							<div class="font-bold text-sm">📊 Topic Performance Heatmap</div>
+							<div class="flex items-center gap-2">
+								<div class="font-bold text-sm">📊 Topic Performance Heatmap</div>
+								<Tooltip text="Real-time mastery visualization. Red topics require urgent practice, while green indicates examination readiness." />
+							</div>
 							<div class="flex items-center gap-3 text-xs">
 								<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#e11d48;"></span><span class="text-white/40">Needs Work</span></span>
 								<span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block" style="background:#f59e0b;"></span><span class="text-white/40">Developing</span></span>
@@ -438,7 +471,10 @@
 
 					<!-- AI Projection -->
 					<div class="glass-card p-5 mb-5" style="background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.25);">
-						<div class="font-bold text-sm text-violet-light mb-3 flex items-center gap-2">🤖 AI Outcome Projection</div>
+						<div class="font-bold text-sm text-violet-light mb-3 flex items-center justify-between">
+							<div class="flex items-center gap-2">🤖 AI Outcome Projection</div>
+							<Tooltip content="This analysis uses a predictive algorithm to forecast your final grade based on current mock exam data and topic mastery." />
+						</div>
 						<p class="text-sm text-white/80 leading-relaxed">
 							Based on your current practice trajectory across DBMS, Computer Networks, and Data Structures, you are on course to achieve a
 							<strong class="text-lime-DEFAULT">B2 grade (70–74%)</strong> in your end-of-semester examinations.

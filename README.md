@@ -12,13 +12,14 @@ Enterprise-grade AI Exam Preparation Platform for Nigerian Higher Institution st
 * **Lifecycle Triggers (`triggers.ts`):** Emulated SQL row-level auditing triggers for high-sensitivity operations tracking.
 * **Autonomous Maintenance (`crons.ts`):** Automated garbage collection for stale sessions and rate limit entries.
 
-### 2. Premium UI & UX (Svelte 5)
+### 2. Premium UI & UX (Svelte 5 Runes)
 
-* **Global Reactive Notifications (`toast.svelte.ts`):** Unified, accessible notification system replacing legacy UI blocks.
-* **Informational Tooltips (`Tooltip.svelte`):** Beautifully engineered tooltips providing contextual guidance on all key features.
-* **PWA & Real-time Push:** Successfull integration of service worker hooks and PushManager for real-time market/exam resolution deliveries.
-* **Online/Offline Resilience:** Automatic connection status tracking with user feedback.
-
+* **Svelte 5 Engine Upgrade:** 100% migration to `$state`, `$derived`, and `$props` runes for high-performance reactive updates and reduced bundle size.
+* **Syntax Modernization:** Surgical conversion of legacy `on:event` handlers to the new `onclick`, `oninput`, etc., syntax to eliminate build-time reactivity warnings.
+* **Global Reactive Notifications (`toast.svelte.ts`):** Unified, accessible notification manager providing real-time user feedback.
+* **Informational Tooltips (`Tooltip.svelte`):** Contextual "knowledge node" indicators on all key features, helping students understand platform functionality instantly.
+* **PWA & Real-time Connectivity:** Integrated service worker with network-first strategy and `PushManager` hooks for offline resilience and device-level notifications.
+* **Mobile-First Engineering:** Optimized `BottomNav` and layout structure for a 100% responsive experience on any device.
 
 ### [v2.2.0] — Super Admin & Institutional Gateway (CURRENT)
 
