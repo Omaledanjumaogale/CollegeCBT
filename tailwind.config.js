@@ -5,6 +5,18 @@ export default {
 	theme: {
 		extend: {
 			colors: {
+				primary: {
+					DEFAULT: '#7c3aed', // matches violet
+					light: '#a78bfa'
+				},
+				secondary: {
+					DEFAULT: '#0d0820', // matches ink.dark
+					surface: '#120e2e'
+				},
+				accent: {
+					DEFAULT: '#84cc16', // matches lime
+					light: '#a3e635'
+				},
 				violet: {
 					DEFAULT: '#7c3aed',
 					light: '#a78bfa',
