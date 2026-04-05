@@ -21,14 +21,14 @@ Enterprise-grade AI Exam Preparation Platform for Nigerian Higher Institution st
 * **PWA & Real-time Connectivity:** Integrated service worker with network-first strategy and `PushManager` hooks for offline resilience and device-level notifications.
 * **Mobile-First Engineering:** Optimized `BottomNav` and layout structure for a 100% responsive experience on any device.
 
-### [v2.2.0] — Super Admin & Institutional Gateway (CURRENT)
+### [v3.0.0] — AI Academic Infrastructure & Curriculum Orchestration (NEW)
 
-* **World-Class Admin Portal**: 100% Mobile-responsive dashboard with collapsible sidebar & glassmorphism.
-* **Identity Registry**: Real-time User & RBAC management via Convex subscriptions.
-* **System Observability**: High-fidelity telemetry Dashboard (Latency, Throughput, Health).
-* **Audit Registry**: Immutable log of sensitive admin operations.
-* **PWA & Push Resilience**: Service Worker integration for offline recovery and push notifications.
-* **Config Engine**: Centralized feature flags and master environment overrides.
+* **Dynamic Academic Selector**: Reusable, cascading selection component (Institution → Faculty → Department → Level → Course) with full searchable support for 100+ universities.
+* **AI Question Bank Orchestration**: Intelligent 'Lookup-First' logic in Convex. If questions aren't in the bank, AI generates them and **self-archives** the result to the global registry for future users.
+* **Nigerian Higher Education Registry**: Integrated 100+ Federal, State, and Private universities, polytechnics, and colleges with structured curriculum mappings.
+* **"Other" Topic Synthesizer**: Support for user-defined custom departments and topics. AI autonomously generates the syllabus and questions real-time.
+* **Hardened 2-Tier Pricing**: Simplified "Free Forever" and "Student Pro" (₦10,000/annum) mapping across Convex and Firebase Auth.
+* **Mock Simulation Engine**: Dynamic 50-question mock generator with WAEC-graded analysis (A1-F9) and AI topic heatmaps.
 
 ### [v2.1.0] — Enterprise UI & UX Modernization (Legacy Release)
 
@@ -57,9 +57,11 @@ Enterprise-grade AI Exam Preparation Platform for Nigerian Higher Institution st
 
 ### Production Build
 
-```bash
-npm run build
-```
+### Local Data Seeding
+
+To populate your live database with the 100+ institutions and initial curriculum:
+1. Run `npx convex dev`
+2. In the Convex dashboard, execute the **`seed:runSeed`** mutation.
 
 ## 🔒 Security & Compliance
 
