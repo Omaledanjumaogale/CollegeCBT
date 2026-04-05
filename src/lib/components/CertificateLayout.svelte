@@ -1,6 +1,6 @@
 <script lang="ts">
 	let { 
-		studentName = 'STUDENT NAME',
+		studentName = '',
 		questionsAnswered = 0,
 		mockExamsCompleted = 0,
 		timeSpent = 'N/A',

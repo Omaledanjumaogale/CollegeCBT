@@ -58,7 +58,8 @@ async function getFirebase(): Promise<Auth | null> {
 					let userData: User = {
 						uid: firebaseUser.uid,
 						email: firebaseUser.email || '',
-						displayName: firebaseUser.displayName || 'Student',
+						displayName: firebaseUser.displayName || '',
+						fullName: firebaseUser.displayName || '',
 						photoURL: firebaseUser.photoURL || undefined,
 						plan: 'free'
 					};
@@ -160,6 +161,7 @@ export async function signUpWithEmail(
 				uid: result.user.uid,
 				email,
 				displayName,
+				fullName: displayName,
 				plan: 'free',
 				createdAt: Date.now(),
 				...profileData

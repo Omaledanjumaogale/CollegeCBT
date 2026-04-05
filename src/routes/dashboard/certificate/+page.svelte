@@ -111,7 +111,7 @@
 			const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 			pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-			const safeName = ($currentUser.displayName || 'Student').replace(/\s+/g, '_');
+			const safeName = ($currentUser.fullName || $currentUser.displayName || 'Student').replace(/\s+/g, '_');
 			pdf.save(`${safeName}_CollegeCBT_Certificate.pdf`);
 			showToast('✅ Downloaded!', 'Your certificate has been saved.', 'success');
 		} catch (err) {
@@ -230,7 +230,7 @@
 						"
 					>
 						<CertificateLayout
-							studentName={($currentUser.displayName ?? 'STUDENT').toUpperCase()}
+							studentName={($currentUser.fullName || $currentUser.displayName || '').toUpperCase()}
 							questionsAnswered={totalAnswered}
 							mockExamsCompleted={mockExamsCount}
 							{timeSpent}

@@ -118,7 +118,7 @@
 						🎓
 					</div>
 					<div class="min-w-0">
-						<div class="text-sm font-bold text-white truncate">{$currentUser.displayName}</div>
+						<div class="text-sm font-bold text-white truncate">{$currentUser.fullName || $currentUser.displayName}</div>
 						<div class="text-xs text-white/40 truncate">{$currentUser.email}</div>
 					</div>
 					<span class="ml-auto text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0 {$currentUser.plan === 'pro' ? 'bg-lime-900/50 text-lime-400 border border-lime-500/30' : 'bg-violet-900/50 text-violet-400 border border-violet-500/30'}">

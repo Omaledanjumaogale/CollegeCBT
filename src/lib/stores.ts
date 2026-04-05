@@ -5,6 +5,7 @@ export interface User {
 	uid: string;
 	email: string;
 	displayName: string;
+	fullName?: string;
 	photoURL?: string;
 	plan: 'free' | 'pro';
 	role?: 'user' | 'admin';
