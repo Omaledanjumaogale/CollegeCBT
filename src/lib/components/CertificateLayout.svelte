@@ -1,81 +1,176 @@
 <script lang="ts">
-    let { 
-        studentName = 'STUDENT NAME',
-        questionsAnswered = 850,
-        mockExamsCompleted = 12,
-        timeSpent = '48 hrs 30 mins',
-        averageScore = '85%',
-        totalCorrectAnswers = 722,
-        totalFailedQuestions = 128,
-        date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    } = $props<{
-        studentName?: string;
-        questionsAnswered?: number | string;
-        mockExamsCompleted?: number | string;
-        timeSpent?: string;
-        averageScore?: string | number;
-        totalCorrectAnswers?: number | string;
-        totalFailedQuestions?: number | string;
-        date?: string;
-    }>();
-
-    function handleImageError(e: Event) {
-        const target = e.currentTarget as HTMLImageElement;
-        if (target) {
-            target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1056' height='816' viewBox='0 0 1056 816'%3E%3Crect width='1056' height='816' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%239ca3af'%3EMissing Background%3C/text%3E%3C/svg%3E";
-        }
-    }
+	let { 
+		studentName = 'STUDENT NAME',
+		questionsAnswered = 0,
+		mockExamsCompleted = 0,
+		timeSpent = 'N/A',
+		averageScore = '0%',
+		totalCorrectAnswers = 0,
+		totalFailedQuestions = 0,
+		course = '',
+		institution = '',
+		level = '',
+		date = new Date().toLocaleDateString('en-NG', { year: 'numeric', month: 'long', day: 'numeric' })
+	} = $props<{
+		studentName?: string;
+		questionsAnswered?: number | string;
+		mockExamsCompleted?: number | string;
+		timeSpent?: string;
+		averageScore?: string | number;
+		totalCorrectAnswers?: number | string;
+		totalFailedQuestions?: number | string;
+		course?: string;
+		institution?: string;
+		level?: string;
+		date?: string;
+	}>();
 </script>
 
-<div class="relative w-[1056px] h-[816px] flex items-center justify-center bg-white shadow-xl overflow-hidden font-sans mx-auto text-center" id="certificate-container">
-	<!-- Background Image Component (loads from static/images/cert-bg.png) -->
-	<img src="/images/cert-bg.png" alt="Certificate Background" class="absolute inset-0 w-full h-full object-cover z-0" crossorigin="anonymous" onerror={handleImageError} />
-	
-	<!-- Foreground Certificate Typography Overlay -->
-	<div class="relative z-10 w-[85%] h-full flex flex-col items-center pt-[100px]">
-        <!-- 1. Project Full Name -->
-        <h3 class="text-[19px] font-bold text-gray-800 tracking-[0.15em] uppercase mb-1" style="font-family: Arial, sans-serif;">ELITE WORKFORCE IMPACT NIGERIA (E-WIN) PROJECT</h3>
-        
-        <!-- 2. Application Name (Boldly) -->
-        <h1 class="text-[38px] font-extrabold text-[#064E3B] mb-7 uppercase tracking-[0.05em]" style="font-family: Arial, sans-serif;">COLLEGECBT PREPARATORY TEST REPORT</h1>
-        
-        <!-- 3. Readiness -->
-        <h2 class="text-5xl font-bold text-[#A3E635] mb-5 uppercase tracking-wide" style="font-family: Georgia, serif;">CERTIFICATE OF READINESS</h2>
-        
-        <!-- 4. Certify Text -->
-        <p class="text-[24px] text-[#374151] mb-6 italic" style="font-family: Georgia, serif;">This is to certify that</p>
-        
-        <!-- 5. Active Student Fullname -->
-        <h2 class="text-[54px] font-extrabold text-black mb-4 uppercase tracking-wide border-b-[3px] border-[#064E3B] pb-2 px-[80px]" style="font-family: Arial, sans-serif;">{studentName}</h2>
-        
-        <!-- 6. Accolade Phrase -->
-        <p class="text-[22px] text-[#374151] mb-12 italic px-8" style="font-family: Georgia, serif;">has achieved an exceptional AI Readiness Score and practice trajectory</p>
-        
-        <!-- Footer Area -->
-        <div class="flex justify-between items-end w-full absolute bottom-[90px] px-8">
-            <!-- 7. Left Side: Stats -->
-            <div class="flex flex-col items-start text-left bg-white/75 backdrop-blur-sm p-5 rounded-2xl border border-gray-300 shadow-md w-[430px]">
-                <h4 class="text-lg font-bold text-black mb-3 uppercase tracking-wider border-b-2 border-[#A3E635] pb-1 w-full flex items-center justify-between">Performance Record <span class="text-xl">🏆</span></h4>
-                <div class="grid grid-cols-[1fr_auto] gap-x-6 gap-y-[9px] text-[16px] text-gray-800 w-full mt-1">
-                    <span class="font-semibold text-gray-700">Mock Exams Completed:</span> <span class="font-bold text-[#064E3B] text-right">{mockExamsCompleted}</span>
-                    <span class="font-semibold text-gray-700">Questions Answered:</span> <span class="font-bold text-[#064E3B] text-right">{questionsAnswered}</span>
-                    <span class="font-semibold text-gray-700">Total Correct Answers:</span> <span class="font-bold text-emerald-600 text-right">{totalCorrectAnswers}</span>
-                    <span class="font-semibold text-gray-700">Total Failed Questions:</span> <span class="font-bold text-rose-500 text-right">{totalFailedQuestions}</span>
-                    <span class="font-semibold text-gray-700">Total Time Spent:</span> <span class="font-bold text-blue-700 text-right">{timeSpent}</span>
-                    <div class="col-span-2 border-t border-gray-200 mt-1 pt-2 grid grid-cols-[1fr_auto] gap-x-6">
-                        <span class="font-extrabold text-black uppercase text-sm self-center tracking-wider">Average Score:</span> 
-                        <span class="font-black text-[#064E3B] text-xl text-right">{averageScore}</span>
-                    </div>
-                </div>
-            </div>
+<!--
+	A4 Landscape certificate: 1122×794 CSS px (96dpi equivalent of 297×210mm)
+	html2canvas captures this at scale:2 → 2244×1588 → placed into PDF landscape A4
+-->
+<div
+	id="certificate-container"
+	class="relative overflow-hidden bg-white font-sans text-black"
+	style="width:1122px;height:794px;flex-shrink:0;"
+>
+	<!-- ── Outer decorative border ── -->
+	<div class="absolute inset-[16px] border-[3px] border-[#064E3B] rounded-sm pointer-events-none z-10"></div>
+	<div class="absolute inset-[22px] border border-[#A3E635]/60 rounded-sm pointer-events-none z-10"></div>
 
-            <!-- 8. Right Side: Signature & Date -->
-            <div class="flex flex-col items-center justify-end w-[300px] pb-1">
-                <img src="/images/signature.jpg" alt="Founder Signature" class="h-32 object-contain mb-[-10px] mix-blend-multiply" crossorigin="anonymous" onerror={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-                <div class="w-full border-t-[3px] border-black mt-1"></div>
-                <p class="text-[16px] font-extrabold text-black mt-2 uppercase tracking-wide">Signed by the Project Founder</p>
-                <p class="text-lg font-bold text-gray-700 mt-1 italic">{date}</p>
-            </div>
-        </div>
+	<!-- ── Background gradient panels ── -->
+	<div class="absolute inset-0 z-0" style="background:linear-gradient(135deg,#f0fdf4 0%,#ffffff 50%,#f0fdf4 100%);"></div>
+
+	<!-- ── Left accent strip ── -->
+	<div class="absolute left-0 top-0 bottom-0 w-[14px] z-0" style="background:linear-gradient(180deg,#064E3B,#16a34a,#A3E635);"></div>
+
+	<!-- ── Right accent strip ── -->
+	<div class="absolute right-0 top-0 bottom-0 w-[14px] z-0" style="background:linear-gradient(180deg,#064E3B,#16a34a,#A3E635);"></div>
+
+	<!-- ── Corner ornaments ── -->
+	{#each [
+		'top-[30px] left-[30px]',
+		'top-[30px] right-[30px] rotate-90',
+		'bottom-[30px] left-[30px] -rotate-90',
+		'bottom-[30px] right-[30px] rotate-180'
+	] as pos}
+		<div class="absolute {pos} w-10 h-10 z-[11]" style="border-top:4px solid #064E3B;border-left:4px solid #064E3B;border-radius:2px 0 0 0;"></div>
+	{/each}
+
+	<!-- ── Watermark ── -->
+	<div class="absolute inset-0 flex items-center justify-center z-[1] pointer-events-none select-none opacity-[0.04]">
+		<span style="font-size:180px;font-weight:900;color:#064E3B;transform:rotate(-30deg);font-family:Arial,sans-serif;letter-spacing:-0.05em;">CBT</span>
+	</div>
+
+	<!-- ── Main content ── -->
+	<div class="absolute inset-0 z-20 flex flex-col items-center px-[90px] pt-[46px] pb-[40px]">
+
+		<!-- TOP HEADER ROW -->
+		<div class="w-full flex items-center justify-between mb-3">
+			<!-- Org name left -->
+			<div class="text-left">
+				<p style="font-size:9px;font-weight:700;color:#6b7280;letter-spacing:0.15em;font-family:Arial,sans-serif;text-transform:uppercase;">Elite Workforce Impact Nigeria</p>
+				<p style="font-size:9px;font-weight:700;color:#6b7280;letter-spacing:0.15em;font-family:Arial,sans-serif;text-transform:uppercase;">(E-WIN) Project</p>
+			</div>
+			<!-- CollegeCBT logo centre -->
+			<div class="text-center">
+				<p style="font-size:28px;font-weight:900;letter-spacing:-0.02em;font-family:Arial,sans-serif;">
+					<span style="color:#064E3B;">College</span><span style="color:#16a34a;">CBT</span>
+				</p>
+				<p style="font-size:9px;letter-spacing:0.25em;color:#6b7280;font-family:Arial,sans-serif;text-transform:uppercase;margin-top:1px;">AI Exam Preparation Platform</p>
+			</div>
+			<!-- Date right -->
+			<div class="text-right">
+				<p style="font-size:9px;font-weight:700;color:#6b7280;letter-spacing:0.1em;font-family:Arial,sans-serif;text-transform:uppercase;">Date Issued</p>
+				<p style="font-size:10px;font-weight:700;color:#374151;font-family:Arial,sans-serif;">{date}</p>
+			</div>
+		</div>
+
+		<!-- THIN DIVIDER -->
+		<div class="w-full mb-4" style="height:2px;background:linear-gradient(90deg,transparent,#064E3B 20%,#A3E635 50%,#064E3B 80%,transparent);"></div>
+
+		<!-- CERTIFICATE TYPE -->
+		<div class="text-center mb-2">
+			<p style="font-size:10px;font-weight:700;letter-spacing:0.4em;color:#6b7280;text-transform:uppercase;font-family:Arial,sans-serif;">CollegeCBT Preparatory Test Report</p>
+		</div>
+
+		<!-- MAIN TITLE -->
+		<h2 style="font-size:36px;font-weight:900;color:#064E3B;letter-spacing:0.04em;text-transform:uppercase;font-family:Georgia,serif;text-align:center;margin-bottom:6px;line-height:1.1;">
+			Certificate of Readiness
+		</h2>
+
+		<!-- CERTIFY LINE -->
+		<p style="font-size:13px;color:#374151;font-style:italic;font-family:Georgia,serif;margin-bottom:6px;">
+			This is to certify that
+		</p>
+
+		<!-- STUDENT NAME -->
+		<div class="text-center mb-3 px-8">
+			<h1 style="font-size:38px;font-weight:900;color:#111827;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:0.04em;line-height:1;padding-bottom:6px;border-bottom:3px solid #064E3B;display:inline-block;">
+				{studentName}
+			</h1>
+		</div>
+
+		<!-- ACCOLADE TEXT -->
+		<p style="font-size:12px;color:#374151;font-style:italic;font-family:Georgia,serif;text-align:center;max-width:600px;line-height:1.5;margin-bottom:12px;">
+			has demonstrated exceptional commitment and achieved outstanding results in AI-powered exam preparation
+			{#if course} for <strong>{course}</strong>{/if}
+			{#if level} at <strong>{level}</strong>{/if}
+			{#if institution} — <strong>{institution}</strong>{/if}.
+		</p>
+
+		<!-- THIN DIVIDER -->
+		<div class="w-[60%] mb-10" style="height:1px;background:rgba(6,78,59,0.2);"></div>
+
+		<!-- STATS + SIGNATURE ROW -->
+		<div class="w-full flex items-end justify-between gap-6 mt-auto">
+
+			<!-- LEFT: Performance Stats -->
+			<div style="background:rgba(240,253,244,0.9);border:1.5px solid #A3E635;border-radius:12px;padding:16px 20px;width:420px;flex-shrink:0;">
+				<h4 style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:#064E3B;border-bottom:1.5px solid #A3E635;padding-bottom:6px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;font-family:Arial,sans-serif;">
+					Performance Record <span style="font-size:14px;">🏆</span>
+				</h4>
+				<div style="display:grid;grid-template-columns:1fr auto;gap:5px 20px;font-family:Arial,sans-serif;">
+					{#each [
+						{ label: 'Mock Exams Completed', value: mockExamsCompleted, color: '#374151' },
+						{ label: 'Total Questions Answered', value: questionsAnswered, color: '#374151' },
+						{ label: 'Total Correct Answers', value: totalCorrectAnswers, color: '#15803d' },
+						{ label: 'Total Incorrect Answers', value: totalFailedQuestions, color: '#dc2626' },
+						{ label: 'Total Study Time', value: timeSpent, color: '#1d4ed8' }
+					] as row}
+						<span style="font-size:11px;font-weight:600;color:#4b5563;">{row.label}:</span>
+						<span style="font-size:11px;font-weight:700;color:{row.color};text-align:right;">{row.value}</span>
+					{/each}
+					<!-- Average score full row -->
+					<div style="grid-column:1/-1;border-top:1px solid #d1fae5;margin-top:6px;padding-top:6px;display:grid;grid-template-columns:1fr auto;gap:0 20px;">
+						<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#111827;font-family:Arial,sans-serif;">Average Score:</span>
+						<span style="font-size:16px;font-weight:900;color:#064E3B;text-align:right;">{averageScore}</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- CENTRE: Verification seal -->
+			<div class="flex flex-col items-center flex-1">
+				<div style="width:90px;height:90px;border-radius:50%;border:4px solid #064E3B;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#f0fdf4,#dcfce7);box-shadow:0 4px 20px rgba(6,78,59,0.2);">
+					<span style="font-size:24px;line-height:1;">✓</span>
+					<span style="font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#064E3B;margin-top:2px;font-family:Arial,sans-serif;">Verified</span>
+				</div>
+				<p style="font-size:8px;color:#9ca3af;text-align:center;margin-top:8px;font-family:Arial,sans-serif;max-width:100px;line-height:1.3;">
+					CollegeCBT Digital Certificate
+				</p>
+			</div>
+
+			<!-- RIGHT: Signature block -->
+			<div style="width:240px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-bottom:4px;">
+				<!-- Signature area placeholder -->
+				<div style="height:52px;width:100%;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;">
+					<span style="font-size:26px;font-style:italic;font-family:Georgia,serif;color:#064E3B;letter-spacing:-0.02em;opacity:0.8;">E-WIN Project</span>
+				</div>
+				<div style="width:100%;border-top:2.5px solid #111827;margin-bottom:6px;"></div>
+				<p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#111827;text-align:center;font-family:Arial,sans-serif;">Project Founder</p>
+				<p style="font-size:10px;color:#6b7280;text-align:center;font-family:Arial,sans-serif;">Elite Workforce Impact Nigeria</p>
+			</div>
+		</div>
 	</div>
 </div>

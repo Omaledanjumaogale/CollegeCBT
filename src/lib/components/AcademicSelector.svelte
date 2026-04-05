@@ -71,8 +71,8 @@
 <div class="space-y-6">
 	<!-- 1. Institution Type -->
 	<div class="space-y-2">
-		<label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">1. Institution Type</label>
-		<select bind:value={institutionType} onchange={() => resetFrom('type')} class="form-select">
+		<label for="acs-inst-type" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">1. Institution Type</label>
+		<select id="acs-inst-type" bind:value={institutionType} onchange={() => resetFrom('type')} class="form-select">
 			<option value="">Select Type</option>
 			{#if instTypes.data}
 				{#each instTypes.data as t}
@@ -86,8 +86,8 @@
 	<!-- 2. Faculty -->
 	{#if institutionType}
 		<div class="space-y-2" transition:slide>
-			<label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">2. Faculty / School</label>
-			<select bind:value={faculty} onchange={() => resetFrom('faculty')} class="form-select">
+			<label for="acs-faculty" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">2. Faculty / School</label>
+			<select id="acs-faculty" bind:value={faculty} onchange={() => resetFrom('faculty')} class="form-select">
 				<option value="">Select Faculty</option>
 				{#if faculties.data}
 					{#each faculties.data as f}
@@ -111,8 +111,8 @@
 	<!-- 3. Department -->
 	{#if faculty && (faculty !== 'Other' || otherFaculty)}
 		<div class="space-y-2" transition:slide>
-			<label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">3. Department</label>
-			<select bind:value={department} onchange={() => resetFrom('dept')} class="form-select">
+			<label for="acs-dept" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">3. Department</label>
+			<select id="acs-dept" bind:value={department} onchange={() => resetFrom('dept')} class="form-select">
 				<option value="">Select Department</option>
 				{#if departments.data}
 					{#each departments.data as d}
@@ -136,8 +136,8 @@
 	<!-- 4. Level -->
 	{#if department && (department !== 'Other' || otherDept)}
 		<div class="space-y-2" transition:slide>
-			<label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">4. Academic Level</label>
-			<select bind:value={level} onchange={() => resetFrom('level')} class="form-select">
+			<label for="acs-level" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">4. Academic Level</label>
+			<select id="acs-level" bind:value={level} onchange={() => resetFrom('level')} class="form-select">
 				<option value="">Select Level</option>
 				{#if levels.data && levels.data.length > 0}
 					{#each levels.data as l}
@@ -156,8 +156,8 @@
 	<!-- 5. Course / Subject -->
 	{#if level}
 		<div class="space-y-2" transition:slide>
-			<label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">5. Subject / Course Module</label>
-			<select bind:value={course} onchange={() => resetFrom('course')} class="form-select">
+			<label for="acs-course" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">5. Subject / Course Module</label>
+			<select id="acs-course" bind:value={course} onchange={() => resetFrom('course')} class="form-select">
 				<option value="">Select Subject</option>
 				{#if courses.data}
 					{#each courses.data as c}
@@ -181,8 +181,8 @@
 	<!-- 6. Topic (Optional but encouraged for precision) -->
 	{#if course && (course !== 'Other' || otherCourse)}
 		<div class="space-y-2" transition:slide>
-			<label class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">6. Specific Topic (Optional)</label>
-			<select bind:value={topic} class="form-select">
+			<label for="acs-topic" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">6. Specific Topic (Optional)</label>
+			<select id="acs-topic" bind:value={topic} class="form-select">
 				<option value="General">General / All Topics</option>
 				{#if courses.data}
 					{@const currentCourseObj = courses.data.find(c => c.course === course)}

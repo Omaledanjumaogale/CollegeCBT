@@ -135,7 +135,7 @@
 		<ToastProvider>
 			<TooltipProvider>
 				<DynamicNavbar />
-				<main class="relative z-10 pb-20 md:pb-0" id="main-content">
+				<main class="relative z-10 pt-[68px] pb-20 md:pb-0" id="main-content">
 					{@render children?.()}
 				</main>
 				<BottomNav />

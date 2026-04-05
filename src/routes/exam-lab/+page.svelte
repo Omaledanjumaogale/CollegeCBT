@@ -216,7 +216,7 @@
 				{#if activeTab === 'lab'}
 					<div class="mt-8 pt-8 border-t border-white/5 space-y-6">
 						<div>
-							<label class="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-4">Question Format</label>
+							<div class="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-4">Question Format</div>
 							<div class="grid grid-cols-2 gap-2">
 								<button 
 									onclick={() => labQtype = 'MCQ'}
@@ -245,8 +245,8 @@
 				{:else}
 					<div class="mt-8 pt-8 border-t border-white/5 space-y-6">
 						<div>
-							<label class="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-4">Exam Size</label>
-							<select bind:value={mockQCount} class="form-select text-sm font-bold">
+							<label for="exam-size" class="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-4">Exam Size</label>
+							<select id="exam-size" bind:value={mockQCount} class="form-select text-sm font-bold">
 								<option value={10}>10 Questions</option>
 								<option value={20}>20 Questions</option>
 								<option value={30}>30 Questions</option>
