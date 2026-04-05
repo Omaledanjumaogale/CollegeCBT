@@ -130,7 +130,6 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		}
 
 		// ── AI generation or Bank lookup with Orchestration ────────────────
-		const questionType = type || 'MCQ';
 		
 		// 1. Attempt to find matching questions in the bank for randomization
 		let existingQuestion = null;
