@@ -437,12 +437,12 @@
 								</div>
 							{/if}
 						{:else}
+							{@const grading = gradedResults.find((_, ri) => ri === questions.slice(0, i).filter(sq => !('options' in sq)).length)}
 							<div class="space-y-4">
 								<div class="p-6 rounded-2xl bg-white/5">
 									<div class="text-[10px] font-black text-white/30 uppercase tracking-widest mb-2">Your Answer</div>
 									<p class="text-sm text-white/60 leading-relaxed font-serif italic">{theoryAnswers[i]}</p>
 								</div>
-								{@const grading = gradedResults.find((_, ri) => ri === questions.slice(0, i).filter(sq => !('options' in sq)).length)}
 								{#if grading}
 									<div class="p-6 rounded-2xl bg-primary/5 border-l-4 border-primary">
 										<div class="text-[10px] font-black text-primary uppercase tracking-widest mb-2">Evaluator Note</div>
@@ -471,9 +471,7 @@
 		backdrop-filter: blur(20px);
 		border: 1px solid rgba(255, 255, 255, 0.1);
 	}
-	.form-select, .form-input {
-		@apply w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-4 text-white focus:border-primary transition-all outline-none;
-	}
+
 	.italic-shadow {
 		text-shadow: 4px 4px 0 rgba(139, 92, 246, 0.2);
 	}

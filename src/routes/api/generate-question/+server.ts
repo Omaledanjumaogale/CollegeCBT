@@ -1,11 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { generateQuestionSchema } from '$lib/data/schemas';
-import { CONVEX_URL } from '$env/static/private';
-import { ConvexHttpClient } from 'convex/browser';
-import { api } from '$lib/services/convexClient';
-
-const convex = new ConvexHttpClient(CONVEX_URL);
+import { api, convex } from '$lib/services/convexClient';
 
 // ─── Edge-compatible in-memory rate limiter ───────────────────────────────────
 // Uses a Map keyed by IP or UID, pruned every 10 minutes to prevent memory leaks.
