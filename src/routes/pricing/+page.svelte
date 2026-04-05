@@ -90,8 +90,8 @@
 			<p class="text-white/50 max-w-xl mx-auto">No foreign currency conversion. Pay with Flutterwave or KoraPay — card, bank transfer, USSD, or POS. Cancel anytime.</p>
 		</div>
 
-		<!-- Pricing Grid — centered for 2 cards -->
-		<div class="flex flex-wrap justify-center gap-6 mb-10">
+		<!-- Pricing Grid -->
+		<div class="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-6 mb-10 w-full">
 			{#each plans as plan}
 				<div class="w-full md:w-[360px]">
 				<div class="glass-card p-7 relative flex flex-col transition-all hover:-translate-y-1 {plan.highlight ? 'border-violet-DEFAULT/50 shadow-violet' : ''}" style="{plan.highlight ? 'background:linear-gradient(135deg,rgba(124,58,237,0.22),rgba(168,85,247,0.12));' : ''}">

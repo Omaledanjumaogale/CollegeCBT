@@ -230,7 +230,7 @@
 </script>
 
 <svelte:head>
-	<title>Student Dashboard — CollegeCBT | AI Readiness Score & Results Intelligence</title>
+	<title>Student Dashboard — CollegeCBT | AI Readiness Score & Results</title>
 	<meta name="description" content="Track your exam performance, AI readiness score, grade predictions, and topic heatmaps on the CollegeCBT dashboard." />
 </svelte:head>
 
@@ -238,7 +238,7 @@
 	<div class="page-container">
 		<div class="mb-4">
 			<div class="section-tag">📊 Student Dashboard</div>
-			<h1 class="font-display text-3xl sm:text-4xl mb-1">Your Results Intelligence Command Centre</h1>
+			<h1 class="font-display text-3xl sm:text-4xl mb-1">Your Practice Dashboard</h1>
 			<p class="text-white/40 text-sm">Track performance, readiness score, topic heatmaps and grade predictions — all powered by AI.</p>
 		</div>
 

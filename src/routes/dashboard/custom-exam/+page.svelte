@@ -246,7 +246,7 @@
 							class="w-full mt-10 py-5 rounded-2xl bg-gradient-to-r from-primary to-accent text-secondary font-black text-lg uppercase tracking-widest hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-primary/20 flex items-center justify-center gap-4 group"
 							onclick={generateAll}
 						>
-							Start Intelligence Scan
+							Start Custom Exam
 							<svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
 						</button>
 					</div>
@@ -263,7 +263,7 @@
 				</div>
 			</div>
 			<p class="text-2xl font-black text-white mb-4 tracking-tight uppercase italic">{generatingMsg}</p>
-			<p class="text-white/40 text-sm max-w-md mx-auto">AI is synthesizing academic content and cross-referencing with the national curriculum...</p>
+			<p class="text-white/40 text-sm max-w-md mx-auto">AI is preparing your practice questions based on the official curriculum...</p>
 		</div>
 
 	{:else if phase === 'exam'}
@@ -459,7 +459,7 @@
 				class="w-full mt-12 py-5 rounded-3xl bg-primary text-secondary font-black uppercase tracking-widest shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
 				onclick={() => { phase = 'config'; questions = []; currentQIdx = 0; }}
 			>
-				New Simulation
+				Start New Exam
 			</button>
 		</div>
 	{/if}

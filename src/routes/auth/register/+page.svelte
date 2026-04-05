@@ -96,7 +96,7 @@
 <div class="min-h-screen flex items-center justify-center px-4 py-20 pt-[100px]">
 	<div class="w-full max-w-md">
 		<!-- Card -->
-		<div class="glass-card p-8 rounded-3xl" style="background:rgba(13,8,32,0.85);border:1px solid rgba(124,58,237,0.25);backdrop-filter:blur(20px);">
+		<div class="glass-card p-8 rounded-3xl">
 			<!-- Header -->
 			<div class="text-center mb-6">
 				<a href="/" class="inline-block font-display text-3xl mb-4" style="background:linear-gradient(135deg,#fff 40%,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">

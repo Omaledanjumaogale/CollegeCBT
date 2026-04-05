@@ -171,23 +171,23 @@
 				<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
 				<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
 			</span>
-			Neural Intelligence Practice
+			AI Practice Mode
 		</div>
 		<h1 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tighter uppercase italic italic-shadow">
-			{activeTab === 'lab' ? 'Exam' : 'Mock'} <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{activeTab === 'lab' ? 'Lab' : 'Simulation'}</span>
+			{activeTab === 'lab' ? 'Exam' : 'Mock'} <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{activeTab === 'lab' ? 'Practice' : 'Exam'}</span>
 		</h1>
 		<div class="flex items-center justify-center gap-4 mt-8">
 			<button 
 				onclick={() => activeTab = 'lab'}
 				class="px-8 py-3 rounded-2xl font-bold text-sm transition-all {activeTab === 'lab' ? 'bg-white text-secondary shadow-xl' : 'text-white/40 hover:text-white'}"
 			>
-				AI Training Lab
+				Practice Mode
 			</button>
 			<button 
 				onclick={() => { activeTab = 'mock'; mockPhase = 'config'; }}
 				class="px-8 py-3 rounded-2xl font-bold text-sm transition-all {activeTab === 'mock' ? 'bg-white text-secondary shadow-xl' : 'text-white/40 hover:text-white'}"
 			>
-				Standard Mock
+				Mock Exam
 			</button>
 		</div>
 	</div>
@@ -200,7 +200,7 @@
 			<div class="glass p-8 rounded-[32px] border-white/10 sticky top-24">
 				<h2 class="text-xs font-black text-white/30 uppercase tracking-[0.3em] mb-8 flex items-center gap-3">
 					<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
-					Configuration
+					Exam Setup
 				</h2>
 
 				<AcademicSelector
@@ -235,7 +235,7 @@
 						>
 							{#if labLoading}
 								<div class="w-5 h-5 border-2 border-secondary/20 border-t-secondary rounded-full animate-spin"></div>
-								Scanning...
+								Generating...
 							{:else}
 								<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.45l8.15 14.1H3.85L12 5.45zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
 								Generate
@@ -257,7 +257,7 @@
 							onclick={startMock}
 							class="w-full py-5 rounded-2xl bg-gradient-to-r from-primary to-accent text-secondary font-black uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
 						>
-							Start Simulation
+							Start Mock Exam
 						</button>
 					</div>
 				{/if}
@@ -272,8 +272,8 @@
 					{#if labQuestion}
 						<div class="glass p-8 md:p-12 rounded-[40px] border-white/10 relative overflow-hidden" in:fade>
 							<div class="flex justify-between items-center mb-10">
-								<span class="text-primary text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-primary/10 rounded-full">Objective Training</span>
-								<span class="text-white/30 text-[10px] font-bold uppercase tabular-nums">Session Q#{labStats.total}</span>
+								<span class="text-primary text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 bg-primary/10 rounded-full">Objective Questions</span>
+								<span class="text-white/30 text-[10px] font-bold uppercase tabular-nums">Question {labStats.total}</span>
 							</div>
 							<h3 class="text-xl md:text-2xl font-medium text-white mb-10 leading-relaxed">{labQuestion.question}</h3>
 							<div class="space-y-4">
@@ -362,8 +362,8 @@
 							<div class="w-24 h-24 rounded-full bg-white/5 flex items-center justify-center mb-8 border border-white/10">
 								<svg class="w-10 h-10 text-white/20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
 							</div>
-							<h3 class="text-xl font-bold text-white mb-2">Neural Link Ready</h3>
-							<p class="text-white/30 text-sm max-w-xs mx-auto italic">Synchronized with the Nigerian National Curriculum. Ready to synthesize practice exercises.</p>
+							<h3 class="text-xl font-bold text-white mb-2">Ready to Start</h3>
+							<p class="text-white/30 text-sm max-w-xs mx-auto italic">Based on your school curriculum. Ready to generate practice questions.</p>
 						</div>
 					{/if}
 				</div>
@@ -373,10 +373,10 @@
 					{#if mockPhase === 'config'}
 						<div class="glass p-12 rounded-[48px] border-white/10 text-center" in:fade>
 							<div class="text-6xl mb-8">🎯</div>
-							<h3 class="text-2xl font-black text-white uppercase tracking-tight mb-4">Exam Mode Details</h3>
+							<h3 class="text-2xl font-black text-white uppercase tracking-tight mb-4">Mock Exam Details</h3>
 							<p class="text-white/40 text-sm max-w-md mx-auto mb-10 leading-relaxed">
-								Standardized simulations track your accuracy across {mockQCount} curated questions. 
-								AI will provide a deep analysis of your performance profile after submission.
+								Take a timed exam with {mockQCount} practice questions. 
+								Get your score and predictions after you submit.
 							</p>
 							<div class="grid grid-cols-3 gap-4 max-w-sm mx-auto mb-10">
 								<div class="p-4 rounded-2xl bg-white/5">
@@ -395,13 +395,13 @@
 							<button 
 								onclick={startMock}
 								class="px-12 py-5 rounded-2xl bg-white text-secondary font-black uppercase tracking-widest shadow-2xl hover:scale-105 transition-all"
-							>Initialize Simulation</button>
+							>Start Mock Exam</button>
 						</div>
 					{:else if mockPhase === 'generating'}
 						<div class="flex flex-col items-center justify-center py-32 text-center" in:fade>
 							<div class="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-8"></div>
-							<h3 class="text-xl font-black text-white uppercase italic mb-2 tracking-tighter">Synthesizing Exam Bank</h3>
-							<p class="text-white/30 text-xs">Curating {mockQCount} high-probability questions for {academicData.course}...</p>
+							<h3 class="text-xl font-black text-white uppercase italic mb-2 tracking-tighter">Preparing Questions</h3>
+							<p class="text-white/30 text-xs">Loading {mockQCount} practice questions for {academicData.course}...</p>
 						</div>
 					{:else if mockPhase === 'active'}
 						{@const q = mockQuestions[mockCurrentIdx]}
@@ -443,12 +443,12 @@
 								<button 
 									onclick={() => mockCurrentIdx < mockQCount - 1 ? mockCurrentIdx++ : finishMock()}
 									class="px-8 py-3 rounded-xl bg-white/5 text-white font-bold border border-white/10 hover:bg-white/10 transition-all"
-								>{mockCurrentIdx === mockQCount - 1 ? 'FINISH SIMULATION' : 'SKIP QUESTION'}</button>
+								>{mockCurrentIdx === mockQCount - 1 ? 'FINISH EXAM' : 'SKIP QUESTION'}</button>
 							</div>
 						</div>
 					{:else if mockPhase === 'results'}
 						<div class="glass p-12 rounded-[50px] border-white/10 text-center relative overflow-hidden" in:fade>
-							<div class="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] mb-6">Simulation Outcome</div>
+							<div class="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] mb-6">Exam Result</div>
 							<div class="text-9xl font-black italic italic-shadow text-white leading-none mb-4">{mockResult.grade}</div>
 							<div class="text-3xl font-black text-primary mb-12 tabular-nums">{mockResult.pct}%</div>
 							
@@ -466,7 +466,7 @@
 							<button 
 								onclick={() => { mockPhase = 'config'; activeTab = 'lab'; }}
 								class="w-full py-5 rounded-2xl bg-white text-secondary font-black uppercase tracking-widest shadow-2xl"
-							>Return to Training Lab</button>
+							>Return to Practice Mode</button>
 						</div>
 					{/if}
 				</div>

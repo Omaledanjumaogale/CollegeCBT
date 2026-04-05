@@ -50,7 +50,7 @@
 </script>
 
 <!-- Static header — fixed so it doesn't shift content; main content has pt-[72px] via layout -->
-<nav class="glass-nav fixed top-0 left-0 right-0 z-50 h-[68px]" aria-label="Main navigation">
+<nav class="glass-nav static z-50 border-b border-white/5 h-[68px]" aria-label="Main navigation">
 	<div class="page-container h-full">
 		<div class="flex items-center justify-between h-full gap-4">
 			<!-- Logo -->
@@ -60,27 +60,6 @@
 
 			<!-- Right side: Auth buttons + Hamburger -->
 			<div class="flex items-center gap-3 flex-shrink-0">
-				{#if $currentUser}
-					<!-- Logged in: show user info + sign out on md+ -->
-					<div class="hidden sm:flex items-center gap-2">
-						<div class="text-right hidden lg:block">
-							<div class="text-xs font-bold text-white truncate max-w-[140px]">{$currentUser.displayName}</div>
-							<div class="text-[10px] text-white/30 truncate max-w-[140px]">
-								{$currentUser.plan === 'pro' ? '⭐ Student Pro' : '🎓 Free Plan'}
-							</div>
-						</div>
-						<button onclick={signOut} class="btn-ghost text-sm px-3 py-2">
-							Sign Out
-						</button>
-					</div>
-				{:else}
-					<!-- Not logged in: show Sign In + Get Started on sm+ -->
-					<button onclick={openLogin} class="hidden sm:block btn-ghost text-sm px-3 py-2">Sign In</button>
-					<button onclick={openSignup} class="hidden sm:block btn-violet text-sm px-4 py-2 shadow-violet">
-						Get Started →
-					</button>
-				{/if}
-
 				<!-- Hamburger — always visible -->
 				<button
 					onclick={toggleMenu}
