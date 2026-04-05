@@ -232,6 +232,48 @@ export const updateJobStatus = internalMutation({
   },
 });
 
+export const getCachedCrawlContext = internalQuery({
+  args: { url: v.string() },
+  handler: async (ctx, args) => {
+    // Edge-compatible b64 hashing
+    const urlHash = btoa(encodeURIComponent(args.url)).replace(/[+/=]/g, (c) => ({'+':'_','/':'-','=':''})[c] ?? c);
+    const cached = await ctx.db
+      .query('crawlCache')
+      .withIndex('by_url_hash', (q) => q.eq('urlHash', urlHash))
+      .first();
+
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.content;
+    }
+    return null;
+  }
+});
+
+export const saveCrawlCacheContext = internalMutation({
+  args: { url: v.string(), content: v.string() },
+  handler: async (ctx, args) => {
+    const urlHash = btoa(encodeURIComponent(args.url)).replace(/[+/=]/g, (c) => ({'+':'_','/':'-','=':''})[c] ?? c);
+    const TTL = 48 * 60 * 60 * 1000;
+    
+    // Check if already exist before inserting to avoid race conditions
+    const existing = await ctx.db
+      .query('crawlCache')
+      .withIndex('by_url_hash', (q) => q.eq('urlHash', urlHash))
+      .first();
+      
+    if (!existing) {
+        await ctx.db.insert('crawlCache', {
+            url: args.url,
+            urlHash,
+            content: args.content,
+            metadata: JSON.stringify({ source: 'agent_direct_fetch' }),
+            timestamp: Date.now(),
+            expiresAt: Date.now() + TTL,
+        });
+    }
+  }
+});
+
 export const completeJob = internalMutation({
   args: { jobId: v.id('crawlJobs'), result: v.string(), responseTime: v.number() },
   handler: async (ctx, args) => {

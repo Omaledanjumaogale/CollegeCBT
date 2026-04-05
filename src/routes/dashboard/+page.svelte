@@ -8,6 +8,7 @@
 	import { updateUserProfile } from '$lib/services/firebase';
 	import { profileUpdateSchema } from '$lib/data/schemas';
 	import Tooltip from '$lib/components/Tooltip.svelte';
+	import { triggerAgentTask } from '$lib/services/convexClient';
 
 	$effect(() => {
 		if (!$isAuthenticated && typeof window !== 'undefined') {
@@ -107,6 +108,44 @@
 			heatmap = (analyticsQuery.data as any).heatmap || [];
 		}
 	});
+
+	// AI Logic
+	let aiAnalyzing = $state(false);
+	let aiPrediction = $state<any>(null);
+
+	async function analyzePerformance() {
+		if (!$currentUser?.uid) return;
+		aiAnalyzing = true;
+		showToast('🤖 AI Processing', 'Consulting orchestration cascade for insights...', 'info');
+
+		try {
+			// Construct prompt from real student telemetry
+			const telemetry = {
+				totalAnswered,
+				avgScore,
+				recentActivity: recentActivity.map(a => a.badge),
+				heatmap: heatmap.map(h => ({ topic: h.topic, pct: h.pct }))
+			};
+			
+			const res = await triggerAgentTask('performance_analyst', JSON.stringify(telemetry));
+			
+			if (res && res.ok && res.data) {
+				try {
+					aiPrediction = JSON.parse(res.data);
+					showToast('✅ AI Complete', `Analysis routed via ${res.provider?.toUpperCase()}`, 'success');
+				} catch {
+					showToast('⚠️ AI Parse Warning', 'Agent output was not strictly structured.', 'warning');
+				}
+			} else {
+				showToast('❌ AI Error', res?.message || 'Agent failed to respond', 'error');
+			}
+		} catch (error) {
+			console.error(error);
+			showToast('❌ Server Error', 'Failed to connect to agent workflow', 'error');
+		} finally {
+			aiAnalyzing = false;
+		}
+	}
 
 	onMount(async () => {
 		setTimeout(() => {
@@ -279,23 +318,50 @@
 								📈 At current pace, you'll reach 85+ within 2 weeks of consistent practice.
 							</div>
 						</div>
-						<!-- Grade Prediction -->
+						<!-- Grade Prediction & AI Analyst -->
 						<div class="glass-card p-5">
-							<div class="font-bold text-sm mb-1">🔮 Grade Prediction</div>
-							<div class="text-xs text-white/40 mb-4">DBMS End-of-Semester Exam</div>
+							<div class="flex items-center justify-between mb-1">
+								<div class="font-bold text-sm">🔮 AI Performance Analyst</div>
+								<button onclick={analyzePerformance} disabled={aiAnalyzing} class="btn-micro-feedback rounded-lg px-2.5 py-1 text-xs" style="background:rgba(124,58,237,0.15);color:#a855f7;border:1px solid rgba(124,58,237,0.3);">
+									{#if aiAnalyzing}
+										<span class="animate-pulse">🧠 Thinking...</span>
+									{:else}
+										<span>🤖 Analyze Telemetry</span>
+									{/if}
+								</button>
+							</div>
+							<div class="text-xs text-white/40 mb-4">Deep Analytics via Multi-Model Orchestrator</div>
+							
 							<div class="space-y-2.5">
-								<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.25);">
-									<span class="text-sm">Predicted Grade</span>
-									<span class="font-title text-2xl" style="color:#84cc16;">B2 — 72%</span>
-								</div>
-								<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);">
-									<span class="text-sm">National Rank</span>
-									<span class="text-sm text-violet-light">Top 27% of 300L CS</span>
-								</div>
-								<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);">
-									<span class="text-sm">To reach A1 (75%+)</span>
-									<span class="text-sm text-amber-DEFAULT">12 more correct answers</span>
-								</div>
+								{#if aiPrediction}
+									<!-- Dynamic AI insights via JSON parse -->
+									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.25);">
+										<span class="text-sm">Motivation Score</span>
+										<span class="font-title text-2xl text-lime-DEFAULT">{aiPrediction.motivationScore}/100</span>
+									</div>
+									<div class="p-3 rounded-xl" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);">
+										<span class="text-xs font-semibold uppercase tracking-wider block mb-1">Top Weakness</span>
+										<span class="text-sm font-medium">{aiPrediction.weaknesses?.[0] || 'Need more data'}</span>
+									</div>
+									<div class="p-3 rounded-xl" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);">
+										<span class="text-xs font-semibold uppercase tracking-wider block mb-1">Actionable Next Step</span>
+										<span class="text-sm font-medium text-amber-DEFAULT">{aiPrediction.nextSteps?.[0] || 'Keep practicing!'}</span>
+									</div>
+								{:else}
+									<!-- Skeleton/Placeholder before trigger -->
+									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.25);">
+										<span class="text-sm">Predicted Grade</span>
+										<span class="font-title text-2xl" style="color:#84cc16;">B2 — 72%</span>
+									</div>
+									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);">
+										<span class="text-sm">National Rank</span>
+										<span class="text-sm text-violet-light">Top 27% of 300L CS</span>
+									</div>
+									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);">
+										<span class="text-sm">To reach A1 (75%+)</span>
+										<span class="text-sm text-amber-DEFAULT">12 more correct answers</span>
+									</div>
+								{/if}
 							</div>
 						</div>
 					</div>

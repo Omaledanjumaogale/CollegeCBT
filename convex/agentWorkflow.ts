@@ -1,6 +1,7 @@
 import { v } from 'convex/values';
 import { action } from './_generated/server';
-import { api } from './_generated/api';
+import { api, internal } from './_generated/api';
+import type { ActionCtx } from './_generated/server';
 
 /**
  * Enterprise Agent Workflow Engine — CollegeCBT v2.0
@@ -110,14 +111,27 @@ const AGENT_CATALOG: Record<string, AgentConfig> = {
 
 /**
  * Attempts to fetch real-time web context for an agent via Crawl4AI.
- * Falls back to empty string gracefully — never blocks the agent.
+ * Uses the deterministic caching layer first to avoid expensive blocking calls.
  */
-async function fetchCrawlContext(url: string): Promise<string> {
+async function fetchCrawlContext(ctx: ActionCtx, url: string): Promise<string> {
+  // 1. Check local Crawl4AI Cache
+  try {
+    const cachedJSON = await ctx.runQuery(internal.crawler.getCachedCrawlContext, { url });
+    if (cachedJSON) {
+        const data = JSON.parse(cachedJSON);
+        const text = data.markdown || data.content || '';
+        return text.slice(0, 3000);
+    }
+  } catch (err) {
+      console.warn(`[Agent Workflow] Local cache check failed:`, err);
+  }
+
+  // 2. Fallback to aggressive online fetch
   const apiUrl = process.env.CRAWL4AI_API_URL;
   const apiSecret = process.env.CRAWL4AI_API_SECRET;
 
   if (!apiUrl || !apiSecret) {
-    console.warn('[Agent Workflow] Crawl4AI not configured — skipping web enrichment.');
+    console.warn('[Agent Workflow] Crawl4AI not configured & Cache Miss — skipping web enrichment.');
     return '';
   }
 
@@ -138,11 +152,16 @@ async function fetchCrawlContext(url: string): Promise<string> {
     }
 
     const data = await resp.json() as { markdown?: string; content?: string };
+    const rawJSONString = JSON.stringify(data);
+    
+    // Save to Cache Asynchronously
+    ctx.runMutation(internal.crawler.saveCrawlCacheContext, { url, content: rawJSONString }).catch(() => {});
+
     const text = data.markdown || data.content || '';
     // Truncate to ~3000 chars to fit LLM context window gracefully
     return text.slice(0, 3000);
   } catch (err: any) {
-    console.warn(`[Agent Workflow] Crawl4AI enrichment failed (non-critical):`, err.message);
+    console.warn(`[Agent Workflow] Crawl4AI HTTP fetch failed (non-critical):`, err.message);
     return '';
   }
 }
@@ -191,7 +210,7 @@ export const runAgentTask = action({
     if (!config.noCrawl && config.crawlUrl) {
       const targetUrl = config.crawlUrl(args.userContext);
       if (targetUrl) {
-        const webContext = await fetchCrawlContext(targetUrl);
+        const webContext = await fetchCrawlContext(ctx, targetUrl);
         if (webContext) {
           enrichedContext = `
 [LIVE WEB CONTEXT — Crawl4AI]

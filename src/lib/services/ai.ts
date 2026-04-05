@@ -1,6 +1,7 @@
 // ── AI Question Generation Service ──
-// Calls Claude AI via our server-side API route for security
+// Calls the High-Resilience Convex AI Orchestrator Cascade
 import type { Question, TheoryQuestion } from '$lib/stores';
+import { triggerAgentTask } from '$lib/services/convexClient';
 
 interface GenerateOptions {
 	course: string;
@@ -53,23 +54,20 @@ export function getDemoTheory(course: string): TheoryQuestion {
 
 export async function generateMCQ(options: GenerateOptions): Promise<Question> {
 	try {
-		const response = await fetch('/api/generate-question', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ ...options, type: 'MCQ' })
-		});
-
-		if (!response.ok) {
-			const err = await response.json().catch(() => ({ error: 'API Error' }));
-			throw { message: err.error, status: response.status };
+		// Use Enterprise Convex AI Orchestrator instead of basic API
+		const res = await triggerAgentTask('board_grade_generator', JSON.stringify({ ...options, type: 'MCQ' }));
+		
+		if (!res.ok || !res.data) {
+			throw { message: res.message || 'Orchestrator failed to return data', status: 500 };
 		}
-		const data = await response.json();
+		
+		const data = JSON.parse(res.data);
 		return {
 			id: `q-${Date.now()}`,
 			...data
 		};
 	} catch (e: any) {
-		if (e.status) throw e; // Repropagate identified errors (403, 429)
+		if (e.status === 403 || e.status === 429) throw e; // Repropagate identified errors
 		console.warn('AI generation failed, using demo question');
 		return getDemoMCQ(options.course);
 	}
@@ -77,19 +75,16 @@ export async function generateMCQ(options: GenerateOptions): Promise<Question> {
 
 export async function generateTheory(options: GenerateOptions): Promise<TheoryQuestion> {
 	try {
-		const response = await fetch('/api/generate-question', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ ...options, type: 'Theory' })
-		});
-
-		if (!response.ok) {
-			const err = await response.json().catch(() => ({ error: 'API Error' }));
-			throw { message: err.error, status: response.status };
+		// Use Enterprise Convex AI Orchestrator
+		const res = await triggerAgentTask('theory_grader', JSON.stringify({ ...options, type: 'Theory' }));
+		
+		if (!res.ok || !res.data) {
+			throw { message: res.message || 'Orchestrator failed to return data', status: 500 };
 		}
-		return await response.json();
+		
+		return JSON.parse(res.data);
 	} catch (e: any) {
-		if (e.status) throw e;
+		if (e.status === 403 || e.status === 429) throw e;
 		console.warn('AI generation failed, using demo theory question');
 		return getDemoTheory(options.course);
 	}

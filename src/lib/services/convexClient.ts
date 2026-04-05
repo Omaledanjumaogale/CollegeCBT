@@ -123,3 +123,22 @@ export async function syncPlatformUser(plan: 'free' | 'pro' | 'institutional' = 
 		return null;
 	}
 }
+
+// ── Enterprise AI Agent Interface ─────────────────────────────────────────
+
+/**
+ * Triggers a designated AI Agent Task through the Fallback Orchestrator.
+ * Handles performance analysts, grading, and board-level generation.
+ */
+export async function triggerAgentTask(agentName: string, userContext: string) {
+	try {
+        // Run action instead of mutation/query for long-form AI endpoints
+		return await convex.action(anyApi.agentWorkflow.runAgentTask, {
+			agentName,
+			userContext
+		});
+	} catch (err) {
+		console.error(`[CollegeCBT Convex] AI Task Error (${agentName}):`, err);
+		throw err;
+	}
+}

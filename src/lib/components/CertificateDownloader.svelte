@@ -4,11 +4,21 @@
 	
     let { 
         studentName = '',
-        courseName = '', 
+        questionsAnswered = 0,
+        mockExamsCompleted = 0,
+        timeSpent = '',
+        averageScore = '',
+        totalCorrectAnswers = 0,
+        totalFailedQuestions = 0,
         date = ''
     } = $props<{
         studentName?: string;
-        courseName?: string;
+        questionsAnswered?: number | string;
+        mockExamsCompleted?: number | string;
+        timeSpent?: string;
+        averageScore?: string | number;
+        totalCorrectAnswers?: number | string;
+        totalFailedQuestions?: number | string;
         date?: string;
     }>();
 
@@ -62,7 +72,16 @@
          while retaining 1056x816 DOM pixel mapping required for high-res PDF conversion. -->
 	<div class="w-full overflow-x-auto pb-6 pt-6 custom-scrollbar flex justify-center bg-white/5 border border-white/10 shadow-2xl rounded-2xl p-2 md:p-8">
         <div style="transform-origin: top center; transform: scale(min(1, 100% / 1056));" class="flex-shrink-0 transition-all duration-300 pointer-events-none select-none">
-		    <CertificateLayout {studentName} {courseName} {date} />
+		    <CertificateLayout 
+				{studentName} 
+				{questionsAnswered}
+				{mockExamsCompleted}
+				{timeSpent}
+				{averageScore}
+				{totalCorrectAnswers}
+				{totalFailedQuestions}
+				{date} 
+			/>
         </div>
 	</div>
 

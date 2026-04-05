@@ -11,9 +11,10 @@
 	import NetworkMonitor from '$lib/components/NetworkMonitor.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import { onMount } from 'svelte';
-	import { authLoading } from '$lib/stores';
+	import { authLoading, currentUser } from '$lib/stores';
 	import { browser } from '$app/environment';
-	import { setupConvex } from 'convex-svelte';
+	import { setupConvex, useQuery } from 'convex-svelte';
+	import { api } from '$lib/services/convexClient';
 
 	// ── Initialize Convex real-time WebSocket client ──
 	// This must run during component init (not onMount) so setContext works
@@ -56,6 +57,18 @@
 	const appName = "CollegeCBT";
 	const appUrl = "https://collegecbt.dev";
 	let { children }: { children?: import('svelte').Snippet } = $props();
+
+	// ── Real-time Enterprise Identity Sync ──
+	// Reactively polls Convex for the authoritative user state (role, plan) and patches the local Firebase-hydrated UI store instantly.
+	const syncedProfile = useQuery(api.users.getUserByUid, () => ({ uid: $currentUser?.uid || '' }));
+	$effect(() => {
+		if (syncedProfile.data && $currentUser) {
+			const data = syncedProfile.data as any;
+			if (data && (data.plan !== $currentUser.plan || data.role !== $currentUser.role || data.institutionName !== $currentUser.institutionName)) {
+				currentUser.update(u => u ? { ...u, plan: data.plan, role: data.role, institutionName: data.institutionName } : null);
+			}
+		}
+	});
 </script>
 
 <svelte:head>
