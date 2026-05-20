@@ -251,4 +251,38 @@ export default defineSchema({
   })
     .index('by_user', ['userId'])
     .index('by_platform_user', ['platform', 'userId']),
+
+  // ── Support Chat & Messaging ──────────────────────────────────────────────
+  supportMessages: defineTable({
+    userId: v.string(), // Student user UID
+    sender: v.union(v.literal('student'), v.literal('admin'), v.literal('system'), v.literal('ai')),
+    senderName: v.string(),
+    text: v.string(),
+    attachmentUrl: v.optional(v.string()),
+    attachmentName: v.optional(v.string()),
+    timestamp: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_timestamp', ['timestamp']),
+
+  // ── Push Notification Subscriptions ─────────────────────────────────────────
+  pushSubscriptions: defineTable({
+    userId: v.string(), // Firebase UID
+    subscription: v.string(), // JSON stringified PushSubscription
+    updatedAt: v.number(),
+  })
+    .index('by_user', ['userId']),
+
+  // ── E-WIN Referral Logs ─────────────────────────────────────────────────────
+  referralLogs: defineTable({
+    userId: v.string(), // Firebase UID of referred user
+    referralCode: v.string(), // E-WIN Referral/Affiliate code
+    type: v.union(v.literal('signup'), v.literal('subscription')),
+    amount: v.optional(v.number()),
+    status: v.string(), // e.g. 'processed', 'failed_ewin'
+    timestamp: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_code', ['referralCode'])
+    .index('by_type', ['type']),
 });

@@ -1,7 +1,7 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-const ADMIN_SESSION_SECRET = "tRx$uPerAdm!n$ecr3t2026#Ewin@project";
+const ADMIN_SESSION_SECRET = "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
 
 export const load: LayoutServerLoad = async ({ url, cookies }) => {
 	// ── Bypass Gate for Login Page ──
@@ -16,6 +16,7 @@ export const load: LayoutServerLoad = async ({ url, cookies }) => {
 	}
 
 	return {
-		isAdmin: true
+		isAdmin: true,
+		adminSecret: session
 	};
 };

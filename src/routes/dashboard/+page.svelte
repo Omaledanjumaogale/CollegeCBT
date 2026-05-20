@@ -167,7 +167,7 @@
 		// Triggers permission request and VAPID binding after a short delay
 		// ensuring user is warmed up and session is stable.
 		setTimeout(() => {
-			subscribeToPush();
+			subscribeToPush($currentUser?.uid);
 		}, 2000);
 	});
 

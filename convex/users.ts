@@ -205,7 +205,25 @@ export const processPayment = mutation({
 
     if (existingSub) {
       console.log(`[processPayment] Reference ${args.reference} already processed`);
-      return { success: true, alreadyProcessed: true };
+      const user = await ctx.db
+        .query('users')
+        .withIndex('by_uid', (q) => q.eq('uid', existingSub.userId))
+        .first();
+
+      const subReferral = user ? await ctx.db
+        .query('referralLogs')
+        .withIndex('by_user', (q) => q.eq('userId', user.uid))
+        .filter((q) => q.eq(q.field('type'), 'subscription'))
+        .first() : null;
+
+      return {
+        success: true,
+        alreadyProcessed: true,
+        userId: existingSub.userId,
+        email: user?.email || '',
+        referralCode: subReferral?.referralCode || null,
+        referralLogged: !!subReferral,
+      };
     }
 
     // 2. Locate user profile by email or UID
@@ -282,7 +300,50 @@ export const processPayment = mutation({
       timestamp: Date.now(),
     });
 
-    return { success: true, alreadyProcessed: false };
+    // ── Check E-WIN Referral (Non-fatal) ──
+    try {
+      const signupReferral = await ctx.db
+        .query('referralLogs')
+        .withIndex('by_user', (q) => q.eq('userId', user.uid))
+        .filter((q) => q.eq(q.field('type'), 'signup'))
+        .first();
+
+      if (signupReferral) {
+        const existingSubReferral = await ctx.db
+          .query('referralLogs')
+          .withIndex('by_user', (q) => q.eq('userId', user.uid))
+          .filter((q) => q.eq(q.field('type'), 'subscription'))
+          .first();
+
+        if (!existingSubReferral) {
+          await ctx.db.insert('referralLogs', {
+            userId: user.uid,
+            referralCode: signupReferral.referralCode,
+            type: 'subscription',
+            amount: args.amount,
+            status: 'pending_webhook_processed',
+            timestamp: Date.now(),
+          });
+        }
+      }
+    } catch (refErr) {
+      console.warn('[Referral Log] Error logging subscription referral in Convex (non-fatal):', refErr);
+    }
+
+    const subReferral = await ctx.db
+      .query('referralLogs')
+      .withIndex('by_user', (q) => q.eq('userId', user.uid))
+      .filter((q) => q.eq(q.field('type'), 'subscription'))
+      .first();
+
+    return {
+      success: true,
+      alreadyProcessed: false,
+      userId: user.uid,
+      email: user.email,
+      referralCode: subReferral?.referralCode || null,
+      referralLogged: !!subReferral,
+    };
   },
 });
 

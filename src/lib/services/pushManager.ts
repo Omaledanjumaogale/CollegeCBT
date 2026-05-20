@@ -6,9 +6,12 @@ import { showToast } from '$lib/stores';
  * Orchestrates VAPID subscription, permission gating, and service worker synchronization.
  */
 
+import { convex } from '$lib/services/convexClient';
+import { anyApi } from 'convex/server';
+
 const VAPID_KEY = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY || '';
 
-export async function subscribeToPush() {
+export async function subscribeToPush(userId?: string) {
     if (!browser || !('serviceWorker' in navigator) || !('PushManager' in window)) {
         console.warn('[PushManager] Navigation or PushManager not available.');
         return;
@@ -33,18 +36,23 @@ export async function subscribeToPush() {
             });
             
             showToast('🔔 Notifications Enabled', 'You will now receive real-time exam updates.', 'success');
-            
-            // In a real implementation, we would send this subscription to the Convex backend:
-            // await convex.mutation(api.notifications.saveSubscription, { subscription: JSON.stringify(subscription) });
             console.log('[PushManager] New subscription created:', subscription);
         } else {
             console.log('[PushManager] Active subscription found.');
+        }
+
+        // Synchronize with Convex backend if userId is logged in
+        if (userId && subscription) {
+            await convex.mutation(anyApi.notifications.saveSubscription, {
+                userId,
+                subscription: JSON.stringify(subscription)
+            });
+            console.log('[PushManager] Sync with Convex complete for user:', userId);
         }
         
         return subscription;
     } catch (error) {
         console.error('[PushManager] Subscription failed:', error);
-        // showToast('⚠️ Registry Failed', 'Could not activate push notifications.', 'error');
     }
 }
 

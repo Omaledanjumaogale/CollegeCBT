@@ -4,12 +4,16 @@
 	import { anyApi } from 'convex/server';
 	import { fade, slide } from 'svelte/transition';
 	import { showToast } from '$lib/stores';
+	import Tooltip from '$lib/components/Tooltip.svelte';
+
+	// ── Props ──
+	let { data } = $props();
 
 	// ── Real-time Analytics ──
-	const statsQuery = useQuery(api.admin.getDashboardStats, {});
-	const activityQuery = useQuery(api.admin.getRecentActivity, { limit: 12 });
-	const healthQuery = useQuery(api.admin.getSystemHealth, {});
-	const maintenanceQuery = useQuery(anyApi.admin.getConfigFlag, { key: 'maintenance_mode' });
+	const statsQuery = useQuery(api.admin.getDashboardStats, () => ({ adminSecret: data?.adminSecret }));
+	const activityQuery = useQuery(api.admin.getRecentActivity, () => ({ limit: 12, adminSecret: data?.adminSecret }));
+	const healthQuery = useQuery(api.admin.getSystemHealth, () => ({ adminSecret: data?.adminSecret }));
+	const maintenanceQuery = useQuery(anyApi.admin.getConfigFlag, () => ({ key: 'maintenance_mode', adminSecret: data?.adminSecret }));
 
 	// ── Metrics Computed via .data property (Svelte 5 runes mode) ──
 	let stats = $derived(statsQuery.data);
@@ -27,7 +31,8 @@
 			icon: '👥', 
 			color: '#7c3aed', 
 			trend: '+12%', 
-			sub: 'Cumulative Growth' 
+			sub: 'Cumulative Growth',
+			tooltip: 'Total count of students registered on E-Win platform.'
 		},
 		{ 
 			label: 'Concurrent Active Sessions', 
@@ -35,7 +40,8 @@
 			icon: '⚡', 
 			color: '#84cc16', 
 			trend: 'Stable', 
-			sub: 'Past 5 Minutes' 
+			sub: 'Past 5 Minutes',
+			tooltip: 'Number of students actively attempting exams in the past 5 minutes.'
 		},
 		{ 
 			label: 'Real-time Exam Count', 
@@ -43,7 +49,8 @@
 			icon: '📝', 
 			color: '#22d3ee', 
 			trend: '↑ 34', 
-			sub: 'Conducted Today' 
+			sub: 'Conducted Today',
+			tooltip: 'Total exams generated and completed by students today.'
 		},
 		{ 
 			label: 'Estimated Revenue', 
@@ -51,7 +58,8 @@
 			icon: '💰', 
 			color: '#f59e0b', 
 			trend: 'New Milestone', 
-			sub: 'Monthly Revenue' 
+			sub: 'Monthly Revenue',
+			tooltip: 'Calculated monthly revenue estimate based on active subscription packages.'
 		}
 	]);
 
@@ -60,7 +68,7 @@
 		isFlushing = true;
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const result: any = await convex.mutation(anyApi.admin.flushCache, {});
+			const result: any = await convex.mutation(anyApi.admin.flushCache, { adminSecret: data?.adminSecret });
 			showToast('✅ Cache Flushed', `${result?.flushed ?? 0} entries cleared from global cache.`, 'success');
 		} catch (err) {
 			showToast('❌ Flush Failed', 'Could not flush cache. Check logs.', 'error');
@@ -74,7 +82,7 @@
 		isTogglingMaintenance = true;
 		try {
 			const next = !maintenanceEnabled;
-			await convex.mutation(anyApi.admin.setMaintenanceMode, { enabled: next });
+			await convex.mutation(anyApi.admin.setMaintenanceMode, { enabled: next, adminSecret: data?.adminSecret });
 			showToast(
 				next ? '🛑 Maintenance ON' : '✅ Maintenance OFF',
 				next ? 'AI generation is now blocked for all users.' : 'System returned to normal operation.',
@@ -121,7 +129,11 @@
 					</div>
 					
 					<div class="space-y-1">
-						<div class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-0.5">{k.label}</div>
+						<div class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-0.5">
+							<Tooltip text={k.tooltip}>
+								{k.label}
+							</Tooltip>
+						</div>
 						<div class="text-3xl font-display text-white tracking-tight">{k.value}</div>
 						<p class="text-[10px] text-white/20 italic">{k.sub}</p>
 					</div>
@@ -224,7 +236,9 @@
 				<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-600 to-lime-500"></div>
 				
 				<div class="flex items-center justify-between mb-8">
-					<h3 class="font-bold text-white text-sm">System Pulse</h3>
+					<Tooltip text="Real-time stream of student activity, credentials registry, crawler logs, and database mutations.">
+						<h3 class="font-bold text-white text-sm">System Pulse</h3>
+					</Tooltip>
 					<div class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-600/20 text-[9px] font-black text-violet-400 uppercase tracking-widest">Live</div>
 				</div>
 

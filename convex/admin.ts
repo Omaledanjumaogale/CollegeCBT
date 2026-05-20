@@ -1,11 +1,15 @@
 import { v } from 'convex/values';
 import { query, mutation } from './_generated/server';
+import { validateAdminAuth } from './authGuard';
+import { checkRateLimitInternal } from './rateLimit';
 
 // ── Dashboard Overview ──────────────────────────────────────────────────────
 
 export const getDashboardStats = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { adminSecret: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
     const users = await ctx.db.query('users').collect();
     const sessions = await ctx.db.query('sessions').collect();
     const activeHeartbeats = await ctx.db
@@ -37,8 +41,10 @@ export const getDashboardStats = query({
 });
 
 export const getRecentActivity = query({
-  args: { limit: v.number() },
+  args: { limit: v.number(), adminSecret: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
     const logs = await ctx.db
       .query('auditLogs')
       .withIndex('by_timestamp')
@@ -68,11 +74,13 @@ export const getRecentActivity = query({
 export const getUsers = query({
   args: { 
     search: v.optional(v.string()),
-    plan: v.optional(v.string())
+    plan: v.optional(v.string()),
+    adminSecret: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
     let usersQuery = ctx.db.query('users');
-    
     const users = await usersQuery.collect();
     
     let filtered = users;
@@ -94,8 +102,21 @@ export const getUsers = query({
 });
 
 export const updateUserRole = mutation({
-  args: { uid: v.string(), role: v.union(v.literal('admin'), v.literal('user')) },
+  args: { 
+    uid: v.string(), 
+    role: v.union(v.literal('admin'), v.literal('user')), 
+    adminSecret: v.optional(v.string()) 
+  },
   handler: async (ctx, args) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
+    const rl = await checkRateLimitInternal(ctx, {
+      key: `admin:updateUserRole:${args.uid}`,
+      burst: 5,
+      rate: 0.1
+    });
+    if (!rl.ok) throw new Error(rl.message);
+
     const user = await ctx.db
       .query('users')
       .withIndex('by_uid', (q) => q.eq('uid', args.uid))
@@ -120,8 +141,10 @@ export const updateUserRole = mutation({
 // ── Infrastructure & Monitoring ──────────────────────────────────────────────
 
 export const getSystemHealth = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { adminSecret: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
     const lastHour = Date.now() - 3600000;
 
     // Collect all sessions, filter in memory (no timestamp index yet)
@@ -155,8 +178,10 @@ export const getSystemHealth = query({
 });
 
 export const getAuditLogs = query({
-  args: { limit: v.number() },
+  args: { limit: v.number(), adminSecret: v.optional(v.string()) },
   handler: async (ctx, args) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
     return await ctx.db
       .query('auditLogs')
       .withIndex('by_timestamp')
@@ -172,9 +197,18 @@ export const getAuditLogs = query({
  * Logs the action for audit trail.
  */
 export const flushCache = mutation({
-  args: {},
+  args: { adminSecret: v.optional(v.string()) },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handler: async (ctx: any) => {
+  handler: async (ctx: any, args: any) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
+    const rl = await checkRateLimitInternal(ctx, {
+      key: 'admin:flushCache',
+      burst: 3,
+      rate: 0.05
+    });
+    if (!rl.ok) throw new Error(rl.message);
+
     const allCache = await ctx.db.query('apiCache').collect();
     let flushed = 0;
     for (const entry of allCache) {
@@ -197,9 +231,18 @@ export const flushCache = mutation({
  * When enabled, new AI question generation requests are blocked.
  */
 export const setMaintenanceMode = mutation({
-  args: { enabled: v.boolean() },
+  args: { enabled: v.boolean(), adminSecret: v.optional(v.string()) },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handler: async (ctx: any, args: { enabled: boolean }) => {
+  handler: async (ctx: any, args: any) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
+    const rl = await checkRateLimitInternal(ctx, {
+      key: 'admin:setMaintenanceMode',
+      burst: 5,
+      rate: 0.1
+    });
+    if (!rl.ok) throw new Error(rl.message);
+
     const existing = await ctx.db
       .query('configFlags')
       .withIndex('by_key', (q: any) => q.eq('key', 'maintenance_mode'))
@@ -235,9 +278,11 @@ export const setMaintenanceMode = mutation({
  * Read a global config flag value.
  */
 export const getConfigFlag = query({
-  args: { key: v.string() },
+  args: { key: v.string(), adminSecret: v.optional(v.string()) },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  handler: async (ctx: any, args: { key: string }) => {
+  handler: async (ctx: any, args: any) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
     const flag = await ctx.db
       .query('configFlags')
       .withIndex('by_key', (q: any) => q.eq('key', args.key))
@@ -245,4 +290,3 @@ export const getConfigFlag = query({
     return flag ? flag.value : null;
   },
 });
-

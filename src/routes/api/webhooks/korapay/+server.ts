@@ -73,13 +73,29 @@ export const POST: RequestHandler = async ({ request, platform }) => {
             console.log(`[Korapay Webhook] Payment verified: ${reference} for ${email}`);
             try {
                 // Call unified Convex transaction mutation to process subscription state
-                await convex.mutation(anyApi.users.processPayment, {
+                const result = await convex.mutation(anyApi.users.processPayment, {
                     email,
                     plan: 'pro',
                     amount: Number(amount),
                     gateway: 'korapay',
                     reference
-                });
+                }) as any;
+
+                // Sync referral to E-WIN Server API (Non-fatal / Non-blocking)
+                if (result?.success && result.referralCode) {
+                    try {
+                        const { syncReferralToEwinServer } = await import('$lib/services/referral');
+                        await syncReferralToEwinServer({
+                            userId: result.userId,
+                            email: result.email,
+                            referralCode: result.referralCode,
+                            type: 'subscription',
+                            amount: Number(amount)
+                        });
+                    } catch (refErr) {
+                        console.warn('[Korapay Webhook] E-WIN referral sync failed (non-fatal):', refErr);
+                    }
+                }
             } catch (error) {
                 console.error('[Korapay Webhook] Convex sync failed:', error);
                 return json({ status: 'error', message: 'Backend integration failed' }, { status: 500 });

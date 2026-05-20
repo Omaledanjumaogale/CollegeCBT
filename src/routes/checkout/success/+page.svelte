@@ -21,6 +21,20 @@
 	$effect(() => {
 		if (syncedProfile.data && syncedProfile.data.plan === 'pro') {
 			showToast('🎉 Account Upgraded', 'Your Student Pro plan has been activated successfully!', 'success');
+			
+			// ── E-WIN Referral Subscription Event Recording (Non-fatal) ──
+			import('$lib/services/referral').then(async ({ recordReferralEvent }) => {
+				try {
+					await recordReferralEvent('subscription', {
+						userId: $currentUser?.uid || '',
+						email: $currentUser?.email || '',
+						amount: 10000
+					});
+				} catch (err) {
+					console.warn('[Referral] Failed to record subscription referral (non-fatal):', err);
+				}
+			});
+
 			// Wait 3 seconds to let the beautiful success card show, then redirect
 			const timer = setTimeout(() => {
 				goto('/dashboard');

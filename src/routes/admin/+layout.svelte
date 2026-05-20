@@ -13,7 +13,8 @@
 			title: 'Control Center',
 			items: [
 				{ href: '/admin/dashboard', icon: '📊', label: 'Overview' },
-				{ href: '/admin/users',     icon: '👥', label: 'User Management' }
+				{ href: '/admin/users',     icon: '👥', label: 'User Management' },
+				{ href: '/admin/support',   icon: '💬', label: 'Support Desk' }
 			]
 		},
 		{

@@ -3,6 +3,9 @@
 	import { anyApi } from 'convex/server';
 	import { showToast } from '$lib/stores';
 
+	// ── Props ──
+	let { data } = $props();
+
 	// ── Feature Flags State (local with Convex sync planned) ──
 	let flags = $state([
 		{ id: 'ai_orchestration',    label: 'AI Exam Generation',     desc: 'Enable multi-model AI question generation for all users.',   enabled: true,  badge: 'Core' },
@@ -23,7 +26,7 @@
 		// Sync maintenance_mode to Convex backend
 		if (id === 'maintenance_mode') {
 			try {
-				await convex.mutation(anyApi.admin.setMaintenanceMode, { enabled: flag.enabled });
+				await convex.mutation(anyApi.admin.setMaintenanceMode, { enabled: flag.enabled, adminSecret: data?.adminSecret });
 			} catch (err) {
 				console.error('[Admin] Maintenance flag sync failed:', err);
 			}

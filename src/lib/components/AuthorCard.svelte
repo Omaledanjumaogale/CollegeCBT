@@ -28,7 +28,7 @@
 	<div class="relative w-16 h-16 rounded-full overflow-hidden border border-violet-500/30 flex-shrink-0 bg-violet-950 flex items-center justify-center">
 		{#if avatar && avatar !== '/avatars/danjuma.png'}
 			<img src={avatar} alt={name} itemprop="image" class="w-full h-full object-cover" />
-		{#else}
+		{:else}
 			<!-- Visual User Initials Icon -->
 			<span class="text-xl font-bold text-violet-300">OD</span>
 		{/if}

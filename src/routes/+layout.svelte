@@ -10,6 +10,7 @@
 	import BgMesh from '$lib/components/BgMesh.svelte';
 	import NetworkMonitor from '$lib/components/NetworkMonitor.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import SupportChat from '$lib/components/SupportChat.svelte';
 	import { onMount } from 'svelte';
 	import { authLoading, currentUser } from '$lib/stores';
 	import { browser } from '$app/environment';
@@ -47,6 +48,14 @@
 		} catch (err) {
 			console.warn('[CollegeCBT] Auth init failed:', err);
 			authLoading.set(false);
+		}
+
+		// ── E-WIN Referral Parameter Capture ──
+		try {
+			const { captureReferralCode } = await import('$lib/services/referral');
+			captureReferralCode();
+		} catch (err) {
+			console.warn('[CollegeCBT] Referral capture error (non-fatal):', err);
 		}
 
 		// 2. Progressive Web Push & Offline Logic
@@ -162,5 +171,6 @@
 
 	<AuthModal />
 	<NetworkMonitor />
+	<SupportChat />
 </div>
 

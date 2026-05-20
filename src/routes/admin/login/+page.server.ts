@@ -4,7 +4,7 @@ import type { Actions, PageServerLoad } from './$types';
 // ── HARDCODED SUPER ADMIN CREDENTIALS (PER USER INSTRUCTIONS) ──
 const SUPER_ADMIN_EMAIL = "Omaledanjumaogale@gmail.com";
 const SUPER_ADMIN_PASSWORD = "Omale51566122%%%";
-const ADMIN_SESSION_SECRET = "tRx$uPerAdm!n$ecr3t2026#Ewin@project";
+const ADMIN_SESSION_SECRET = "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
 
 export const load: PageServerLoad = async ({ cookies }) => {
 	const session = cookies.get('admin_session');

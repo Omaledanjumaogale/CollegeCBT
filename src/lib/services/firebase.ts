@@ -98,6 +98,17 @@ async function getFirebase(): Promise<Auth | null> {
 						await convex.mutation(anyApi.users.storeUser, {
 							plan: userData.plan ?? 'free'
 						});
+
+						// ── E-WIN Referral Recording (Non-fatal) ──
+						try {
+							const { recordReferralEvent } = await import('./referral');
+							await recordReferralEvent('signup', {
+								userId: firebaseUser.uid,
+								email: firebaseUser.email || '',
+							});
+						} catch (refErr) {
+							console.warn('[CollegeCBT Referral] Referral tracking error (non-fatal):', refErr);
+						}
 					} catch (e) {
 						console.warn('[CollegeCBT] Convex sync on auth change failed (non-critical):', e);
 					}

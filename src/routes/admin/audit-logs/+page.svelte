@@ -3,7 +3,9 @@
 	import { api } from '$lib/services/convexClient';
 	import DataTable from '$lib/components/admin/DataTable.svelte';
 
-	const logsQuery = useQuery(api.admin.getAuditLogs, { limit: 100 });
+	let { data } = $props();
+
+	const logsQuery = useQuery(api.admin.getAuditLogs, () => ({ limit: 100, adminSecret: data?.adminSecret }));
 
 	let logs = $derived(logsQuery.data ?? []);
 	let loadingLogs = $derived(logsQuery.isLoading);

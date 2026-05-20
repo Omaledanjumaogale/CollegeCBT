@@ -97,7 +97,23 @@ export const POST: RequestHandler = async ({ request, platform }) => {
       amount: amount,
       gateway: gateway,
       reference: reference
-    });
+    }) as any;
+
+    // Sync referral to E-WIN Server API (Non-fatal / Non-blocking)
+    if (result?.success && result.referralCode) {
+      try {
+        const { syncReferralToEwinServer } = await import('$lib/services/referral');
+        await syncReferralToEwinServer({
+          userId: result.userId,
+          email: result.email,
+          referralCode: result.referralCode,
+          type: 'subscription',
+          amount: amount
+        });
+      } catch (refErr) {
+        console.warn('[payment/mock-trigger] E-WIN referral sync failed (non-fatal):', refErr);
+      }
+    }
 
     return json({ success: true, result });
 

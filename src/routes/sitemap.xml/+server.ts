@@ -1,7 +1,7 @@
 import type { RequestHandler } from './$types';
 
-export const runtime = 'edge';
-export const dynamic = 'force-dynamic';
+export const _runtime = 'edge';
+export const _dynamic = 'force-dynamic';
 
 const siteUrl = 'https://collegecbt.ewinproject.org';
 
