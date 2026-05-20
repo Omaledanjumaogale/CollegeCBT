@@ -1,14 +1,11 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { ConvexHttpClient } from 'convex/browser';
+import { convex } from '$lib/services/convexClient';
 import { anyApi } from 'convex/server';
-import { env as publicEnv } from '$env/dynamic/public';
 import { env } from '$env/dynamic/private';
 
-/**
- * Paystack Webhook Handler
- * Validates HMAC-SHA512 signature and upgrades user plan via Convex.
- */
+export const _runtime = 'edge';
+export const _dynamic = 'force-dynamic';
 
 /** Edge-compatible HMAC-SHA512 hex verification */
 async function verifyHmacSha512(secret: string, payload: string, expectedHex: string): Promise<boolean> {
@@ -25,7 +22,11 @@ async function verifyHmacSha512(secret: string, payload: string, expectedHex: st
     return computed === expectedHex;
 }
 
-export const POST: RequestHandler = async ({ request }) => {
+/**
+ * Paystack Webhook Handler
+ * Validates HMAC-SHA512 signature and upgrades user plan via processPayment.
+ */
+export const POST: RequestHandler = async ({ request, platform }) => {
     const signature = request.headers.get('x-paystack-signature');
     if (!signature) {
         return json({ status: 'error', message: 'Missing signature' }, { status: 401 });
@@ -33,10 +34,19 @@ export const POST: RequestHandler = async ({ request }) => {
 
     const payloadText = await request.text();
 
+    // Resolve private API keys securely (fallback to platform.env for Edge environment compatibility)
+    const platformEnv = (platform?.env || {}) as Record<string, string>;
+    const secretKey = env.PAYSTACK_SECRET_KEY || platformEnv.PAYSTACK_SECRET_KEY;
+
+    if (!secretKey) {
+        console.error('[Paystack Webhook] Secret key not configured');
+        return json({ status: 'error', message: 'Webhook configuration error' }, { status: 500 });
+    }
+
     // ── Signature Verification ──────────────────────────────────────────────────
     let isValid = false;
     try {
-        isValid = await verifyHmacSha512(env.PAYSTACK_SECRET_KEY!, payloadText, signature);
+        isValid = await verifyHmacSha512(secretKey, payloadText, signature);
     } catch (err) {
         console.error('[Paystack Webhook] Verification failed:', err);
         return json({ status: 'error', message: 'Verification error' }, { status: 500 });
@@ -57,20 +67,25 @@ export const POST: RequestHandler = async ({ request }) => {
 
     if (payload.event === 'charge.success') {
         const { reference, amount, customer } = payload.data;
-        const uid = customer?.email;
+        const email = customer?.email;
 
-        if (uid) {
-            console.log(`[Paystack Webhook] Payment verified: ${reference} for ${uid}`);
-            const convex = new ConvexHttpClient(publicEnv.PUBLIC_CONVEX_URL!);
+        if (email) {
+            console.log(`[Paystack Webhook] Payment verified: ${reference} for ${email}`);
             try {
-                await convex.mutation(anyApi.users.updateUserPlan, { uid, plan: 'pro' });
-                await convex.mutation(anyApi.interactionSessions.logAudit, {
-                    action: 'payment_webhook_processed',
-                    status: 'success',
-                    metadata: JSON.stringify({ gateway: 'paystack', reference, amount })
+                // Convert amount from kobo (minor unit) to NGN (major unit)
+                const majorAmount = Number(amount) / 100;
+
+                // Call unified Convex transaction mutation to process subscription state
+                await convex.mutation(anyApi.users.processPayment, {
+                    email,
+                    plan: 'pro',
+                    amount: majorAmount,
+                    gateway: 'paystack',
+                    reference
                 });
             } catch (error) {
                 console.error('[Paystack Webhook] Convex sync failed:', error);
+                return json({ status: 'error', message: 'Backend integration failed' }, { status: 500 });
             }
         }
     }

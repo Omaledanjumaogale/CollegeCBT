@@ -1,34 +1,39 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { ConvexHttpClient } from 'convex/browser';
+import { convex } from '$lib/services/convexClient';
 import { anyApi } from 'convex/server';
-import { env as publicEnv } from '$env/dynamic/public';
 import { env } from '$env/dynamic/private';
+
+export const _runtime = 'edge';
+export const _dynamic = 'force-dynamic';
 
 /**
  * Flutterwave Webhook Handler
  * Validates the verif-hash header against a dedicated webhook hash secret
- * (set in Flutterwave Dashboard → Webhooks → Secret Hash) and upgrades user plan.
- *
- * NOTE: FLUTTERWAVE_WEBHOOK_HASH is a separate secret you define yourself
- * in the Flutterwave dashboard. It is NOT the API Client Secret nor the
- * Encryption Key. Set a strong random string there and add it to .env here.
+ * and upgrades user plan via the unified processPayment mutation.
  */
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, platform }) => {
     const receivedHash = request.headers.get('verif-hash');
 
-    // Simple constant-time-safe comparison using crypto.subtle
     if (!receivedHash) {
         console.error('[Flutterwave Webhook] Missing verif-hash header');
         return json({ status: 'error', message: 'Missing signature' }, { status: 401 });
     }
 
-    if (receivedHash !== env.FLUTTERWAVE_WEBHOOK_HASH) {
-        console.error('[Flutterwave Webhook] Invalid verif-hash');
+    // Resolve private API keys securely (fallback to platform.env for Edge environment compatibility)
+    const platformEnv = (platform?.env || {}) as Record<string, string>;
+    const expectedHash = env.FLUTTERWAVE_WEBHOOK_HASH || platformEnv.FLUTTERWAVE_WEBHOOK_HASH;
+
+    if (!expectedHash) {
+        console.error('[Flutterwave Webhook] Server hash secret not configured');
+        return json({ status: 'error', message: 'Webhook configuration error' }, { status: 500 });
+    }
+
+    if (receivedHash !== expectedHash) {
+        console.error('[Flutterwave Webhook] Invalid verif-hash signature mismatch');
         return json({ status: 'error', message: 'Invalid signature' }, { status: 401 });
     }
 
-    // ── Parse ────────────────────────────────────────────────────────────────────
     let payload: any;
     try {
         payload = await request.json();
@@ -36,24 +41,24 @@ export const POST: RequestHandler = async ({ request }) => {
         return json({ status: 'error', message: 'Invalid JSON body' }, { status: 400 });
     }
 
-    // ── Process successful charge ────────────────────────────────────────────────
     if (payload.event === 'charge.completed' && payload.data?.status === 'successful') {
         const { tx_ref, amount, customer } = payload.data;
-        // Use email as the user identifier (matched in Convex by uid which is email on signup)
-        const uid = customer?.email;
+        const email = customer?.email;
 
-        if (uid) {
-            console.log(`[Flutterwave Webhook] Payment verified: ${tx_ref} for ${uid}`);
-            const convex = new ConvexHttpClient(publicEnv.PUBLIC_CONVEX_URL!);
+        if (email) {
+            console.log(`[Flutterwave Webhook] Payment verified: ${tx_ref} for ${email}`);
             try {
-                await convex.mutation(anyApi.users.updateUserPlan, { uid, plan: 'pro' });
-                await convex.mutation(anyApi.interactionSessions.logAudit, {
-                    action: 'payment_webhook_processed',
-                    status: 'success',
-                    metadata: JSON.stringify({ gateway: 'flutterwave', tx_ref, amount })
+                // Call unified Convex transaction mutation to process subscription state
+                await convex.mutation(anyApi.users.processPayment, {
+                    email,
+                    plan: 'pro',
+                    amount: Number(amount),
+                    gateway: 'flutterwave',
+                    reference: tx_ref
                 });
             } catch (error) {
                 console.error('[Flutterwave Webhook] Convex sync failed:', error);
+                return json({ status: 'error', message: 'Backend integration failed' }, { status: 500 });
             }
         }
     }
