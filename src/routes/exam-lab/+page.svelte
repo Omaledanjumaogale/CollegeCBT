@@ -98,7 +98,7 @@
 					correct: isCorrect ? 1 : 0,
 					wrong: isCorrect ? 0 : 1,
 					score: isCorrect ? 100 : 0,
-					mode: 'practice',
+					mode: 'lab',
 					grade: isCorrect ? 'A1' : 'F9',
 					timestamp: Date.now()
 				}).catch(err => console.error('[CollegeCBT] Practice session save failed:', err));

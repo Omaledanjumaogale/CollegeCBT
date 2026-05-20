@@ -104,19 +104,20 @@
 	>
 		<!-- Slide-in Drawer -->
 		<div
-			class="absolute top-0 right-0 bottom-0 w-[80%] max-w-sm flex flex-col border-l border-white/10 shadow-2xl"
-			style="background:rgba(13,8,32,0.98);"
+			class="absolute top-0 right-0 bottom-0 w-[80%] max-w-sm flex flex-col border-l shadow-2xl"
+			style="background: var(--bg); border-color: var(--glass-border);"
 			role="dialog"
 			aria-label="Navigation menu"
 			aria-modal="true"
 			transition:fly={{ x: 300, duration: 300 }}
 		>
 			<!-- Drawer header -->
-			<div class="h-[68px] flex items-center justify-between px-6 border-b border-white/10">
-				<span class="font-display text-xl text-white">Navigation</span>
+			<div class="h-[68px] flex items-center justify-between px-6" style="border-bottom: 1px solid var(--glass-border);">
+				<span class="font-display text-xl font-bold" style="color: var(--text);">Navigation</span>
 				<button
 					onclick={closeMenu}
-					class="h-[44px] w-[44px] flex items-center justify-center rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-white transition-colors"
+					class="h-[44px] w-[44px] flex items-center justify-center rounded-lg transition-colors"
+					style="background: var(--glass); border: 1px solid var(--glass-border); color: var(--text);"
 					aria-label="Close navigation menu"
 				>
 					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -127,13 +128,13 @@
 
 			<!-- User info bar (mobile) -->
 			{#if $currentUser}
-				<div class="px-6 py-4 border-b border-white/5 flex items-center gap-3">
+				<div class="px-6 py-4 flex items-center gap-3" style="border-bottom: 1px solid var(--glass-border);">
 					<div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
 						🎓
 					</div>
 					<div class="min-w-0">
-						<div class="text-sm font-bold text-white truncate">{$currentUser.fullName || $currentUser.displayName}</div>
-						<div class="text-xs text-white/40 truncate">{$currentUser.email}</div>
+						<div class="text-sm font-bold truncate" style="color: var(--text);">{$currentUser.fullName || $currentUser.displayName}</div>
+						<div class="text-xs truncate" style="color: var(--text-muted);">{$currentUser.email}</div>
 					</div>
 					<span class="ml-auto text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0 {$currentUser.plan === 'pro' ? 'bg-lime-900/50 text-lime-400 border border-lime-500/30' : 'bg-violet-900/50 text-violet-400 border border-violet-500/30'}">
 						{$currentUser.plan === 'pro' ? '⭐ PRO' : 'FREE'}
@@ -157,7 +158,7 @@
 			</div>
 
 			<!-- CTA / auth section at bottom -->
-			<div class="p-4 border-t border-white/10 flex flex-col gap-2 bg-black/20">
+			<div class="p-4 flex flex-col gap-2" style="border-top: 1px solid var(--glass-border); background: var(--glass);">
 				{#if $currentUser}
 					<button
 						onclick={() => { signOut(); closeMenu(); }}

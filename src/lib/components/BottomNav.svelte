@@ -22,13 +22,14 @@
 	}
 </script>
 
-<div class="md:hidden fixed bottom-0 left-0 right-0 z-[100] h-[72px] pb-[safe-area-inset-bottom] border-t border-white/10" style="background:rgba(13,8,30,0.95);backdrop-filter:blur(32px);">
+<div class="md:hidden fixed bottom-0 left-0 right-0 z-[100] h-[72px] pb-[safe-area-inset-bottom]" style="background: var(--bg-alt); backdrop-filter: blur(32px); border-top: 1px solid var(--glass-border);">
 	<div class="grid grid-cols-4 h-full">
 		{#each bottomLinks as link}
 			{#if link.href === '/dashboard' && !$currentUser}
 				<button 
 					onclick={handleUserClick}
-					class="flex flex-col items-center justify-center gap-1 text-[10px] font-bold text-white/40 transition-all hover:text-white/60"
+					class="flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition-all"
+					style="color: var(--text-muted);"
 				>
 					<span class="text-xl">👤</span>
 					<span>Login</span>
@@ -36,12 +37,13 @@
 			{:else}
 				<a 
 					href={link.href}
-					class="flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition-all {isActive(link.href) ? 'text-white' : 'text-white/40'}"
+					class="flex flex-col items-center justify-center gap-1 text-[10px] font-bold transition-all relative"
+					style="color: {isActive(link.href) ? 'var(--text)' : 'var(--text-muted)'};"
 				>
 					<span class="text-xl">{link.icon}</span>
 					<span>{link.label}</span>
 					{#if isActive(link.href)}
-						<div class="absolute bottom-1 w-1 h-1 rounded-full bg-violet-DEFAULT"></div>
+						<div class="absolute bottom-1.5 w-1.5 h-1.5 rounded-full" style="background-color: var(--violet);"></div>
 					{/if}
 				</a>
 			{/if}
@@ -49,6 +51,4 @@
 	</div>
 </div>
 
-<style>
-	.bg-violet-DEFAULT { background-color: #7c3aed; }
-</style>
+

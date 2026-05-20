@@ -107,7 +107,7 @@
 		</div>
 
 		<!-- Pricing Grid -->
-		<div class="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-6 mb-10 w-full">
+		<div class="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto justify-items-center gap-6 mb-10 w-full">
 			{#each plans as plan}
 				<div class="w-full md:w-[360px]">
 				<div class="glass-card p-7 relative flex flex-col transition-all hover:-translate-y-1 {plan.highlight ? 'border-violet-DEFAULT/50 shadow-violet' : ''}" style="{plan.highlight ? 'background:linear-gradient(135deg,rgba(124,58,237,0.22),rgba(168,85,247,0.12));' : ''}">

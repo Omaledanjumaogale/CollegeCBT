@@ -129,7 +129,7 @@
 	</script>
 </svelte:head>
 
-<div class="min-h-screen" style="background:#0d0820;">
+<div class="min-h-screen" style="background: var(--bg); color: var(--text);">
 	<BgMesh />
 	
 	<AppPreferencesProvider>

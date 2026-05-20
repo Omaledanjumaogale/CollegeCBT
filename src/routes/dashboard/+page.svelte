@@ -246,18 +246,22 @@
 		<div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8">
 			<!-- ── Sidebar ── -->
 			<div class="glass-card p-5 h-fit lg:sticky lg:top-24">
-				<div class="w-14 h-14 rounded-full mx-auto mb-3 flex items-center justify-center text-3xl" style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:3px solid rgba(124,58,237,0.4);">🎓</div>
-				<div class="text-center font-bold text-sm">{userProfile.name}</div>
-				<div class="text-center text-xs text-white/40 mt-0.5">{userProfile.email}</div>
-				<div class="flex justify-center mt-2 mb-4">
-					{#if $currentUser?.plan === 'pro'}
-						<span class="badge badge-lime text-xs">⭐ Student Pro</span>
-					{:else}
-						<span class="badge badge-violet text-xs">🎓 Free Plan</span>
-					{/if}
+				<div class="flex lg:flex-col items-center lg:items-stretch gap-4 lg:gap-0">
+					<div class="w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center text-3xl" style="background:linear-gradient(135deg,#7c3aed,#a855f7);border:3px solid rgba(124,58,237,0.4);">🎓</div>
+					<div class="flex-1 lg:text-center lg:mt-3 min-w-0">
+						<div class="font-bold text-sm truncate">{userProfile.name}</div>
+						<div class="text-xs text-white/40 mt-0.5 truncate">{userProfile.email}</div>
+						<div class="flex lg:justify-center mt-2">
+							{#if $currentUser?.plan === 'pro'}
+								<span class="badge badge-lime text-xs">⭐ Student Pro</span>
+							{:else}
+								<span class="badge badge-violet text-xs">🎓 Free Plan</span>
+							{/if}
+						</div>
+					</div>
 				</div>
-				<hr class="border-white/8 mb-4" />
-				<nav class="space-y-1">
+				<hr class="border-white/8 my-4" />
+				<nav class="grid grid-cols-2 gap-2 lg:flex lg:flex-col lg:space-y-1 lg:gap-0">
 					{#each panels as p}
 						<button
 							onclick={() => dashboardPanel.set(p.id)}
@@ -268,13 +272,17 @@
 							<span>{p.icon}</span>{p.label}
 						</button>
 					{/each}
-					<hr class="border-white/8 my-2" />
-					<a href="/exam-lab" class="w-full flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all">
-						🤖 Go to Exam Lab →
-					</a>
-					<a href="/exam-lab?mode=mock" class="w-full flex items-center gap-2.5 px-3 min-h-[44px] rounded-xl text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 transition-all">
-						⏱️ Take Mock Exam →
-					</a>
+					<div class="col-span-2 lg:col-span-1">
+						<hr class="border-white/8 my-2 hidden lg:block" />
+						<div class="grid grid-cols-2 gap-2 lg:flex lg:flex-col lg:gap-0 lg:space-y-1 mt-2 lg:mt-0">
+							<a href="/exam-lab" class="w-full flex items-center justify-center lg:justify-start gap-2.5 px-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 border border-white/5 lg:border-none transition-all">
+								🤖 <span class="lg:inline">Go to Exam Lab →</span><span class="inline lg:hidden">Practice</span>
+							</a>
+							<a href="/exam-lab?mode=mock" class="w-full flex items-center justify-center lg:justify-start gap-2.5 px-3 min-h-[44px] rounded-xl text-xs sm:text-sm font-medium text-white/40 hover:text-white hover:bg-white/5 border border-white/5 lg:border-none transition-all">
+								⏱️ <span class="lg:inline">Take Mock Exam →</span><span class="inline lg:hidden">Mock Exam</span>
+							</a>
+						</div>
+					</div>
 				</nav>
 			</div>
 
@@ -295,36 +303,36 @@
 					</div>
 
 					<!-- KPIs -->
-					<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+					<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
 						{#each kpis as k}
-							<div class="glass-card p-5 relative overflow-hidden" style="--kpi-color:{k.color};">
+							<div class="glass-card p-4 sm:p-5 relative overflow-hidden" style="--kpi-color:{k.color};">
 								<div class="absolute top-0 left-0 right-0 h-0.5" style="background:{k.color};"></div>
-								<div class="text-2xl mb-2">{k.icon}</div>
-								<div class="font-title text-3xl" style="color:{k.color};">{k.value}</div>
+								<div class="text-xl sm:text-2xl mb-1.5">{k.icon}</div>
+								<div class="font-title text-2xl sm:text-3xl" style="color:{k.color};">{k.value}</div>
 								{#if k.label === 'AI Readiness Score'}
-									<div class="flex items-center gap-1.5 mt-0.5">
-										<div class="text-xs text-white/40">{k.label}</div>
+									<div class="flex items-center gap-1 mt-0.5">
+										<div class="text-[10px] sm:text-xs text-white/40">{k.label}</div>
 										<Tooltip text="Our proprietary AI-driven projection of your likely performance in an actual examination setting, based on mastery and consistency." />
 									</div>
 								{:else if k.label === 'Average Score'}
-									<div class="flex items-center gap-1.5 mt-0.5">
-										<div class="text-xs text-white/40">{k.label}</div>
+									<div class="flex items-center gap-1 mt-0.5">
+										<div class="text-[10px] sm:text-xs text-white/40">{k.label}</div>
 										<Tooltip text="Your cumulative average percentage across all mock exams taken on the platform." />
 									</div>
 								{:else if k.label === 'Questions Answered'}
-									<div class="flex items-center gap-1.5 mt-0.5">
-										<div class="text-xs text-white/40">{k.label}</div>
+									<div class="flex items-center gap-1 mt-0.5">
+										<div class="text-[10px] sm:text-xs text-white/40">{k.label}</div>
 										<Tooltip text="The total number of AI-generated and curriculum-based questions you have attempted in the Exam Lab." />
 									</div>
 								{:else if k.label === 'Mock Exams Taken'}
-									<div class="flex items-center gap-1.5 mt-0.5">
-										<div class="text-xs text-white/40">{k.label}</div>
+									<div class="flex items-center gap-1 mt-0.5">
+										<div class="text-[10px] sm:text-xs text-white/40">{k.label}</div>
 										<Tooltip text="Number of full-length timed mock exams completed under exam conditions." />
 									</div>
 								{:else}
-									<div class="text-xs text-white/40 mt-0.5">{k.label}</div>
+									<div class="text-[10px] sm:text-xs text-white/40 mt-0.5">{k.label}</div>
 								{/if}
-								<div class="text-xs mt-1" style="color:{k.color};">{k.change}</div>
+								<div class="text-[10px] sm:text-xs mt-1" style="color:{k.color};">{k.change}</div>
 							</div>
 						{/each}
 					</div>

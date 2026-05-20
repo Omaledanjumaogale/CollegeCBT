@@ -21,7 +21,7 @@
 		course = $bindable(''), 
 		topic = $bindable(''),
 		onUpdate 
-	} = $props<Props>();
+	}: Props = $props();
 
 	// ── Queries ───────────────────────────────────────────────────────────────
 	const instTypes = useQuery(api.academic.getInstitutionTypes, () => ({}));
