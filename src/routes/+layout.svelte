@@ -15,10 +15,11 @@
 	import { browser } from '$app/environment';
 	import { setupConvex, useQuery } from 'convex-svelte';
 	import { api } from '$lib/services/convexClient';
+	import { env } from '$env/dynamic/public';
 
 	// ── Initialize Convex real-time WebSocket client ──
 	// This must run during component init (not onMount) so setContext works
-	const CONVEX_URL = 'https://different-warthog-453.eu-west-1.convex.cloud';
+	const CONVEX_URL = env?.PUBLIC_CONVEX_URL || 'https://different-warthog-453.eu-west-1.convex.cloud';
 	setupConvex(CONVEX_URL);
 
 	onMount(async () => {

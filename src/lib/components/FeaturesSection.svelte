@@ -5,7 +5,7 @@
 		{ icon: '📊', title: 'Smart Progress Reports', desc: 'See your Exam Readiness Score (0–100), predicted grades, and topic-level charts. Download your performance certificate when you are ready.', color: '#f59e0b', tag: 'Track Success' },
 		{ icon: '🎯', title: 'Detailed Explanations', desc: 'Every wrong option explained — understand exactly why your answer was wrong and learn the logic behind the correct choice.', color: '#22d3ee', tag: 'Understand Better' },
 		{ icon: '🏛️', title: '550+ Institutions', desc: 'Covers Universities, Polytechnics, and Colleges of Education across Nigeria. Every course and every level from 100L up.', color: '#a855f7', tag: 'Built for Nigeria' },
-		{ icon: '📝', title: 'Essay/Theory Practice', desc: 'Essay questions with AI model answers and marking schemes — see exactly how to answer to get full marks from your lecturers.', color: '#e11d48', tag: 'A+ Essay Guide' }
+		{ icon: '📝', title: 'Written / Essay Practice', desc: 'Written questions with suggested answers and marking schemes — see exactly how to answer to get full marks from your lecturers.', color: '#e11d48', tag: 'A+ Written Guide' }
 	];
 </script>
 

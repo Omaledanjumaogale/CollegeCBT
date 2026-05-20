@@ -9,7 +9,7 @@
 	const articles = [
 		{
 			title: 'How to Smash Database Normalization (1NF, 2NF, 3NF)',
-			excerpt: 'Struggling with database normalization? Here are 3 simple tricks to identify normal forms instantly in MCQs and never confuse 2NF with 3NF again.',
+			excerpt: 'Struggling with database normalization? Here are 3 simple tricks to identify normal forms instantly in multiple choice questions and never confuse 2NF with 3NF again.',
 			category: 'Exam Tips' as Category,
 			readTime: '3 min read',
 			date: 'Apr 3, 2025',
@@ -36,7 +36,7 @@
 		},
 		{
 			title: 'Data Structures: Sorting Algorithms You Must Know',
-			excerpt: 'Bubble, Merge, Quick, Heap sort — their time complexity, space complexity, and when lecturers expect you to choose each. MCQ-targeted guide.',
+			excerpt: 'Bubble, Merge, Quick, Heap sort — their time complexity, space complexity, and when lecturers expect you to choose each. Exam-targeted guide.',
 			category: 'Subject Deep-Dive' as Category,
 			readTime: '6 min read',
 			date: 'Mar 25, 2025',
@@ -45,7 +45,7 @@
 		},
 		{
 			title: 'How to Score A1 in Any Mock Exam: The CollegeCBT Method',
-			excerpt: 'A proven 4-step approach: warm up with Exam Lab, take 3 consecutive mocks, analyse your heatmap, focus on your weakest 2 topics. Repeat.',
+			excerpt: 'A proven 4-step approach: warm up with Exam Lab, take 3 consecutive mocks, analyse your performance breakdown, focus on your weakest 2 topics. Repeat.',
 			category: 'Mock Exam Prep' as Category,
 			readTime: '5 min read',
 			date: 'Mar 20, 2025',
@@ -54,7 +54,7 @@
 		},
 		{
 			title: 'Financial Accounting: Ledger Accounts vs Trial Balance',
-			excerpt: 'For 100L–200L Accounting students — the key differences, pro tips for detecting errors, and the 5 most commonly tested MCQ traps.',
+			excerpt: 'For 100L–200L Accounting students — the key differences, pro tips for detecting errors, and the 5 most commonly tested exam traps.',
 			category: 'Subject Deep-Dive' as Category,
 			readTime: '4 min read',
 			date: 'Mar 18, 2025',
@@ -62,8 +62,8 @@
 			color: '#f59e0b'
 		},
 		{
-			title: 'Eliminating Wrong Answers: How to Use Distractor Analysis',
-			excerpt: 'CollegeCBT shows you why each wrong answer is wrong. Learn how to use this to eliminate 2 of 4 options in any MCQ within 20 seconds.',
+			title: 'Eliminating Wrong Answers: How to Use Answer Option Analysis',
+			excerpt: 'CollegeCBT shows you why each wrong answer is wrong. Learn how to use this to eliminate 2 of 4 options in any multiple choice question within 20 seconds.',
 			category: 'Strategy' as Category,
 			readTime: '3 min read',
 			date: 'Mar 15, 2025',
@@ -72,7 +72,7 @@
 		},
 		{
 			title: 'Law of Contract: Offer, Acceptance, and Consideration Simplified',
-			excerpt: 'The 3 elements law students always confuse in MCQs, with landmark Nigerian cases attached to each concept for quick memorisation.',
+			excerpt: 'The 3 elements law students always confuse in exams, with landmark Nigerian cases attached to each concept for quick memorisation.',
 			category: 'Subject Deep-Dive' as Category,
 			readTime: '7 min read',
 			date: 'Mar 10, 2025',
@@ -81,7 +81,7 @@
 		},
 		{
 			title: 'Understanding Your AI Readiness Score',
-			excerpt: 'What does a score of 78 mean? How is it calculated? And how do you get from 65 to 80 in 2 weeks? Full breakdown of the CollegeCBT scoring engine.',
+			excerpt: 'What does a score of 78 mean? How is it calculated? And how do you get from 65 to 80 in 2 weeks? Full breakdown of the CollegeCBT scoring system.',
 			category: 'Exam Tips' as Category,
 			readTime: '3 min read',
 			date: 'Mar 5, 2025',
@@ -91,9 +91,9 @@
 	];
 
 	const quickGuides = [
-		{ icon: '📝', title: 'MCQ Attack Strategy', tip: 'Read the question, eliminate 2 options, then decide. Never spend more than 90s on any single question — move on and return.' },
+		{ icon: '📝', title: 'Multiple Choice Strategy', tip: 'Read the question, eliminate 2 options, then decide. Never spend more than 90s on any single question — move on and return.' },
 		{ icon: '🔁', title: 'Active Recall Loop', tip: 'After each Exam Lab session, close CollegeCBT and write out everything you remember about the topic. Recall beats re-reading 5:1.' },
-		{ icon: '🌡️', title: 'Use Your Heatmap', tip: 'Your topic heatmap shows exactly where to focus. Any topic below 60% needs 2 targeted sessions before your mock exam.' },
+		{ icon: '🌡️', title: 'Use Your Performance Breakdown', tip: 'Your topic performance breakdown shows exactly where to focus. Any topic below 60% needs 2 targeted sessions before your mock exam.' },
 		{ icon: '⏰', title: 'Spaced Repetition', tip: 'Practise daily for 20 minutes. 20 minutes × 7 days beats 3 hours in one sitting. Consistency is the #1 predictor of exam success.' }
 	];
 
@@ -110,6 +110,20 @@
 	<title>Study Resources & Exam Tips — CollegeCBT | Nigerian Higher Education Guides</title>
 	<meta name="description" content="Expert study guides, exam tips, and subject cheat sheets for Nigerian higher institution students. Score A1 with proven CollegeCBT strategies." />
 	<meta name="keywords" content="Nigerian exam tips, CBT study guide, university exam strategy, CollegeCBT resources, how to pass exams Nigeria" />
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "Blog",
+			"name": "CollegeCBT Exam Prep & Study Resources Blog",
+			"description": "Expert study guides, exam tips, and subject cheat sheets for Nigerian higher institution students.",
+			"publisher": {
+				"@type": "Organization",
+				"name": "CollegeCBT",
+				"logo": "https://collegecbt.ewinproject.org/favicon.svg"
+			},
+			"url": "https://collegecbt.ewinproject.org/resources"
+		}
+	</script>
 </svelte:head>
 
 <div class="pt-[100px] pb-20">

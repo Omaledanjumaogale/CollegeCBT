@@ -117,7 +117,7 @@
 	async function analyzePerformance() {
 		if (!$currentUser?.uid) return;
 		aiAnalyzing = true;
-		showToast('🤖 AI Processing', 'Consulting orchestration cascade for insights...', 'info');
+		showToast('🤖 AI Processing', 'Analyzing your progress for insights...', 'info');
 
 		try {
 			// Construct prompt from real student telemetry
@@ -135,14 +135,14 @@
 					aiPrediction = JSON.parse(res.data);
 					showToast('✅ AI Complete', `Analysis routed via ${res.provider?.toUpperCase()}`, 'success');
 				} catch {
-					showToast('⚠️ AI Parse Warning', 'Agent output was not strictly structured.', 'warning');
+					showToast('⚠️ AI Parse Warning', 'AI output could not be parsed.', 'warning');
 				}
 			} else {
-				showToast('❌ AI Error', res?.message || 'Agent failed to respond', 'error');
+				showToast('❌ AI Error', res?.message || 'AI service failed to respond', 'error');
 			}
 		} catch (error) {
 			console.error(error);
-			showToast('❌ Server Error', 'Failed to connect to agent workflow', 'error');
+			showToast('❌ Server Error', 'Failed to connect to the AI service', 'error');
 		} finally {
 			aiAnalyzing = false;
 		}
@@ -231,7 +231,8 @@
 
 <svelte:head>
 	<title>Student Dashboard — CollegeCBT | AI Readiness Score & Results</title>
-	<meta name="description" content="Track your exam performance, AI readiness score, grade predictions, and topic heatmaps on the CollegeCBT dashboard." />
+	<meta name="description" content="Track your exam performance, AI readiness score, grade predictions, and topic performance on the CollegeCBT dashboard." />
+	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
 <div class="pt-[100px] pb-20">
@@ -239,7 +240,7 @@
 		<div class="mb-4">
 			<div class="section-tag">📊 Student Dashboard</div>
 			<h1 class="font-display text-3xl sm:text-4xl mb-1">Your Practice Dashboard</h1>
-			<p class="text-white/40 text-sm">Track performance, readiness score, topic heatmaps and grade predictions — all powered by AI.</p>
+			<p class="text-white/40 text-sm">Track performance, readiness score, topic performance and grade predictions — all powered by AI.</p>
 		</div>
 
 		<div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8">

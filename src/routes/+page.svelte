@@ -20,6 +20,28 @@
 <svelte:head>
 	<title>CollegeCBT — AI Exam Practice for Nigerian Higher Institutions</title>
 	<meta name="description" content="Unlimited AI-generated exam questions, timed WAEC-graded mock exams, and AI Readiness Score for 550+ Nigerian universities, polytechnics, and colleges of education." />
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "WebSite",
+			"name": "CollegeCBT",
+			"url": "https://collegecbt.ewinproject.org/",
+			"potentialAction": {
+				"@type": "SearchAction",
+				"target": "https://collegecbt.ewinproject.org/resources?search={search_term_string}",
+				"query-input": "required name=search_term_string"
+			}
+		}
+	</script>
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "Organization",
+			"name": "CollegeCBT",
+			"url": "https://collegecbt.ewinproject.org/",
+			"logo": "https://collegecbt.ewinproject.org/favicon.svg"
+		}
+	</script>
 </svelte:head>
 
 <div class="landing-page overflow-x-hidden">

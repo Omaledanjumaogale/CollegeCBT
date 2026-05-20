@@ -20,7 +20,7 @@
 				<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Results Command Centre</span>
 			</h2>
 			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-semibold">
-				Track performance, AI readiness score, topic heatmaps, and grade predictions from your personalised dashboard — updated in real-time.
+				Track performance, AI readiness score, topic performance, and grade predictions from your personalised dashboard — updated in real-time.
 			</p>
 		</div>
 
@@ -74,7 +74,7 @@
 			<!-- Topic Heatmap Card -->
 			<div class="glass-card p-8 lg:p-10 flex flex-col transition-all duration-300 hover:shadow-2xl hover:border-amber-500/20">
 				<div class="font-display font-bold text-lg sm:text-xl mb-8 text-white flex items-center gap-2">
-					<span>🌡️</span> Personal Topic Heatmap
+					<span>🌡️</span> Personal Topic Performance
 				</div>
 				<div class="space-y-6 flex-1">
 					{#each heatmap as h}

@@ -16,17 +16,22 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://collegecbt.ewinproject.org/resources</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://collegecbt.ewinproject.org/dashboard</loc>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://collegecbt.ewinproject.org/auth/sign-in</loc>
+    <loc>https://collegecbt.ewinproject.org/auth/login</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://collegecbt.ewinproject.org/auth/sign-up</loc>
+    <loc>https://collegecbt.ewinproject.org/auth/register</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

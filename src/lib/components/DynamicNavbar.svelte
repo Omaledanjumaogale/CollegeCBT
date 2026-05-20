@@ -3,6 +3,8 @@
 	import { signOut } from '$lib/services/firebase';
 	import { page } from '$app/stores';
 
+	import { fade, fly } from 'svelte/transition';
+
 	const publicLinks = [
 		{ href: '/', label: '🏠 Home' },
 		{ href: '/#features', label: '✨ Features' },
@@ -16,12 +18,22 @@
 		{ href: '/', label: '🏠 Home' },
 		{ href: '/dashboard', label: '📊 My Dashboard' },
 		{ href: '/exam-lab', label: '🤖 Exam Lab' },
+		{ href: '/dashboard/custom-exam', label: '🛠️ Custom Study Material' },
 		{ href: '/dashboard/certificate', label: '🎓 My Certificate' },
 		{ href: '/pricing', label: '💰 Pricing' },
 		{ href: '/resources', label: '📖 Resources' },
 	];
 
-	let navLinks = $derived($currentUser ? authLinks : publicLinks);
+	let navLinks = $derived(
+		$currentUser
+			? ($currentUser.role === 'admin'
+				? [
+						...authLinks,
+						{ href: '/admin/dashboard', label: '👑 Admin Panel' }
+				  ]
+				: authLinks)
+			: publicLinks
+	);
 
 	function toggleMenu() {
 		mobileMenuOpen.update((v) => !v);
@@ -88,6 +100,7 @@
 	<div
 		class="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm"
 		onclick={(e) => { if (e.target === e.currentTarget) closeMenu(); }}
+		transition:fade={{ duration: 200 }}
 	>
 		<!-- Slide-in Drawer -->
 		<div
@@ -96,6 +109,7 @@
 			role="dialog"
 			aria-label="Navigation menu"
 			aria-modal="true"
+			transition:fly={{ x: 300, duration: 300 }}
 		>
 			<!-- Drawer header -->
 			<div class="h-[68px] flex items-center justify-between px-6 border-b border-white/10">

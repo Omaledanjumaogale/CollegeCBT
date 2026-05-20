@@ -136,7 +136,7 @@
 					<h4 class="font-bold text-violet-100 text-sm">Custom Exam Need?</h4>
 					<Tooltip text="Use our advanced AI generator to create questions for any specific module or topic not listed here." />
 				</div>
-				<p class="text-xs text-violet-300/70">Can't find your specific topic or module? Use the AI orchestrator.</p>
+				<p class="text-xs text-violet-300/70">Can't find your specific topic or course? Use our AI generator.</p>
 			</div>
 			<a href="/dashboard/custom-exam" class="btn-violet px-4 py-2 text-xs whitespace-nowrap">Build Custom →</a>
 		</div>

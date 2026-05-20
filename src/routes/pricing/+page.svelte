@@ -21,7 +21,7 @@
 				{ included: true, text: '3 mock exams per month' },
 				{ included: true, text: 'Full curriculum selection' },
 				{ included: false, text: 'Detailed AI answer logic' },
-				{ included: false, text: 'Essay questions & model answers' },
+				{ included: false, text: 'Written / Essay questions & suggested answers' },
 				{ included: false, text: 'AI Readiness Score & grade prediction' },
 				{ included: false, text: 'Performance certificate download' },
 				{ included: false, text: 'Priority support' }
@@ -40,7 +40,7 @@
 				{ included: true, text: 'Unlimited AI-generated questions' },
 				{ included: true, text: 'Full explanations + answer logic' },
 				{ included: true, text: 'Unlimited mock exams with official grades' },
-				{ included: true, text: 'Detailed essay questions with model answers' },
+				{ included: true, text: 'Detailed written questions with suggested answers' },
 				{ included: true, text: 'AI Readiness Score (0–100)' },
 				{ included: true, text: 'Grade prediction & progress tracking' },
 				{ included: true, text: 'National student ranking' },
@@ -77,6 +77,22 @@
 <svelte:head>
 	<title>Pricing — CollegeCBT | Simple Nigerian Naira Pricing</title>
 	<meta name="description" content="Simple pricing for CollegeCBT. Pay in Nigerian Naira via Flutterwave or Korapay. Free plan available, Student Pro at only ₦10,000/year." />
+	<script type="application/ld+json">
+		{
+			"@context": "https://schema.org",
+			"@type": "Product",
+			"name": "CollegeCBT Student Pro",
+			"description": "Unlimited AI-generated questions, mock exams with official grades, national student ranking, suggested answers, and downloadable performance certificates.",
+			"offers": {
+				"@type": "Offer",
+				"price": "10000",
+				"priceCurrency": "NGN",
+				"priceValidUntil": "2027-12-31",
+				"availability": "https://schema.org/InStock",
+				"url": "https://collegecbt.ewinproject.org/pricing"
+			}
+		}
+	</script>
 </svelte:head>
 
 <div class="pt-[100px] pb-20">
