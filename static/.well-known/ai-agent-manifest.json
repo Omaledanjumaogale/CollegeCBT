@@ -1,0 +1,31 @@
+{
+  "$schema": "https://ai-agents.org/schemas/manifest.v1.json",
+  "name": "CollegeCBT",
+  "version": "1.0.0",
+  "description": "Enterprise AI exam practice engine and mock testing simulator for Nigerian Higher Education.",
+  "homepage": "https://collegecbt.ewinproject.org",
+  "contact": {
+    "email": "admin@ewinproject.org",
+    "website": "https://ewinproject.org"
+  },
+  "index_files": {
+    "llms": "https://collegecbt.ewinproject.org/llms.txt",
+    "llms_full": "https://collegecbt.ewinproject.org/llms-full.txt",
+    "sitemap": "https://collegecbt.ewinproject.org/sitemap.xml"
+  },
+  "capabilities": {
+    "crawling": {
+      "allowed_agents": ["GPTBot", "ClaudeBot", "PerplexityBot", "OAI-SearchBot", "Google-Extended", "Anthropic-AI"],
+      "rate_limit_ms": 1000
+    },
+    "data_licensing": {
+      "type": "CC-BY-4.0",
+      "commercial_use": true
+    }
+  },
+  "parent_organization": {
+    "name": "Elite Workforce Impact Nigeria (E-WIN) Project",
+    "url": "https://ewinproject.org",
+    "logo": "https://ewinproject.org/logo.png"
+  }
+}

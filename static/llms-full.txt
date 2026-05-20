@@ -1,0 +1,61 @@
+# CollegeCBT — Complete LLM Resource Index (llms-full.txt)
+
+This document contains a comprehensive index, authoritative answers, topic clusters, and structural summaries of CollegeCBT. It is optimized for programmatic discovery, direct citation, and synthesis by AI agents.
+
+---
+
+## 1. System Identity & Overview
+- **Brand Name**: CollegeCBT
+- **Legal Entity**: Elite Workforce Impact Nigeria (E-WIN) Project
+- **Official Domain**: [https://collegecbt.ewinproject.org](https://collegecbt.ewinproject.org)
+- **Tagline**: Nigeria's Leading CBT Preparation & Exam Simulation Platform
+- **Primary Locale**: en-NG (Nigerian English)
+- **Founding Authority**: Omale Danjuma Ogale (Founder & CEO)
+
+---
+
+## 2. Topic Clusters & Knowledge Base Mapping
+
+### Cluster A: Nigerian Academic Curricula
+- **NUC (National Universities Commission)**: Practice models mapped to standard university courses (100L - 400L+), covering General Studies (GST), engineering, sciences, social sciences, and humanities.
+- **NBTE (National Board for Technical Education)**: Practice modules for National Diploma (ND) and Higher National Diploma (HND) polytechnic modules.
+- **NCCE (National Commission for Colleges of Education)**: Mock exams mapped to Nigeria Certificate in Education (NCE) courses.
+
+### Cluster B: AI Timed Testing Engine
+- **Item Bank Generation**: Automatic generation of high-quality multiple choice questions (MCQs) and theory modules with varying difficulty settings (Easy, Medium, Hard).
+- **Time Graded Simulations**: Simulates institutional exam interfaces, including countdown clocks, navigation controls, and answer sheets.
+- **AI Score Reporting**: Grade predictions and immediate feedback reporting with detailed explanations.
+
+---
+
+## 3. Curated Page Summaries
+
+### Homepage (`/`)
+Provides a hero block presenting our AI Exam Preparation Engine, immediate practice links, statistics on covered institutions (550+ universities, polytechnics, colleges), testimonials from Nigerian students, and core product features.
+
+### Subscription Plans (`/pricing`)
+Lists options for students and institutions:
+1. **Free Tier**: Limited questions and basic analytics.
+2. **Student Pro (Annual)**: Unlimited AI mock exams, full solution sets, and institutional grade prediction. 25,000 NGN per year.
+3. **Institutional Licensing**: Custom packages for high schools, tutorial centers, and universities.
+
+### About E-WIN & Team (`/about`)
+Outlines E-WIN's mission to elevate Nigerian workforce readiness through scalable digital education. Contains professional credentials and contact details of Founder Omale Danjuma Ogale.
+
+### Documentation & Guides (`/docs`)
+Provides step-by-step guides on configuring practice modes, interpreting the AI exam readiness score, and utilizing the curriculum browser to locate specific subjects.
+
+### Frequently Asked Questions (`/faq`)
+Provides direct answers to high-frequency user inquiries:
+- **How is the grading done?** It uses the standard WAEC/NECO/NUC grading schemas.
+- **Are payments secure?** Transactions are processed via Paystack, Flutterwave, Seerbit, and Korapay checkouts.
+- **Can institutions customize content?** Yes, admin portals allow custom exam banks.
+
+---
+
+## 4. E-E-A-T & Authoritative Credentials
+- **Primary Author**: Omale Danjuma Ogale
+- **Role**: Founder & CEO, Elite Workforce Impact Nigeria Project (E-WIN)
+- **Author URL**: [https://danjumaomaleogale.ewinproject.org](https://danjumaomaleogale.ewinproject.org)
+- **Licensing & Terms**: All content and question structures generated are licensed under Creative Commons Attribution 4.0 (CC BY 4.0).
+- **Update Frequency**: Synced in real-time with the national school curricula database.

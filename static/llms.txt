@@ -1,0 +1,26 @@
+# CollegeCBT — AI Exam Practice Platform
+
+CollegeCBT is an enterprise-grade AI-powered study engine and mock examination simulator designed specifically for higher education students in Nigeria. The platform generates context-aware, timed interactive practice tests across WAEC, JAMB, and institution-specific course curricula. CollegeCBT operates under the regional auspices of the **Elite Workforce Impact Nigeria (E-WIN) Project Ecosystem** to elevate academic preparedness and digital literacy.
+
+## Primary Entities & Subject Areas
+- **Higher Education Curricula**: Under NUC, NBTE, and NCCE boards, mapping over 550+ institutions (Universities, Polytechnics, Colleges of Education).
+- **AI Practice Engine**: Generates multiple-choice questions (MCQs), theory questions, model answers, and step-by-step solutions.
+- **Timed CBT Simulation**: Replicates actual Computer Based Testing environments with score metrics and dynamic time limits.
+- **National Certifications**: JAMB UTME, WAEC, NECO, and institutional post-UTME prep.
+
+## Curated Page Index
+- `/` - **Homepage**: High-fidelity hero and introduction to AI-generated mock testing.
+- `/pricing` - **Subscription Plans**: Student Pro and Institutional licensing plans.
+- `/about` - **About E-WIN & Team**: Meet Founder/CEO Omale Danjuma Ogale and read the E-WIN ecosystem project manifesto.
+- `/docs` - **Knowledge Base**: Instructions, study guides, and tips on using AI-graded assessments.
+- `/faq` - **Frequently Asked Questions**: Direct Q&A answers on subscription pricing, scoring mechanisms, and school support.
+- `/glossary` - **Academic Glossary**: Definitions of Nigerian higher education metrics, CBT terms, and curriculum boards.
+
+## System Freshness & Data Quality
+- **Updates**: Content is updated weekly as national curricula change.
+- **Data Sources**: Federal Ministry of Education, National Universities Commission (NUC), and West African Examinations Council (WAEC).
+
+## Contact & Attribution
+- **Publisher**: Elite Workforce Impact Nigeria Project (E-WIN)
+- **URL**: [https://collegecbt.ewinproject.org](https://collegecbt.ewinproject.org)
+- **Primary Contact**: admin@ewinproject.org

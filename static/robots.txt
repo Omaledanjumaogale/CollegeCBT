@@ -1,12 +1,48 @@
+# static/robots.txt
+# Allow search engines and all major LLM / AI agents to discover CollegeCBT content
 User-agent: *
 Allow: /
 
-# Sitemap
+# Specifically allow key AI search and citation crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+User-agent: DuckAssistBot
+Allow: /
+
+User-agent: cohere-ai
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# Block crawlers from index private/authenticated dashboards, administrative panels, and state transactions
+Disallow: /admin
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /api/private/
+Disallow: /auth/
+Disallow: /checkout/
+
+# Host and Sitemap mapping
+Host: https://collegecbt.ewinproject.org
 Sitemap: https://collegecbt.ewinproject.org/sitemap.xml
-
-# Crawl-delay
-Crawl-delay: 10
-
-# Disallow admin/private areas
-Disallow: /api/
-Disallow: /_app/
