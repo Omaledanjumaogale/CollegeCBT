@@ -176,6 +176,7 @@
 	let settingsName = $state($currentUser?.displayName || '');
 	let settingsEmail = $state($currentUser?.email || '');
 	let settingsPhone = $state($currentUser?.phone || '');
+	let settingsWhatsApp = $state($currentUser?.whatsapp || '');
 	let settingsInstitution = $state($currentUser?.institutionName || '');
 	let settingsDept = $state($currentUser?.department || '');
 	let settingsLevel = $state($currentUser?.level || '100 Level');
@@ -537,6 +538,10 @@
 								<input id="s-phone" type="tel" inputmode="tel" bind:value={settingsPhone} class="form-input" autocomplete="tel" />
 							</div>
 							<div>
+								<label for="s-whatsapp" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">WhatsApp Number</label>
+								<input id="s-whatsapp" type="tel" inputmode="tel" bind:value={settingsWhatsApp} class="form-input" autocomplete="tel" />
+							</div>
+							<div>
 								<label for="s-institution" class="block text-[11px] font-semibold text-white/40 uppercase tracking-wider mb-1">Institution</label>
 								<input id="s-institution" type="text" bind:value={settingsInstitution} class="form-input" />
 							</div>
@@ -614,16 +619,16 @@
 
 <style>
 	.dash-btn-active {
-		background: rgba(124, 58, 237, 0.2);
-		border: 1px solid rgba(124, 58, 237, 0.3);
-		color: #a78bfa;
+		background: rgba(124, 58, 237, 0.12);
+		border: 1px solid rgba(124, 58, 237, 0.25);
+		color: var(--violet-light);
 	}
 	.dash-btn-inactive {
-		color: #94a3b8;
+		color: var(--text-muted);
 		border: 1px solid transparent;
 	}
 	.dash-btn-inactive:hover {
-		background: rgba(255, 255, 255, 0.05);
-		color: #fff;
+		background: var(--glass-border);
+		color: var(--text);
 	}
 </style>

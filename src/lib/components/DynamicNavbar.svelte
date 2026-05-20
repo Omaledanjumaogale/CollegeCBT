@@ -66,25 +66,28 @@
 	<div class="page-container h-full">
 		<div class="flex items-center justify-between h-full gap-4">
 			<!-- Logo -->
-			<a href="/" class="flex-shrink-0 font-display text-2xl leading-none hover:opacity-90 transition-opacity" style="background:linear-gradient(135deg,#fff 40%,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-				College<span style="-webkit-text-fill-color:#84cc16;">CBT</span>
+			<a href="/" class="flex-shrink-0 font-display text-2xl leading-none hover:opacity-90 transition-opacity" style="background:linear-gradient(135deg,var(--text) 40%,var(--violet-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+				College<span style="-webkit-text-fill-color:var(--lime-light);">CBT</span>
 			</a>
 
 			<!-- Right side: Auth buttons + Hamburger -->
 			<div class="flex items-center gap-3 flex-shrink-0">
-				<!-- Hamburger — always visible -->
 				<button
 					onclick={toggleMenu}
-					class="flex flex-col justify-center items-center h-[44px] w-[44px] rounded-lg border border-white/10 bg-white/5 flex-shrink-0 transition-colors hover:bg-white/10"
+					class="flex flex-col justify-center items-center h-[44px] w-[44px] rounded-lg flex-shrink-0 transition-all hover:opacity-85"
+					style="background: var(--glass); border: 1px solid var(--glass-border);"
 					aria-label={$mobileMenuOpen ? 'Close menu' : 'Open menu'}
 					aria-expanded={$mobileMenuOpen}
 				>
 					<div class="flex flex-col gap-[5px]">
-						<span class="block w-[22px] h-[2px] bg-white rounded-full transition-all duration-300"
+						<span class="block w-[22px] h-[2px] rounded-full transition-all duration-300"
+							style="background-color: var(--text);"
 							class:rotate-hamburger-1={$mobileMenuOpen}></span>
-						<span class="block w-[22px] h-[2px] bg-white rounded-full transition-all duration-300"
+						<span class="block w-[22px] h-[2px] rounded-full transition-all duration-300"
+							style="background-color: var(--text);"
 							class:opacity-0={$mobileMenuOpen}></span>
-						<span class="block w-[22px] h-[2px] bg-white rounded-full transition-all duration-300"
+						<span class="block w-[22px] h-[2px] rounded-full transition-all duration-300"
+							style="background-color: var(--text);"
 							class:rotate-hamburger-3={$mobileMenuOpen}></span>
 					</div>
 				</button>
@@ -129,14 +132,14 @@
 			<!-- User info bar (mobile) -->
 			{#if $currentUser}
 				<div class="px-6 py-4 flex items-center gap-3" style="border-bottom: 1px solid var(--glass-border);">
-					<div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+					<div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style="background:linear-gradient(135deg,var(--violet),var(--violet-light));">
 						🎓
 					</div>
 					<div class="min-w-0">
 						<div class="text-sm font-bold truncate" style="color: var(--text);">{$currentUser.fullName || $currentUser.displayName}</div>
 						<div class="text-xs truncate" style="color: var(--text-muted);">{$currentUser.email}</div>
 					</div>
-					<span class="ml-auto text-[10px] font-bold px-2 py-1 rounded-full flex-shrink-0 {$currentUser.plan === 'pro' ? 'bg-lime-900/50 text-lime-400 border border-lime-500/30' : 'bg-violet-900/50 text-violet-400 border border-violet-500/30'}">
+					<span class="ml-auto text-[10px] font-bold px-2.5 py-1 rounded-full flex-shrink-0 {$currentUser.plan === 'pro' ? 'badge badge-lime' : 'badge badge-violet'}">
 						{$currentUser.plan === 'pro' ? '⭐ PRO' : 'FREE'}
 					</span>
 				</div>
@@ -162,14 +165,14 @@
 				{#if $currentUser}
 					<button
 						onclick={() => { signOut(); closeMenu(); }}
-						class="btn-ghost flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl border border-white/10 bg-white/5"
+						class="btn-ghost flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl"
 					>
 						👋 Sign Out
 					</button>
 				{:else}
 					<button
 						onclick={openLogin}
-						class="btn-ghost flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl border border-white/10 bg-white/5"
+						class="btn-ghost flex items-center justify-center min-h-[44px] w-full text-sm rounded-xl"
 					>
 						Sign In
 					</button>
@@ -186,19 +189,6 @@
 {/if}
 
 <style>
-	.nav-active {
-		color: #a78bfa;
-		background: rgba(124, 58, 237, 0.12);
-		border: 1px solid rgba(124, 58, 237, 0.2);
-	}
-	.nav-inactive {
-		color: #94a3b8;
-		border: 1px solid transparent;
-	}
-	.nav-inactive:hover {
-		color: #fff;
-		background: rgba(255, 255, 255, 0.05);
-	}
 	.rotate-hamburger-1 {
 		transform: rotate(45deg) translate(5px, 5px);
 	}

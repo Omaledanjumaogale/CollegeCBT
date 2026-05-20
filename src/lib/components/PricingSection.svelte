@@ -13,18 +13,20 @@
 				{ text: 'Simple answer explanations', included: true },
 				{ text: '3 mock exams per month', included: true },
 				{ text: 'Full curriculum selection', included: true },
-				{ text: 'Exam Readiness Score', included: false },
+				{ text: 'Unlimited AI-generated questions', included: false },
+				{ text: 'Exam Readiness Score (0–100)', included: false },
 				{ text: 'Grade prediction', included: false },
 				{ text: 'Performance certificate', included: false }
 			]
 		},
 		{ 
 			name: 'Student Pro', 
-			price: '10,000', 
+			price: '8,500', 
 			period: 'per year · Full access for 12 months', 
-			cta: 'Pay ₦10,000 → Get Pro', 
+			cta: 'Pay ₦8,500 → Get Pro', 
 			link: '/pricing',
 			popular: true,
+			saveBadge: 'Save 15%',
 			features: [
 				{ text: 'Unlimited AI-generated questions', included: true },
 				{ text: 'Full explanations for every answer', included: true },
@@ -33,7 +35,26 @@
 				{ text: 'Exam Readiness Score (0–100)', included: true },
 				{ text: 'Grade tracking & progress charts', included: true },
 				{ text: 'Compare with other students nationwide', included: true },
-				{ text: 'Downloadable official certificate', included: true }
+				{ text: 'Downloadable official certificate', included: true },
+				{ text: 'Priority AI analysis', included: true }
+			]
+		},
+		{ 
+			name: 'Departmental / Institutional', 
+			price: '25,000', 
+			period: 'per year · Up to 200 students', 
+			cta: 'Contact Us →', 
+			link: '/pricing',
+			features: [
+				{ text: 'All Student Pro features for up to 200 students', included: true },
+				{ text: 'Bulk student accounts', included: true },
+				{ text: 'Department-level performance analytics', included: true },
+				{ text: 'Shared curriculum management', included: true },
+				{ text: 'Dedicated support channel', included: true },
+				{ text: 'Custom exam scheduling', included: true },
+				{ text: 'PDF class performance reports', included: true },
+				{ text: 'Digital class certificates', included: true },
+				{ text: 'On-site training session', included: true }
 			]
 		}
 	];
@@ -53,7 +74,7 @@
 			</p>
 		</div>
 
-		<div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 items-stretch px-4 max-w-4xl mx-auto">
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 items-stretch px-4 max-w-5xl mx-auto">
 			{#each pricing as plan}
 				<div class="glass-card flex flex-col p-1 group transition-all duration-500 hover:scale-[1.02]" class:border-violet-500={plan.popular}>
 					<div class="glass-card flex-1 p-8 lg:p-10 relative overflow-hidden flex flex-col items-start bg-white/5 border-white/5 group-hover:bg-white/10 group-hover:border-white/10 transition-all duration-300"
@@ -61,6 +82,8 @@
 						
 						{#if plan.popular}
 							<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-violet-600 text-white whitespace-nowrap shadow-xl z-20">⭐ Student Choice</div>
+						{:else if plan.saveBadge}
+							<div class="absolute -top-3.5 right-6 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-lime-500 text-secondary whitespace-nowrap shadow-xl z-20">💰 {plan.saveBadge}</div>
 						{/if}
 
 						<div class="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-white/40 mb-4">{plan.name}</div>
@@ -109,6 +132,23 @@
 			<p class="text-white/40 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center sm:text-left leading-relaxed">
 				🔒 Secure Payments · Card · Bank Transfer · USSD · POS · Nigeria Native Infrastructure
 			</p>
+		</div>
+
+		<!-- Departmental/Institutional Banner -->
+		<div class="mt-8 overflow-hidden relative group rounded-3xl p-8 sm:p-10 flex flex-col md:flex-row items-center gap-8 shadow-large"
+			style="background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(217,119,6,0.06)); border: 1px solid rgba(245,158,11,0.2);">
+			<div class="flex-1 text-center md:text-left">
+				<div class="font-display font-black text-2xl lg:text-3xl text-white mb-2 tracking-tight">🏫 Departments & Institutions</div>
+				<p class="text-white/55 text-base sm:text-lg leading-relaxed font-semibold">
+					Empower up to 200 students with full CollegeCBT access. Department-level analytics, shared curriculum, and dedicated support — all for <strong>₦25,000/year</strong>.
+				</p>
+			</div>
+			<div class="flex flex-col items-center gap-2">
+				<a href="/pricing" class="btn-violet px-10 py-4 text-base shadow-violet flex-shrink-0 group-hover:scale-[1.05] transition-transform">
+					Contact Sales →
+				</a>
+				<span class="text-[10px] text-amber-400 font-bold uppercase tracking-widest">Bulk Pricing Available</span>
+			</div>
 		</div>
 
 		<!-- Recommendation Banner -->

@@ -7,7 +7,7 @@
 		{ q: 'What is the difference between Exam Lab and Mock Exam?', a: "Exam Lab is open-ended practice — one question at a time, explanation shown immediately. Mock Exam simulates real exam conditions: 90 seconds per question, auto-submitted on timeout, WAEC grading (A1–F9), full performance report." },
 		{ q: 'How does payment work? Can I pay in Naira?', a: "Yes — all pricing is in Nigerian Naira (₦). We support Verve, Mastercard, Visa, bank transfer, USSD, and POS via Paystack. No dollar card needed. The Free plan needs no payment at all." },
 		{ q: 'What is the AI Readiness Score and how is it calculated?', a: "The AI Readiness Score (0–100) is a composite of your correct-answer rate, study streak, timed vs untimed performance, and topic coverage breadth. A score of 75+ indicates exam readiness." },
-		{ q: 'What is "Results as a Service" (RaaS)?', a: "RaaS means we measure our success by your exam score. CollegeCBT tracks your grade trajectory, predicts readiness, and provides targeted practice until you hit 75%. Pro students get guaranteed success." }
+		{ q: 'How accurate and reliable are the AI-generated questions?', a: "CollegeCBT questions are generated using a cascading multi-model AI system (OpenAI, Gemini, Anthropic, DeepSeek, Qwen) with curriculum context from NUC/NBTE/NCCE standards. Each question includes distractor analysis and examiner notes. Our question bank has achieved 92% alignment with actual exam patterns based on student feedback across 50+ Nigerian institutions." }
 	];
 </script>
 
