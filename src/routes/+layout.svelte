@@ -13,7 +13,7 @@
 	import { onMount } from 'svelte';
 	import { authLoading, currentUser } from '$lib/stores';
 	import { browser } from '$app/environment';
-	import { setupConvex, useQuery } from 'convex-svelte';
+	import { setupConvex, useQuery, useConvexClient } from 'convex-svelte';
 	import { api } from '$lib/services/convexClient';
 	import { env } from '$env/dynamic/public';
 
@@ -21,6 +21,21 @@
 	// This must run during component init (not onMount) so setContext works
 	const CONVEX_URL = env?.PUBLIC_CONVEX_URL || 'https://different-warthog-453.eu-west-1.convex.cloud';
 	setupConvex(CONVEX_URL);
+	const client = useConvexClient();
+
+	// Reactively bind Firebase Auth token state to the Convex WebSocket client
+	$effect(() => {
+		if ($currentUser) {
+			import('$lib/services/firebase').then(async ({ getFirebaseIdToken }) => {
+				const idToken = await getFirebaseIdToken();
+				if (idToken) {
+					client.setAuth(async () => idToken);
+				}
+			});
+		} else {
+			client.setAuth(async () => null);
+		}
+	});
 
 	onMount(async () => {
 		if (!browser) return;

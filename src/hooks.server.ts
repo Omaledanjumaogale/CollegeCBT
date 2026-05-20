@@ -29,7 +29,19 @@ export const handle: Handle = async ({ event, resolve }) => {
 		// to avoid breaking the existing Firebase flow.
 	}
 
-	// ─── Security Headers ───────────────────────────────────────────────────
+	// ─── Security & SEO/AEO Crawl Headers ───────────────────────────────────
+	const userAgent = event.request.headers.get('user-agent') || '';
+	const aiBots = [
+		'gptbot', 'claudebot', 'perplexitybot', 'oai-searchbot', 
+		'google-extended', 'anthropic-ai', 'youbot', 'duckassistbot', 
+		'cohere-ai', 'applebot-extended'
+	];
+	const isAiBot = aiBots.some(bot => userAgent.toLowerCase().includes(bot));
+	
+	if (isAiBot) {
+		console.info(`[CollegeCBT][AEO] AI crawler detected: ${userAgent} accessing ${url.pathname}`);
+	}
+
 	const response = await resolve(event);
 	
 	// Add enterprise security headers
@@ -38,9 +50,25 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
 	response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 	
-	// Ensure no caching for authenticated routes
-	if (url.pathname.startsWith('/dashboard') || url.pathname.startsWith('/admin')) {
+	// Set X-Robots-Tag to prevent indexers from storing private pages
+	if (
+		url.pathname.startsWith('/admin') || 
+		url.pathname.startsWith('/dashboard') || 
+		url.pathname.startsWith('/api/private') || 
+		url.pathname.startsWith('/auth')
+	) {
+		response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
 		response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+	} else if (
+		url.pathname.endsWith('sitemap.xml') || 
+		url.pathname.endsWith('llms.txt') || 
+		url.pathname.endsWith('llms-full.txt')
+	) {
+		// Allow public search engines to cache indexing structures for faster performance
+		response.headers.set('Cache-Control', 'public, max-age=3600, s-maxage=86400');
+	} else {
+		// Public content pages
+		response.headers.set('Cache-Control', 'public, max-age=60, s-maxage=3600');
 	}
 
 	return response;

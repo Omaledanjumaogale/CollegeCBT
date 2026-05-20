@@ -261,3 +261,21 @@ export async function updateUserProfile(
 		return { success: false, error: 'Failed to update profile.' };
 	}
 }
+
+// ── Get Raw Firebase Auth Instance ────────────────────────────────────────────
+export async function getFirebaseAuth(): Promise<Auth | null> {
+	return await getFirebase();
+}
+
+// ── Get Active Firebase JWT ID Token ──────────────────────────────────────────
+export async function getFirebaseIdToken(): Promise<string | null> {
+	try {
+		const authInstance = await getFirebase();
+		if (authInstance && authInstance.currentUser) {
+			return await authInstance.currentUser.getIdToken(true); // force refresh to ensure validity
+		}
+	} catch (err) {
+		console.error('[CollegeCBT Firebase] Error getting Firebase ID Token:', err);
+	}
+	return null;
+}
