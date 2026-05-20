@@ -224,4 +224,31 @@ export default defineSchema({
     .index('by_topic', ['topic'])
     .index('by_type', ['type'])
     .index('by_other', ['isOther']),
+
+  // ── Multi-Platform SaaS Subscriptions & Access Control ────────────────────
+  subscriptions: defineTable({
+    userId: v.string(), // Firebase UID
+    platform: v.string(), // e.g. 'college_cbt'
+    plan: v.union(v.literal('free'), v.literal('pro')),
+    status: v.union(v.literal('active'), v.literal('expired'), v.literal('cancelled'), v.literal('pending')),
+    amount: v.number(),
+    gateway: v.union(v.literal('flutterwave'), v.literal('korapay'), v.literal('paystack'), v.literal('seerbit')),
+    reference: v.string(),
+    createdAt: v.number(),
+    expiresAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_reference', ['reference'])
+    .index('by_platform', ['platform']),
+
+  platformAccess: defineTable({
+    userId: v.string(), // Firebase UID
+    platform: v.string(), // e.g. 'college_cbt'
+    role: v.union(v.literal('user'), v.literal('admin')),
+    status: v.union(v.literal('active'), v.literal('suspended'), v.literal('inactive')),
+    expiresAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_platform_user', ['platform', 'userId']),
 });

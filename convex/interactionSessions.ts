@@ -74,6 +74,11 @@ export const logAudit = mutation({
     metadata: v.string(), // JSON blob for detailed tracking
   },
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity && args.userId && args.userId !== identity.subject) {
+      throw new Error("Unauthorized audit logging: identity mismatch.");
+    }
+
     return await ctx.db.insert('auditLogs', {
       userId: args.userId,
       action: args.action,

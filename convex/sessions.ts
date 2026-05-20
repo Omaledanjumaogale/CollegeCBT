@@ -18,6 +18,12 @@ export const withSession = mutation({
   handler: async (ctx, args) => {
     const now = Date.now();
 
+    // Verify JWT identity matching if user is authenticated
+    const identity = await ctx.auth.getUserIdentity();
+    if (identity && args.userId && args.userId !== identity.subject) {
+      throw new Error("Unauthorized session binding: identity mismatch.");
+    }
+
     // ── Rate Limit ──
     const rl = await checkRateLimitInternal(ctx, { 
       key: `heartbeat:${args.sessionId}`, 
@@ -74,6 +80,12 @@ export const saveSession = mutation({
     timestamp: v.number(),
   },
   handler: async (ctx, args) => {
+    // Verify JWT identity matching
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || args.userId !== identity.subject) {
+      throw new Error("Unauthorized score submission.");
+    }
+
     // ── Rate Limit ──
     const rl = await checkRateLimitInternal(ctx, { 
       key: `saveSession:${args.userId}`, 
@@ -101,6 +113,12 @@ export const saveSession = mutation({
 export const getUserSessions = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    // Verify JWT identity matching
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || args.userId !== identity.subject) {
+      throw new Error("Unauthorized read.");
+    }
+
     return await ctx.db
       .query('sessions')
       .withIndex('by_user', (q) => q.eq('userId', args.userId))
@@ -112,6 +130,12 @@ export const getUserSessions = query({
 export const getDashboardAnalytics = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    // Verify JWT identity matching
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || args.userId !== identity.subject) {
+      throw new Error("Unauthorized read.");
+    }
+
     const sessions = await ctx.db
       .query('sessions')
       .withIndex('by_user', (q) => q.eq('userId', args.userId))

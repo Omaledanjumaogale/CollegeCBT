@@ -3,6 +3,7 @@ import type { MutationCtx, QueryCtx } from './_generated/server';
 import { v } from 'convex/values';
 import type { Doc, Id } from './_generated/dataModel';
 import { checkRateLimitInternal } from './rateLimit';
+import { requireAdmin, requirePlatformAccess, requireUserProfile } from './authGuard';
 
 // ── Identity Verification Mutation ──────────────────────────────────────────
 
@@ -43,10 +44,27 @@ export const storeUser = mutation({
         plan: args.plan ?? existing.plan,
         updatedAt: Date.now(),
       });
+
+      // Ensure platformAccess exists
+      const access = await ctx.db
+        .query('platformAccess')
+        .withIndex('by_platform_user', (q) => q.eq('platform', 'college_cbt').eq('userId', identity.subject))
+        .first();
+      if (!access) {
+        await ctx.db.insert('platformAccess', {
+          userId: identity.subject,
+          platform: 'college_cbt',
+          role: 'user',
+          status: 'active',
+          expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+          updatedAt: Date.now(),
+        });
+      }
+
       return existing._id;
     } else {
       // Initialize platform-specific user record referencing global ID
-      return await ctx.db.insert('users', {
+      const newUserId = await ctx.db.insert('users', {
         uid: identity.subject,
         email: identity.email ?? "unknown@email.com",
         displayName: identity.name ?? "Student",
@@ -57,6 +75,18 @@ export const storeUser = mutation({
         institutionType: args.institutionType,
         institutionName: args.institutionName
       });
+
+      // Provision platformAccess record for 'college_cbt'
+      await ctx.db.insert('platformAccess', {
+        userId: identity.subject,
+        platform: 'college_cbt',
+        role: 'user',
+        status: 'active',
+        expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
+        updatedAt: Date.now(),
+      });
+
+      return newUserId;
     }
   },
 });
@@ -69,19 +99,8 @@ export async function withPlatformAuth<T>(
   ctx: QueryCtx | MutationCtx,
   handler: (user: Doc<"users">) => Promise<T>
 ) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new Error("Unauthorized: Identity missing");
-
-  const user = await ctx.db
-    .query('users')
-    .withIndex('by_uid', (q) => q.eq('uid', identity.subject))
-    .first();
-
-  if (!user) throw new Error("Unauthorized: User not found on this platform");
-  
-  // Platform-specific plan check (e.g., college-cbt only for paying users)
-  // if (user.plan === 'free') throw new Error("Subscription required for this action");
-
+  await requirePlatformAccess(ctx, 'college_cbt');
+  const user = await requireUserProfile(ctx);
   return await handler(user);
 }
 
@@ -93,19 +112,8 @@ export async function withAdminAuth<T>(
   ctx: QueryCtx | MutationCtx,
   handler: (user: Doc<"users">) => Promise<T>
 ) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new Error("Unauthorized: Identity missing");
-
-  const user = await ctx.db
-    .query('users')
-    .withIndex('by_uid', (q) => q.eq('uid', identity.subject))
-    .first();
-
-  if (!user || user.role !== 'admin') {
-    throw new Error("Unauthorized: Elevated privileges required");
-  }
-  
-  return await handler(user);
+  const admin = await requireAdmin(ctx);
+  return await handler(admin);
 }
 
 // ── Get user by Firebase UID ──────────────────────────────────────────────────
@@ -129,10 +137,152 @@ export const updateUserPlan = mutation({
     const user = await ctx.db
       .query('users')
       .withIndex('by_uid', (q) => q.eq('uid', args.uid))
+      .first() || await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.uid))
       .first();
+
     if (user) {
       await ctx.db.patch(user._id, { plan: args.plan, updatedAt: Date.now() });
+
+      // Upsert / upgrade subscription record
+      const subscription = await ctx.db
+        .query('subscriptions')
+        .withIndex('by_user', (q) => q.eq('userId', user.uid))
+        .first();
+
+      const expiresAt = Date.now() + 30 * 24 * 60 * 60 * 1000; // default 30 days
+      if (subscription) {
+        await ctx.db.patch(subscription._id, {
+          plan: args.plan,
+          status: args.plan === 'pro' ? 'active' : 'expired',
+          expiresAt: args.plan === 'pro' ? expiresAt : Date.now(),
+        });
+      } else {
+        await ctx.db.insert('subscriptions', {
+          userId: user.uid,
+          platform: 'college_cbt',
+          plan: args.plan,
+          status: args.plan === 'pro' ? 'active' : 'expired',
+          amount: 0, // system update
+          gateway: 'flutterwave', // default fallback
+          reference: `SYS-UPGRADE-${user.uid}-${Date.now()}`,
+          createdAt: Date.now(),
+          expiresAt: args.plan === 'pro' ? expiresAt : Date.now(),
+        });
+      }
+
+      // Sync platformAccess
+      const access = await ctx.db
+        .query('platformAccess')
+        .withIndex('by_platform_user', (q) => q.eq('platform', 'college_cbt').eq('userId', user.uid))
+        .first();
+      if (access) {
+        await ctx.db.patch(access._id, {
+          expiresAt: args.plan === 'pro' ? expiresAt : Date.now(),
+          updatedAt: Date.now(),
+        });
+      }
     }
+  },
+});
+
+// ── Process payment gateway webhook with idempotency & annual expiration ──
+export const processPayment = mutation({
+  args: {
+    email: v.string(),
+    plan: v.union(v.literal('free'), v.literal('pro')),
+    amount: v.number(),
+    gateway: v.union(v.literal('flutterwave'), v.literal('korapay'), v.literal('paystack'), v.literal('seerbit')),
+    reference: v.string(),
+  },
+  handler: async (ctx, args) => {
+    // 1. Idempotency Check: look up subscription by reference
+    const existingSub = await ctx.db
+      .query('subscriptions')
+      .withIndex('by_reference', (q) => q.eq('reference', args.reference))
+      .first();
+
+    if (existingSub) {
+      console.log(`[processPayment] Reference ${args.reference} already processed`);
+      return { success: true, alreadyProcessed: true };
+    }
+
+    // 2. Locate user profile by email or UID
+    let user = await ctx.db
+      .query('users')
+      .withIndex('by_email', (q) => q.eq('email', args.email))
+      .first();
+
+    if (!user) {
+      user = await ctx.db
+        .query('users')
+        .withIndex('by_uid', (q) => q.eq('uid', args.email))
+        .first();
+    }
+
+    if (!user) {
+      console.error(`[processPayment] User with email/UID ${args.email} not found.`);
+      throw new Error(`User not found for payment reference: ${args.reference}`);
+    }
+
+    // 3. Update the user plan
+    await ctx.db.patch(user._id, { plan: args.plan, updatedAt: Date.now() });
+
+    // 4. Calculate annual expiration (365 days)
+    const expiresAt = Date.now() + 365 * 24 * 60 * 60 * 1000;
+
+    // 5. Insert subscription ledger entry
+    await ctx.db.insert('subscriptions', {
+      userId: user.uid,
+      platform: 'college_cbt',
+      plan: args.plan,
+      status: 'active',
+      amount: args.amount,
+      gateway: args.gateway,
+      reference: args.reference,
+      createdAt: Date.now(),
+      expiresAt: expiresAt,
+    });
+
+    // 6. Sync platformAccess permissions
+    const access = await ctx.db
+      .query('platformAccess')
+      .withIndex('by_platform_user', (q) => q.eq('platform', 'college_cbt').eq('userId', user.uid))
+      .first();
+
+    if (access) {
+      await ctx.db.patch(access._id, {
+        status: 'active',
+        expiresAt: expiresAt,
+        updatedAt: Date.now(),
+      });
+    } else {
+      await ctx.db.insert('platformAccess', {
+        userId: user.uid,
+        platform: 'college_cbt',
+        role: 'user',
+        status: 'active',
+        expiresAt: expiresAt,
+        updatedAt: Date.now(),
+      });
+    }
+
+    // 7. Audit log event
+    await ctx.db.insert('auditLogs', {
+      userId: user.uid,
+      action: 'payment_webhook_processed',
+      status: 'success',
+      metadata: JSON.stringify({
+        gateway: args.gateway,
+        reference: args.reference,
+        amount: args.amount,
+        plan: args.plan,
+      }),
+      timestamp: Date.now(),
+    });
+
+    return { success: true, alreadyProcessed: false };
   },
 });
 
