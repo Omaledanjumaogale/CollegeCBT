@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     
     // Resolve helper for fallback (checking process.env and binding)
     const getSecretKey = (key: string): string => {
-      return env[key] || '';
+      return env[key] || process.env[key] || '';
     };
 
     const appUrl = env.PUBLIC_APP_URL || 'http://localhost:5173';

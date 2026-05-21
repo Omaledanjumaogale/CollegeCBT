@@ -69,11 +69,11 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     // 2. Resolve private API keys securely
     const env = (platform?.env || {}) as Record<string, string>;
     const getSecretKey = (key: string): string => {
-      return env[key] || '';
+      return env[key] || process.env[key] || '';
     };
 
     let secretKey = '';
-    if (gateway === 'flutterwave') secretKey = getSecretKey('FLUTTERWAVE_CLIENT_SECRET');
+    if (gateway === 'flutterwave') secretKey = getSecretKey('FLUTTERWAVE_CLIENT_SECRET') || getSecretKey('FLUTTERWAVE_SECRET_KEY');
     if (gateway === 'korapay') secretKey = getSecretKey('KORAPAY_SECRET_KEY');
     if (gateway === 'paystack') secretKey = getSecretKey('PAYSTACK_SECRET_KEY');
     if (gateway === 'seerbit') secretKey = getSecretKey('SEERBIT_SECRET_KEY');
