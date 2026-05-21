@@ -4,7 +4,7 @@
 	import { flip } from 'svelte/animate';
 </script>
 
-<div class="notification-stack fixed bottom-6 left-1/2 -translate-x-1/2 z-[10000] flex flex-col gap-3 w-[90%] max-w-sm pointer-events-none">
+<div class="notification-stack fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[10000] flex flex-col gap-3 w-[90%] max-w-sm pointer-events-none">
 	{#each notifications.list as t (t.id)}
 		<div
 			animate:flip={{ duration: 300 }}

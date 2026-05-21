@@ -276,7 +276,7 @@
 						{Math.round((currentQIdx / questions.length) * 100)}%
 					</div>
 					
-					<div class="grid grid-cols-5 gap-2 mb-8">
+					<div class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-8">
 						{#each questions as _, i}
 							<button 
 								class="aspect-square rounded-lg flex items-center justify-center text-xs font-black transition-all {i === currentQIdx ? 'bg-primary text-secondary' : answers[i] !== -1 && (theoryAnswers[i] !== '' || 'options' in questions[i]) ? 'bg-white/20 text-white' : 'bg-white/5 text-white/30'}"

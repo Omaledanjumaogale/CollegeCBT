@@ -124,7 +124,7 @@
 	<!-- Floating Action Button -->
 	<button
 		onclick={() => isOpen = !isOpen}
-		class="fixed bottom-6 right-6 z-[9998] w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 group focus:outline-none"
+		class="fixed bottom-24 md:bottom-6 right-6 z-[9998] w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 transform hover:scale-105 active:scale-95 group focus:outline-none"
 		style="background: linear-gradient(135deg, #7c3aed, #a855f7); border: 2px solid rgba(255,255,255,0.15);"
 		aria-label="Open support chat"
 	>
@@ -146,7 +146,7 @@
 	{#if isOpen}
 		<div
 			transition:fade={{ duration: 150 }}
-			class="fixed bottom-24 right-6 z-[9997] w-[92vw] sm:w-[380px] h-[500px] rounded-2xl glass-card border border-white/10 flex flex-col shadow-2xl overflow-hidden"
+			class="fixed bottom-24 right-6 z-[9997] w-[92vw] sm:w-[380px] h-[45vh] sm:h-[500px] max-h-[60vh] rounded-2xl glass-card border border-white/10 flex flex-col shadow-2xl overflow-hidden"
 			style="background: rgba(13, 8, 32, 0.95); backdrop-filter: blur(20px);"
 		>
 			<!-- Header -->

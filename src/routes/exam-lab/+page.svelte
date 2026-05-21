@@ -655,7 +655,7 @@
 								Take a timed exam with <strong>{mockQCount}</strong> practice questions at <strong>{mockTimePerQ}s</strong> each.
 								Get your WAEC grade, topic breakdown, and AI recommendations after you submit.
 							</p>
-							<div class="grid grid-cols-3 gap-4 max-w-sm mx-auto mb-10">
+							<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-sm mx-auto mb-10">
 								<div class="p-4 rounded-2xl bg-white/5">
 									<div class="text-[10px] font-bold text-white/30 uppercase mb-1">Questions</div>
 									<div class="text-sm font-black text-white">{mockQCount}</div>
@@ -784,7 +784,7 @@
 							<div class="text-xs text-white/40 mb-12">{mockResult.score} of {mockQuestions.length} correct · {gradeInfo.label}</div>
 							
 							<!-- Results Stats Grid -->
-							<div class="grid grid-cols-3 gap-4 max-w-md mx-auto mb-10">
+							<div class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-md mx-auto mb-10">
 								<div class="p-5 rounded-3xl bg-white/5 border border-white/10">
 									<div class="text-xs mb-1">✅ Correct</div>
 									<div class="text-xl font-black text-lime-400">{mockResult.correct}</div>

@@ -160,7 +160,7 @@
 {#if $activeModal}
 	<!-- Backdrop -->
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center p-4"
+		class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
 		style="background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);"
 		onclick={(e) => { if (e.target === e.currentTarget) close(); }}
 		onkeydown={handleBackdropKey}
@@ -172,7 +172,7 @@
 	>
 
 		<div
-			class="w-full max-w-lg"
+			class="w-full max-w-lg rounded-t-[32px] sm:rounded-2xl overflow-hidden"
 			transition:scale={{ duration: 250, start: 0.95 }}
 		>
 			<!-- Tab switcher -->

@@ -6,7 +6,7 @@
 	style="background: linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.8));">
 	
 	<!-- Background orb -->
-	<div class="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-[120px] bg-violet-600/5 pointer-events-none"></div>
+	<div class="absolute bottom-[-20%] left-1/2 -translate-x-1/2 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full blur-[120px] bg-violet-600/5 pointer-events-none"></div>
 
 	<div class="page-container relative z-10 px-6 sm:px-12">
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20 items-start">
