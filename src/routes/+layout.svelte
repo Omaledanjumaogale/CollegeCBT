@@ -20,11 +20,8 @@
 
 	// ── Initialize Convex real-time WebSocket client ──
 	// This must run during component init (not onMount) so setContext works
-	const CONVEX_URL = env?.PUBLIC_CONVEX_URL;
-	if (!CONVEX_URL) throw new Error('PUBLIC_CONVEX_URL is required — set it in .env or Cloudflare Pages env vars.');
+	const CONVEX_URL = env?.PUBLIC_CONVEX_URL || 'https://different-warthog-453.eu-west-1.convex.cloud';
 	setupConvex(CONVEX_URL);
-	setupConvex(CONVEX_URL);
-	const client = useConvexClient();
 
 	// Reactively bind Firebase Auth token state to the Convex WebSocket client
 	$effect(() => {
