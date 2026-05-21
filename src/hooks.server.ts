@@ -1,6 +1,7 @@
 import { redirect, type Handle } from '@sveltejs/kit';
+import { env } from '$env/dynamic/private';
 
-const ADMIN_SESSION_SECRET = "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
+const ADMIN_SESSION_SECRET = env.ADMIN_SESSION_SECRET || "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const { url, cookies } = event;

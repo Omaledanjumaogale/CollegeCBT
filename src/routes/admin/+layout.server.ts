@@ -1,7 +1,8 @@
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
+import { env } from '$env/dynamic/private';
 
-const ADMIN_SESSION_SECRET = "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
+const ADMIN_SESSION_SECRET = env.ADMIN_SESSION_SECRET || "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
 
 export const load: LayoutServerLoad = async ({ url, cookies }) => {
 	// ── Bypass Gate for Login Page ──

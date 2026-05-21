@@ -69,7 +69,7 @@ export async function requireAdmin(ctx: QueryCtx | MutationCtx) {
  * Validate admin permission via either a session token secret or Firebase Auth admin role.
  */
 export async function validateAdminAuth(ctx: QueryCtx | MutationCtx, adminSecret?: string) {
-  const ADMIN_SESSION_SECRET = "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
+  const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
   if (adminSecret === ADMIN_SESSION_SECRET) {
     return true;
   }
