@@ -7,21 +7,21 @@ const siteUrl = 'https://collegecbt.ewinproject.org';
 
 const feedItems = [
 	{
-		title: 'E-WIN Launches CollegeCBT Platform',
-		description: 'Elite Workforce Impact Nigeria Project (E-WIN) officially unveils CollegeCBT to modernize and scale academic test prep across Nigeria.',
-		link: '/blog/ewin-launches-collegecbt',
+		title: 'CollegeCBT — AI Exam Practice Platform Launch',
+		description: 'CollegeCBT launches AI-powered exam preparation for 550+ Nigerian universities, polytechnics, and colleges of education.',
+		link: '/exam-lab',
 		pubDate: 'Wed, 20 May 2026 08:00:00 GMT'
 	},
 	{
-		title: 'Practical Strategies for CBT Examination Preparation',
-		description: 'Discover how timed practice simulations and cognitive reinforcement help students optimize their score potential.',
-		link: '/blog/boosting-cbt-scores-nigeria',
+		title: 'How Mock Exams Improve CBT Preparation Scores',
+		description: 'Discover how timed practice simulations and cognitive reinforcement help students optimize their score potential using CollegeCBT.',
+		link: '/pricing',
 		pubDate: 'Mon, 18 May 2026 12:00:00 GMT'
 	},
 	{
-		title: 'AI Grading Models in Higher Education Assessments',
-		description: 'A study on model grading accuracy, feedback loop speeds, and curriculum alignment metrics within CollegeCBT systems.',
-		link: '/blog/ai-grading-in-education',
+		title: 'Understanding WAEC A1–F9 Grading for Nigerian Students',
+		description: 'A comprehensive guide to WAEC grading bands and how CollegeCBT AI models align with NUC/NBTE/NCCE curriculum standards.',
+		link: '/about',
 		pubDate: 'Sat, 16 May 2026 10:30:00 GMT'
 	}
 ];

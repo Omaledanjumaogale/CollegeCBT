@@ -48,6 +48,22 @@
 	<!-- High-fidelity Hero Section with Interactive Demo -->
 	<Hero />
 
+	<!-- E-WIN Ecosystem Banner — Schema.org Organization structured data for SEO/AEO -->
+	<div itemscope itemtype="https://schema.org/Organization" class="w-full py-3 md:py-4" style="background: rgba(108, 217, 115, 0.06); border-bottom: 1px solid rgba(108, 217, 115, 0.12);">
+		<div class="page-container flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-center">
+			<meta itemprop="name" content="Elite Workforce Impact Nigeria (E-WIN) Project" />
+			<meta itemprop="url" content="https://ewinproject.org" />
+			<link itemprop="parentOrganization" href="https://ewinproject.org" />
+			<span class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-emerald-300/70 whitespace-nowrap">🏛️ Part of the</span>
+			<a href="https://ewinproject.org" target="_blank" rel="noopener noreferrer" 
+				class="text-[11px] sm:text-sm font-bold text-emerald-300 hover:text-emerald-200 transition-colors underline underline-offset-4 decoration-emerald-500/30 hover:decoration-emerald-500/60"
+				itemprop="brand">
+				Elite Workforce Impact Nigeria (E-WIN) Project Ecosystem
+			</a>
+			<span class="hidden sm:inline text-emerald-300/40 text-xs">↗</span>
+		</div>
+	</div>
+
 	<!-- Real-time Platform Statistics -->
 	<Stats />
 

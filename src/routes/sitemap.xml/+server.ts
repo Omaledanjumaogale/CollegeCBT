@@ -5,20 +5,14 @@ export const _dynamic = 'force-dynamic';
 
 const siteUrl = 'https://collegecbt.ewinproject.org';
 
-// Static routes to index
+// Static routes to index — only routes that actually exist in the app
 const staticRoutes = [
 	{ path: '', changefreq: 'daily', priority: '1.0' },
 	{ path: '/pricing', changefreq: 'weekly', priority: '0.8' },
 	{ path: '/about', changefreq: 'monthly', priority: '0.7' },
-	{ path: '/faq', changefreq: 'weekly', priority: '0.7' },
-	{ path: '/docs', changefreq: 'weekly', priority: '0.8' },
-	{ path: '/glossary', changefreq: 'monthly', priority: '0.6' }
+	{ path: '/exam-lab', changefreq: 'daily', priority: '0.9' },
+	{ path: '/resources', changefreq: 'weekly', priority: '0.7' },
 ];
-
-// Dynamic topics/terms for sitemap generation
-const mockDocsTopics = ['timed-testing', 'grading-rubric', 'jamb-setup', 'institution-billing'];
-const mockBlogSlugs = ['boosting-cbt-scores-nigeria', 'ewin-launches-collegecbt', 'ai-grading-in-education'];
-const mockGlossaryTerms = ['nuc', 'nbte', 'ncce', 'cbt', 'utme', 'post-utme'];
 
 export const GET: RequestHandler = async () => {
 	const lastmod = new Date().toISOString().split('T')[0];
@@ -26,7 +20,7 @@ export const GET: RequestHandler = async () => {
 	let xml = `<?xml version="1.0" encoding="UTF-8"?>`;
 	xml += `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`;
 
-	// 1. Append Static Pages
+	// 1. Static Pages (only routes that exist)
 	for (const route of staticRoutes) {
 		xml += `
 		<url>
@@ -37,36 +31,24 @@ export const GET: RequestHandler = async () => {
 		</url>`;
 	}
 
-	// 2. Append Dynamic Doc Topics
-	for (const topic of mockDocsTopics) {
-		xml += `
+	// 2. Exam Lab with course params (highly dynamic — daily crawl)
+	xml += `
 		<url>
-			<loc>${siteUrl}/docs/${topic}</loc>
+			<loc>${siteUrl}/exam-lab?mode=mock</loc>
 			<lastmod>${lastmod}</lastmod>
-			<changefreq>weekly</changefreq>
+			<changefreq>daily</changefreq>
 			<priority>0.7</priority>
 		</url>`;
-	}
 
-	// 3. Append Dynamic Blog Posts
-	for (const slug of mockBlogSlugs) {
-		xml += `
-		<url>
-			<loc>${siteUrl}/blog/${slug}</loc>
-			<lastmod>${lastmod}</lastmod>
-			<changefreq>monthly</changefreq>
-			<priority>0.6</priority>
-		</url>`;
-	}
-
-	// 4. Append Dynamic Glossary terms
-	for (const term of mockGlossaryTerms) {
+	// 3. Glossary terms — static content pages that exist in courseData.ts
+	const glossaryTerms = ['nuc', 'nbte', 'ncce', 'cbt', 'utme', 'post-utme', 'waec', 'neco', 'jamb', 'hnd', 'nd', 'nce', 'gce'];
+	for (const term of glossaryTerms) {
 		xml += `
 		<url>
 			<loc>${siteUrl}/glossary/${term}</loc>
 			<lastmod>${lastmod}</lastmod>
 			<changefreq>monthly</changefreq>
-			<priority>0.5</priority>
+			<priority>0.4</priority>
 		</url>`;
 	}
 

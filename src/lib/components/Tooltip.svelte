@@ -1,50 +1,41 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
-	import type { Writable } from 'svelte/store';
+	import { getTooltipStore } from '$lib/stores/tooltip';
+	let { text = '' }: { text?: string } = $props();
 
-	const activeTooltip = getContext<Writable<{id: string, text: string, x: number, y: number} | null>>('tooltip');
+	const store = getTooltipStore();
 
-	const { text, position = 'top', children } = $props<{ 
-		text: string; 
-		position?: 'top' | 'bottom' | 'left' | 'right';
-		children?: any;
-	}>();
-
-	let el: HTMLElement;
-
-	function show() {
-		if (!el) return;
-		const rect = el.getBoundingClientRect();
-		activeTooltip?.set({
-			id: Math.random().toString(),
+	function handleMouseEnter(e: MouseEvent) {
+		if (!text) return;
+		store.set({
 			text,
-			x: rect.left + rect.width / 2,
-			y: position === 'top' ? rect.top : rect.bottom
+			x: e.clientX,
+			y: e.clientY,
+			visible: true,
 		});
 	}
 
-	function hide() {
-		activeTooltip?.set(null);
+	function handleMouseMove(e: MouseEvent) {
+		if (!text) return;
+		store.update((s) => ({ ...s, x: e.clientX, y: e.clientY }));
+	}
+
+	function handleMouseLeave() {
+		store.update((s) => ({ ...s, visible: false }));
 	}
 </script>
 
-<div 
-	bind:this={el}
-	class="inline-block relative cursor-help"
-	onmouseenter={show}
-	onmouseleave={hide}
-	onfocus={show}
-	onblur={hide}
-	role="button"
-	aria-label={text}
-	tabindex="0"
->
-	<div class="inline-flex items-center gap-1.5 group">
-		{@render children?.()}
-		
-		<!-- Small knowledge icon indicator -->
-		<div class="w-3.5 h-3.5 rounded-full bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-[8px] text-violet-300 group-hover:bg-violet-500/20 transition-all opacity-40 group-hover:opacity-100">
-			?
-		</div>
-	</div>
-</div>
+{#if text}
+	<button
+		class="inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold cursor-help flex-shrink-0 ml-1"
+		style="background:rgba(124,58,237,0.15); color:var(--violet-light); border:1px solid rgba(124,58,237,0.25);"
+		onmouseenter={handleMouseEnter}
+		onmousemove={handleMouseMove}
+		onmouseleave={handleMouseLeave}
+		onfocus={() => {}}
+		onblur={() => {}}
+		type="button"
+		aria-label={text}
+	>
+		?
+	</button>
+{/if}

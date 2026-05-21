@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { convex } from '$lib/services/convexClient';
-	import { anyApi } from 'convex/server';
+	import { convex, api } from '$lib/services/convexClient';
 	import { showToast } from '$lib/stores';
+	import { onMount } from 'svelte';
 
 	// ── Props ──
 	let { data } = $props();
 
-	// ── Feature Flags State (local with Convex sync planned) ──
+	// ── Feature Flags ──
 	let flags = $state([
 		{ id: 'ai_orchestration',    label: 'AI Exam Generation',     desc: 'Enable multi-model AI question generation for all users.',   enabled: true,  badge: 'Core' },
 		{ id: 'crawl4ai_pipeline',   label: 'Web Research Agent',     desc: 'Allow AI agents to fetch and cache external content.',        enabled: true,  badge: 'AI' },
@@ -18,18 +18,42 @@
 		{ id: 'email_notifications', label: 'Email Notifications',     desc: 'Send automated emails on score submissions and upgrades.',   enabled: true,  badge: 'Comms' },
 	]);
 
+	// ── Load persisted state from Convex on mount ──
+	onMount(async () => {
+		try {
+			const persisted: any[] = await convex.query(api.admin.getAllConfigFlags);
+			for (const p of persisted) {
+				const flag = flags.find(f => `flag_${f.id}` === p.key || f.id === p.key);
+				if (flag) {
+					flag.enabled = p.value === 'true';
+				}
+			}
+		} catch (err) {
+			console.error('[Admin Config] Failed to load persisted flags:', err);
+		}
+	});
+
 	async function toggleFlag(id: string) {
 		const flag = flags.find(f => f.id === id);
 		if (!flag) return;
 		flag.enabled = !flag.enabled;
 
-		// Sync maintenance_mode to Convex backend
-		if (id === 'maintenance_mode') {
-			try {
-				await convex.mutation(anyApi.admin.setMaintenanceMode, { enabled: flag.enabled, adminSecret: data?.adminSecret });
-			} catch (err) {
-				console.error('[Admin] Maintenance flag sync failed:', err);
+		// Persist every flag toggle to Convex configFlags
+		try {
+			if (id === 'maintenance_mode') {
+				await convex.mutation(api.admin.setMaintenanceMode, { enabled: flag.enabled });
 			}
+			await convex.mutation(api.admin.setConfigFlag, {
+				key: `flag_${id}`,
+				value: flag.enabled ? 'true' : 'false',
+				description: flag.desc,
+			});
+		} catch (err) {
+			console.error(`[Admin Config] Sync failed for flag "${id}":`, err);
+			// Revert on failure
+			flag.enabled = !flag.enabled;
+			showToast('❌ Sync Failed', `Could not persist "${flag.label}" state to Convex.`, 'error');
+			return;
 		}
 
 		showToast(

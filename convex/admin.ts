@@ -40,6 +40,71 @@ export const getDashboardStats = query({
   },
 });
 
+/**
+ * Admin: Set any config flag — used by admin settings panel for feature flags and platform config.
+ */
+export const setConfigFlag = mutation({
+  args: {
+    key: v.string(),
+    value: v.string(),
+    description: v.optional(v.string()),
+    adminSecret: v.optional(v.string()),
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handler: async (ctx: any, args: any) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
+    const existing = await ctx.db
+      .query('configFlags')
+      .withIndex('by_key', (q: any) => q.eq('key', args.key))
+      .unique();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        value: args.value,
+        description: args.description ?? existing.description,
+        updatedAt: Date.now(),
+      });
+    } else {
+      await ctx.db.insert('configFlags', {
+        key: args.key,
+        value: args.value,
+        description: args.description ?? '',
+        updatedAt: Date.now(),
+      });
+    }
+
+    await ctx.db.insert('auditLogs', {
+      userId: 'SYSTEM',
+      action: `config_flag_set:${args.key}`,
+      status: 'success',
+      metadata: JSON.stringify({ key: args.key, value: args.value }),
+      timestamp: Date.now(),
+    });
+
+    return { success: true };
+  },
+});
+
+/**
+ * Admin: Get all config flags.
+ */
+export const getAllConfigFlags = query({
+  args: { adminSecret: v.optional(v.string()) },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  handler: async (ctx: any, args: any) => {
+    await validateAdminAuth(ctx, args.adminSecret);
+
+    const flags = await ctx.db.query('configFlags').collect();
+    return flags.map((f: any) => ({
+      key: f.key,
+      value: f.value,
+      description: f.description ?? '',
+      updatedAt: f.updatedAt,
+    }));
+  },
+});
+
 export const getRecentActivity = query({
   args: { limit: v.number(), adminSecret: v.optional(v.string()) },
   handler: async (ctx, args) => {

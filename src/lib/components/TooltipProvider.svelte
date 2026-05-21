@@ -1,19 +1,25 @@
 <script lang="ts">
-	// TooltipProvider: Manages global tooltip visibility and positioning
-	import { setContext } from 'svelte';
-	import { writable } from 'svelte/store';
+	import { createTooltipStore, getTooltipStore } from '$lib/stores/tooltip';
 
-	const activeTooltip = writable<{id: string, text: string, x: number, y: number} | null>(null);
-	setContext('tooltip', activeTooltip);
+	const { subscribe, set, update } = createTooltipStore();
+
+	let activeTooltip = $state<{ text: string; x: number; y: number; visible: boolean }>({ text: '', x: 0, y: 0, visible: false });
+
+	$effect(() => {
+		const unsub = subscribe((val) => {
+			activeTooltip = val;
+		});
+		return unsub;
+	});
 </script>
 
-<slot />
-
-{#if $activeTooltip}
-	<div 
-		class="fixed z-[9999] px-2 py-1 rounded bg-black/90 border border-white/10 text-[10px] text-white/80 pointer-events-none transition-all duration-200 shadow-xl"
-		style="left: {$activeTooltip.x}px; top: {$activeTooltip.y}px; transform: translate(-50%, -120%);"
+{#if activeTooltip.visible}
+	<div
+		class="fixed z-[9999] px-3 py-1.5 rounded-lg text-xs font-medium pointer-events-none shadow-xl transition-opacity"
+		style="left:{activeTooltip.x}px;top:{activeTooltip.y - 36}px;background:var(--bg-alt);border:1px solid var(--glass-border);color:var(--text);"
 	>
-		{$activeTooltip.text}
+		{activeTooltip.text}
 	</div>
 {/if}
+
+{@render children?.()}
