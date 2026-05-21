@@ -22,16 +22,16 @@
 		if (syncedProfile.data && syncedProfile.data.plan === 'pro') {
 			showToast('🎉 Account Upgraded', 'Your Student Pro plan has been activated successfully!', 'success');
 			
-			// ── E-WIN Referral Subscription Event Recording (Non-fatal) ──
-			import('$lib/services/referral').then(async ({ recordReferralEvent }) => {
+			// ── E-WIN Referral Subscription Commission (Non-fatal) ──
+			import('$lib/services/referral').then(async ({ recordSubscriptionCommission }) => {
 				try {
-					await recordReferralEvent('subscription', {
-						userId: $currentUser?.uid || '',
-						email: $currentUser?.email || '',
-						amount: 10000
-					});
+					await recordSubscriptionCommission(
+						$currentUser?.uid || '',
+						'pro',
+						8500
+					);
 				} catch (err) {
-					console.warn('[Referral] Failed to record subscription referral (non-fatal):', err);
+					console.warn('[E-WIN Referral] Commission recording failed (non-fatal):', err);
 				}
 			});
 

@@ -101,13 +101,14 @@ async function getFirebase(): Promise<Auth | null> {
 
 						// ── E-WIN Referral Recording (Non-fatal) ──
 						try {
-							const { recordReferralEvent } = await import('./referral');
-							await recordReferralEvent('signup', {
-								userId: firebaseUser.uid,
-								email: firebaseUser.email || '',
-							});
+							const { recordReferralAfterSignup } = await import('./referral');
+							await recordReferralAfterSignup(
+								firebaseUser.uid,
+								userData.displayName,
+								firebaseUser.email || ''
+							);
 						} catch (refErr) {
-							console.warn('[CollegeCBT Referral] Referral tracking error (non-fatal):', refErr);
+							console.warn('[E-WIN Referral] Signup tracking error (non-fatal):', refErr);
 						}
 					} catch (e) {
 						console.warn('[CollegeCBT] Convex sync on auth change failed (non-critical):', e);

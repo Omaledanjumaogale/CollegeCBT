@@ -85,14 +85,14 @@ export const POST: RequestHandler = async ({ request, platform }) => {
                     reference: paymentReference
                 }) as any;
 
-                // Sync referral to E-WIN Server API (Non-fatal / Non-blocking)
-                if (result?.success && result.referralCode) {
+                // Sync referral commission to E-WIN Server (Non-fatal / Non-blocking)
+                if (result?.success && result.email) {
                     try {
                         const { syncReferralToEwinServer } = await import('$lib/services/referral');
                         await syncReferralToEwinServer({
                             userId: result.userId,
                             email: result.email,
-                            referralCode: result.referralCode,
+                            referralCode: result.referralCode || 'webhook_auto',
                             type: 'subscription',
                             amount: Number(amount)
                         });

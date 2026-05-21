@@ -5,7 +5,7 @@ import { api, convex } from '$lib/services/convexClient';
 
 // ─── Edge-compatible in-memory rate limiter ───────────────────────────────────
 // Uses a Map keyed by IP or UID, pruned every 10 minutes to prevent memory leaks.
-const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
+const rateLimitFallback = new Map<string, { count: number; windowStart: number }>();
 const WINDOW_MS = 60_000; // 1 minute window
 const FREE_LIMIT = 5;     // 5 req/min for free/unauthenticated users
 const PRO_LIMIT  = 60;    // 60 req/min for pro users
@@ -85,7 +85,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			|| 'unknown';
 		const rlKey   = uid ? `uid:${uid}` : `ip:${ip}`;
 		const limit   = userPlan === 'free' ? FREE_LIMIT : PRO_LIMIT;
-		const { allowed, remaining } = checkAndPrune(rlKey, limit);
+		const { allowed, remaining } = await checkRateLimit(rlKey, limit);
 
 		if (!allowed) {
 			return json(
