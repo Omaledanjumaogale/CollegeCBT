@@ -6,8 +6,7 @@ import { showToast } from '$lib/stores';
  * Orchestrates VAPID subscription, permission gating, and service worker synchronization.
  */
 
-import { convex } from '$lib/services/convexClient';
-import { anyApi } from 'convex/server';
+import { convex, api } from '$lib/services/convexClient';
 
 const VAPID_KEY = import.meta.env.PUBLIC_VAPID_PUBLIC_KEY || '';
 
@@ -43,7 +42,7 @@ export async function subscribeToPush(userId?: string) {
 
         // Synchronize with Convex backend if userId is logged in
         if (userId && subscription) {
-            await convex.mutation(anyApi.notifications.saveSubscription, {
+            await convex.mutation(api.notifications.saveSubscription, {
                 userId,
                 subscription: JSON.stringify(subscription)
             });

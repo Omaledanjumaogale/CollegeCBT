@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { useQuery } from 'convex-svelte';
 	import { api, convex } from '$lib/services/convexClient';
-	import { anyApi } from 'convex/server';
 	import { fade, slide } from 'svelte/transition';
 	import { showToast } from '$lib/stores';
 	import Tooltip from '$lib/components/Tooltip.svelte';
@@ -13,7 +12,7 @@
 	const statsQuery = useQuery(api.admin.getDashboardStats, () => ({ adminSecret: data?.adminSecret }));
 	const activityQuery = useQuery(api.admin.getRecentActivity, () => ({ limit: 12, adminSecret: data?.adminSecret }));
 	const healthQuery = useQuery(api.admin.getSystemHealth, () => ({ adminSecret: data?.adminSecret }));
-	const maintenanceQuery = useQuery(anyApi.admin.getConfigFlag, () => ({ key: 'maintenance_mode', adminSecret: data?.adminSecret }));
+	const maintenanceQuery = useQuery(api.admin.getConfigFlag, () => ({ key: 'maintenance_mode', adminSecret: data?.adminSecret }));
 
 	// ── Metrics Computed via .data property (Svelte 5 runes mode) ──
 	let stats = $derived(statsQuery.data);
@@ -68,7 +67,7 @@
 		isFlushing = true;
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const result: any = await convex.mutation(anyApi.admin.flushCache, { adminSecret: data?.adminSecret });
+			const result: any = await convex.mutation(api.admin.flushCache, { adminSecret: data?.adminSecret });
 			showToast('✅ Cache Flushed', `${result?.flushed ?? 0} entries cleared from global cache.`, 'success');
 		} catch (err) {
 			showToast('❌ Flush Failed', 'Could not flush cache. Check logs.', 'error');
@@ -82,7 +81,7 @@
 		isTogglingMaintenance = true;
 		try {
 			const next = !maintenanceEnabled;
-			await convex.mutation(anyApi.admin.setMaintenanceMode, { enabled: next, adminSecret: data?.adminSecret });
+			await convex.mutation(api.admin.setMaintenanceMode, { enabled: next, adminSecret: data?.adminSecret });
 			showToast(
 				next ? '🛑 Maintenance ON' : '✅ Maintenance OFF',
 				next ? 'AI generation is now blocked for all users.' : 'System returned to normal operation.',

@@ -1,8 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { convex } from '$lib/services/convexClient';
-import { anyApi } from 'convex/server';
+import { convex, api } from '$lib/services/convexClient';
 
 export const _runtime = 'edge';
 export const _dynamic = 'force-dynamic';
@@ -91,7 +90,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     console.log(`[payment/mock-trigger] Executing simulated Convex plan upgrade for reference: ${reference}`);
 
     // Call Convex mutation to record subscription and update user profile to pro
-    const result = await convex.mutation(anyApi.users.processPayment, {
+    const result = await convex.mutation(api.users.processPayment, {
       email: email,
       plan: 'pro',
       amount: amount,

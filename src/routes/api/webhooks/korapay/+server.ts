@@ -1,7 +1,6 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { convex } from '$lib/services/convexClient';
-import { anyApi } from 'convex/server';
+import { convex, api } from '$lib/services/convexClient';
 import { env } from '$env/dynamic/private';
 
 export const _runtime = 'edge';
@@ -73,7 +72,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
             console.log(`[Korapay Webhook] Payment verified: ${reference} for ${email}`);
             try {
                 // Call unified Convex transaction mutation to process subscription state
-                const result = await convex.mutation(anyApi.users.processPayment, {
+                const result = await convex.mutation(api.users.processPayment, {
                     email,
                     plan: 'pro',
                     amount: Number(amount),

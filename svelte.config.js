@@ -7,7 +7,7 @@ const config = {
 	kit: {
 		prerender: {
 			entries: ['*', '/sitemap.xml', '/robots.txt'],
-			handleHttpError: 'warn',
+			handleHttpError: 'fail',
 			handleUnseenRoutes: 'ignore'
 		},
 		adapter: adapter({

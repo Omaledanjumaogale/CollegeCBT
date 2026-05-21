@@ -88,14 +88,13 @@ async function getFirebase(): Promise<Auth | null> {
 					// ── Sync with Convex Platform DB ───────────────────────────────
 					// Attach Firebase ID Token so ctx.auth works in Convex mutations
 					try {
-						const { convex } = await import('./convexClient');
-						const { anyApi } = await import('convex/server');
+						const { convex, api } = await import('./convexClient');
 						const idToken = await firebaseUser.getIdToken();
 						// Attach token so Convex server-side auth can verify identity
 						if (typeof (convex as any).setAuth === 'function') {
 							(convex as any).setAuth(async () => idToken);
 						}
-						await convex.mutation(anyApi.users.storeUser, {
+						await convex.mutation(api.users.storeUser, {
 							plan: userData.plan ?? 'free'
 						});
 

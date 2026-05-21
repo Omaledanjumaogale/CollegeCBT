@@ -8,5 +8,6 @@ pages_build_output_dir = ".svelte-kit/cloudflare"
 PUBLIC_APP_NAME = "CollegeCBT"
 PUBLIC_APP_URL = "https://collegecbt.ewinproject.org"
 PUBLIC_CONVEX_URL = "https://different-warthog-453.eu-west-1.convex.cloud"
-PUBLIC_FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-6fbe0737ae2abee7bc40018b8f1f98be-X"
-PUBLIC_KORAPAY_PUBLIC_KEY = "pk_live_pzXVe13KtNtPVTEZT7e85NCGFhyjfwuCw9S6CWzx"
+# Live API keys — set these in Cloudflare Pages dashboard, NOT committed to version control
+# PUBLIC_FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-..."
+# PUBLIC_KORAPAY_PUBLIC_KEY = "pk_live_..."
