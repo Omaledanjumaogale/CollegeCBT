@@ -19,9 +19,16 @@
 	import { env } from '$env/dynamic/public';
 
 	// ── Initialize Convex real-time WebSocket client ──
-	// This must run during component init (not onMount) so setContext works
+	// setupConvex MUST run on every render (SSR included) to set Svelte context for useQuery.
+	// The library passes disabled: true on SSR so no WebSocket connects.
 	const CONVEX_URL = env?.PUBLIC_CONVEX_URL || 'https://different-warthog-453.eu-west-1.convex.cloud';
 	setupConvex(CONVEX_URL);
+	let client: ReturnType<typeof useConvexClient> | null = $state(null);
+	$effect(() => {
+		if (browser) {
+			client = useConvexClient();
+		}
+	});
 
 	// Reactively bind Firebase Auth token state to the Convex WebSocket client
 	$effect(() => {
@@ -29,11 +36,11 @@
 			import('$lib/services/firebase').then(async ({ getFirebaseIdToken }) => {
 				const idToken = await getFirebaseIdToken();
 				if (idToken) {
-					client.setAuth(async () => idToken);
+					client?.setAuth(async () => idToken);
 				}
 			});
 		} else {
-			client.setAuth(async () => null);
+			client?.setAuth(async () => null);
 		}
 	});
 
