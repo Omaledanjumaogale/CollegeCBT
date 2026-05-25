@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { activeModal } from '$lib/stores';
 	import { onMount } from 'svelte';
+	import ReadinessCard from './ReadinessCard.svelte';
 
 	let demoAnswered = $state(false);
 	let demoCorrect = $state(false);
@@ -101,7 +102,7 @@
 			</div>
 
 			<!-- Right: Interactive MCQ Demo Card -->
-			<div class="relative w-full">
+			<div class="relative w-full space-y-6">
 				<div class="glass-card p-6 relative z-10 border-lime-500/20">
 					<!-- Card Header -->
 					<div class="flex items-center justify-between mb-4">
@@ -166,6 +167,7 @@
 						<div class="text-xs text-white/30 text-center font-medium italic">Click an option above — experience the real Exam Lab</div>
 					{/if}
 				</div>
+				<ReadinessCard />
 
 				<!-- Floating Decorative Elements -->
 				<div class="absolute -top-6 -right-4 glass-card px-4 py-2 hidden sm:flex items-center gap-3 border-lime-500/30 animate-pulse-subtle scale-90">

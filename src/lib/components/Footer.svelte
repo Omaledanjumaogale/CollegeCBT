@@ -22,9 +22,13 @@
 					Nigeria's #1 AI-powered exam preparation engine for higher institutions. Aligned to NUC, NBTE, and NCCE curriculum.
 				</p>
 				<div class="flex gap-4">
-					{#each ['Twitter', 'LinkedIn', 'Facebook'] as platform}
-						<a href="#{platform}" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all">
-							<span class="text-sm font-black italic">{platform[0]}</span>
+					{#each [
+						{ label: 'Twitter/X', href: 'https://twitter.com/EWinProject', mark: 'X' },
+						{ label: 'LinkedIn', href: 'https://linkedin.com/company/ewinproject', mark: 'in' },
+						{ label: 'Email', href: 'mailto:support@collegecbt.dev', mark: '@' }
+					] as platform}
+						<a href={platform.href} target={platform.href.startsWith('http') ? '_blank' : undefined} rel={platform.href.startsWith('http') ? 'noopener noreferrer' : undefined} aria-label={platform.label} class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all">
+							<span class="text-sm font-black italic">{platform.mark}</span>
 						</a>
 					{/each}
 				</div>
@@ -51,6 +55,7 @@
 				<ul class="flex flex-col gap-4">
 					{#each [
 						{ name: 'Pricing', link: '/pricing' },
+						{ name: 'FAQ', link: '/faq' },
 						{ name: 'Terms of Service', link: '/terms' },
 						{ name: 'Privacy Policy', link: '/privacy' },
 						{ name: 'Contact Us', link: 'mailto:support@collegecbt.dev' }

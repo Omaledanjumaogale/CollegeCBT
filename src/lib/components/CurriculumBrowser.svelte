@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { NIGERIAN_CURRICULUM, COURSES, LEVELS, type InstitutionType } from '$lib/data/courseData';
 	import { fade, slide } from 'svelte/transition';
-	import { goto } from '$app/navigation';
-	import { isPro, currentUser } from '$lib/stores';
 	import Tooltip from './Tooltip.svelte';
+	import SelectedCourseBar from './SelectedCourseBar.svelte';
 
 	let activeType = $state<InstitutionType | 'JAMB'>('University');
 	
@@ -22,13 +21,15 @@
 	};
 
 	let searchQuery = $state('');
+	let selectedCourse = $state('');
 
 	let displayedCourses = $derived((courseSamples[activeType] || [])
 		.filter((c: string) => c.toLowerCase().includes(searchQuery.toLowerCase())));
 
-	function launchPractice(course: string) {
+	function selectCourse(course: string) {
+		selectedCourse = course;
 		if (activeType === 'JAMB') {
-			goto(`/exam-lab?course=${encodeURIComponent(course)}&mode=mock&inst=JAMB`);
+			selectedLevel = '';
 			return;
 		}
 		
@@ -36,8 +37,6 @@
 			// Select first level if none selected to make it easy
 			selectedLevel = availableLevels[0] || '100 Level';
 		}
-		
-		goto(`/exam-lab?course=${encodeURIComponent(course)}&level=${encodeURIComponent(selectedLevel)}&inst=${encodeURIComponent(activeType)}&mode=lab`);
 	}
 
 	const types: {id: InstitutionType | 'JAMB', label: string, icon: string}[] = [
@@ -64,6 +63,7 @@
 					onclick={() => {
 						activeType = t.id;
 						selectedLevel = '';
+						selectedCourse = '';
 					}}
 				>
 					<span class="text-lg">{t.icon}</span>
@@ -110,8 +110,8 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
 				{#each displayedCourses as course}
 					<button
-						class="text-left p-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 hover:border-violet-500/30 transition-all group relative overflow-hidden"
-						onclick={() => launchPractice(course)}
+						class="text-left p-4 rounded-xl border transition-all group relative overflow-hidden {selectedCourse === course ? 'border-lime-500 bg-lime-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-violet-500/30'}"
+						onclick={() => selectCourse(course)}
 					>
 						<div class="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0">
 							<span class="text-violet-400">→</span>
@@ -123,6 +123,9 @@
 					</button>
 				{/each}
 			</div>
+			{#if selectedCourse}
+				<SelectedCourseBar course={selectedCourse} level={selectedLevel} institutionType={activeType} />
+			{/if}
 		{:else}
 			<div class="text-center py-10 border border-dashed border-white/10 rounded-2xl">
 				<div class="text-3xl mb-2 opacity-50">📂</div>

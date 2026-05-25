@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import { currentUser, isPro, showToast } from '$lib/stores';
 	import AcademicSelector from '$lib/components/AcademicSelector.svelte';
+	import ExamScoreBar from '$lib/components/ExamScoreBar.svelte';
 	import { fade, slide } from 'svelte/transition';
 
 	// ── TAB STATE ──
@@ -493,34 +494,13 @@
 				<!-- LAB VIEW -->
 				<div class="space-y-6">
 					{#if labStats.total > 0}
-						<!-- Score Bar -->
-						<div class="glass p-4 rounded-2xl border-white/10 flex items-center gap-4 text-xs flex-wrap justify-center sm:justify-between">
-							<div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5">
-								<span class="text-white/40">📋</span>
-								<span class="text-white/70 font-bold tabular-nums">{labStats.total}</span>
-								<span class="text-white/30">Total</span>
-							</div>
-							<div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5">
-								<span class="text-lime-400">✅</span>
-								<span class="text-lime-400 font-bold tabular-nums">{labStats.correct}</span>
-								<span class="text-white/30">Correct</span>
-							</div>
-							<div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5">
-								<span class="text-rose-400">❌</span>
-								<span class="text-rose-400 font-bold tabular-nums">{labStats.wrong}</span>
-								<span class="text-white/30">Wrong</span>
-							</div>
-							<div class="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5">
-								<span class="text-amber-400">📈</span>
-								<span class="text-amber-400 font-bold tabular-nums">{labStats.score}</span>
-								<span class="text-white/30">Score</span>
-							</div>
-							<div class="flex items-center gap-2 px-3 py-1.5 rounded-xl" style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.25);">
-								<span>🔥</span>
-								<span class="text-amber-400 font-bold tabular-nums">{labStats.streak}</span>
-								<span class="text-white/30">Streak</span>
-							</div>
-						</div>
+						<ExamScoreBar
+							questions={labStats.total}
+							correct={labStats.correct}
+							wrong={labStats.wrong}
+							score={labStats.score}
+							streak={labStats.streak}
+						/>
 					{/if}
 
 					{#if labQuestion}
