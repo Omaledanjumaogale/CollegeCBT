@@ -1,7 +1,6 @@
 <script lang="ts">
 	import '../app.css';
 	import DynamicNavbar from '$lib/components/DynamicNavbar.svelte';
-	import BottomNav from '$lib/components/BottomNav.svelte';
 	import TooltipProvider from '$lib/components/TooltipProvider.svelte';
 	import AppPreferencesProvider from '$lib/components/AppPreferencesProvider.svelte';
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
@@ -166,10 +165,9 @@
 		<ToastProvider>
 			<TooltipProvider>
 				<DynamicNavbar />
-				<main class="relative z-10 pt-[68px] pb-20 md:pb-0" id="main-content">
+				<main class="relative z-10 pt-[68px]" id="main-content">
 					{@render children?.()}
 				</main>
-				<BottomNav />
 				<Footer />
 			</TooltipProvider>
 		</ToastProvider>

@@ -12,6 +12,8 @@
 		{ href: '/exam-lab', label: '🤖 Exam Lab' },
 		{ href: '/pricing', label: '💰 Pricing' },
 		{ href: '/resources', label: '📖 Resources' },
+		{ href: '/about', label: '🏢 About' },
+		{ href: '/faq', label: '❓ FAQs' },
 	];
 
 	const authLinks = [
@@ -22,6 +24,7 @@
 		{ href: '/dashboard/certificate', label: '🎓 My Certificate' },
 		{ href: '/pricing', label: '💰 Pricing' },
 		{ href: '/resources', label: '📖 Resources' },
+		{ href: '/faq', label: '❓ FAQs' },
 	];
 
 	let navLinks = $derived(
