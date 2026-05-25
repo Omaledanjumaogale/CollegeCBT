@@ -136,6 +136,9 @@ export async function browseUrl(url: string, apiKey: string): Promise<any> {
 		}
 
 		if (result.status === 'queued') {
+			if (!result.jobId) {
+				throw new Error('Crawl job was queued without a job id');
+			}
 			// Poll for results (Basic polling strategy)
 			let attempts = 0;
 			const maxAttempts = 30; // 30s max

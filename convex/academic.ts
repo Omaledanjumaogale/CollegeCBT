@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
+import { requireAdmin } from './authGuard';
 
 /**
  * Sync institutions list into the database.
@@ -14,6 +15,7 @@ export const syncInstitutions = mutation({
     }))
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     for (const item of args.data) {
       const existing = await ctx.db
         .query('institutions')
@@ -45,6 +47,7 @@ export const syncCurriculum = mutation({
     }))
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     for (const item of args.data) {
       const existing = await ctx.db
         .query('curriculum')
@@ -84,6 +87,7 @@ export const seedData = mutation({
     }))
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     let instCount = 0;
     let currCount = 0;
 

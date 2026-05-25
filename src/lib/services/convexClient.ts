@@ -1,14 +1,14 @@
 import { ConvexHttpClient } from 'convex/browser';
-import { anyApi } from 'convex/server';
 import { api } from '$convex/_generated/api';
 import { env } from '$env/dynamic/public';
 import type { StudySession } from '$lib/stores';
+import type { Id } from '$convex/_generated/dataModel';
 
 export { api };
 
 // Edge-compatible Convex client using $env/dynamic/public (resolved safely at runtime).
 // No process.env usage — fully safe for Cloudflare Workers edge runtime.
-const convexUrl = env?.PUBLIC_CONVEX_URL || 'https://different-warthog-453.eu-west-1.convex.cloud';
+const convexUrl = env?.PUBLIC_CONVEX_URL || '';
 
 export const convex = new ConvexHttpClient(convexUrl);
 
@@ -23,7 +23,7 @@ export function getConvexClient() {
 export async function saveStudySession(userId: string, session: StudySession): Promise<boolean> {
 	try {
 		if (!userId) return false;
-		await convex.mutation(anyApi.sessions.saveSession, {
+		await convex.mutation(api.sessions.saveSession, {
 			userId,
 			sessionId: session.id,
 			course: session.course,
@@ -47,7 +47,7 @@ export async function saveStudySession(userId: string, session: StudySession): P
 export async function getUserSessions(userId: string): Promise<StudySession[]> {
 	try {
 		if (!userId) return [];
-		const sessions = await convex.query(anyApi.sessions.getUserSessions, { userId });
+		const sessions = await convex.query(api.sessions.getUserSessions, { userId });
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		return (sessions as any[]).map((s) => ({
 			id: s.sessionId,
@@ -70,7 +70,7 @@ export async function getUserSessions(userId: string): Promise<StudySession[]> {
 
 export async function getDashboardAnalytics(userId: string) {
 	try {
-		return await convex.query(anyApi.sessions.getDashboardAnalytics, { userId });
+		return await convex.query(api.sessions.getDashboardAnalytics, { userId });
 	} catch (err) {
 		console.error('[CollegeCBT Convex] Error fetching analytics:', err);
 		return null;
@@ -85,7 +85,7 @@ export async function getDashboardAnalytics(userId: string) {
  */
 export async function triggerCrawl(apiKey: string, url: string, priority = 1) {
 	try {
-		return await convex.mutation(anyApi.crawler.requestCrawl, {
+		return await convex.mutation(api.crawler.requestCrawl, {
 			apiKey,
 			url,
 			priority
@@ -102,7 +102,7 @@ export async function triggerCrawl(apiKey: string, url: string, priority = 1) {
 export async function getCrawlJobStatus(jobId: string) {
 	try {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const job = await convex.query(anyApi.crawler.getInternalJob, { jobId: jobId as any });
+		const job = await convex.query(api.crawler.getCrawlJob, { jobId: jobId as Id<'crawlJobs'> });
 		return job;
 	} catch (err) {
 		console.error('[CollegeCBT Convex] Get job status error:', err);
@@ -117,7 +117,7 @@ export async function getCrawlJobStatus(jobId: string) {
 export async function syncPlatformUser(plan: 'free' | 'pro' = 'free') {
 	try {
 		// storeUser uses ctx.auth to verify the identity server-side
-		return await convex.mutation(anyApi.users.storeUser, { plan });
+		return await convex.mutation(api.users.storeUser, { plan });
 	} catch (err) {
 		console.error('[CollegeCBT Convex] User sync error:', err);
 		return null;
@@ -133,7 +133,7 @@ export async function syncPlatformUser(plan: 'free' | 'pro' = 'free') {
 export async function triggerAgentTask(agentName: string, userContext: string) {
 	try {
         // Run action instead of mutation/query for long-form AI endpoints
-		return await convex.action(anyApi.agentWorkflow.runAgentTask, {
+		return await convex.action(api.agentWorkflow.runAgentTask, {
 			agentName,
 			userContext
 		});

@@ -14,23 +14,24 @@ const mockTriggerSchema = z.object({
   idToken: z.string().min(1),
 });
 
-function decodeJWT(token: string) {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return null;
-    const base64Url = parts[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (err) {
-    console.error('[payment/mock-trigger] Error decoding JWT:', err);
-    return null;
-  }
+type FirebaseLookupUser = {
+  localId?: string;
+  email?: string;
+};
+
+async function verifyFirebaseIdToken(idToken: string, apiKey: string): Promise<FirebaseLookupUser | null> {
+  if (!apiKey) return null;
+
+  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken }),
+    signal: AbortSignal.timeout(5000)
+  });
+
+  if (!response.ok) return null;
+  const data = await response.json() as { users?: FirebaseLookupUser[] };
+  return data.users?.[0] ?? null;
 }
 
 export const POST: RequestHandler = async ({ request, platform }) => {
@@ -47,29 +48,17 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
     const { gateway, amount, reference, email, idToken } = validation.data;
 
-    // 1. Verify token content (JWT decoding check)
-    const tokenPayload = decodeJWT(idToken);
-    if (!tokenPayload) {
-      return json({ error: 'Invalid authentication token' }, { status: 401 });
-    }
-
-    const isMatched =
-      (tokenPayload.email === email || tokenPayload.firebase?.identities?.email?.[0] === email);
-
-    if (!isMatched) {
-      return json({ error: 'Session identity mismatch' }, { status: 403 });
-    }
-
-    // Check expiration
-    if (tokenPayload.exp && tokenPayload.exp < Date.now() / 1000) {
-      return json({ error: 'Authentication token has expired' }, { status: 401 });
-    }
-
-    // 2. Resolve private API keys securely
+    // 1. Resolve private API keys securely
     const env = (platform?.env || {}) as Record<string, string>;
     const getSecretKey = (key: string): string => {
       return env[key] || process.env[key] || '';
     };
+
+    const firebaseApiKey = env.PUBLIC_FIREBASE_API_KEY || process.env.PUBLIC_FIREBASE_API_KEY || '';
+    const verifiedUser = await verifyFirebaseIdToken(idToken, firebaseApiKey);
+    if (!verifiedUser || verifiedUser.email !== email) {
+      return json({ error: 'Invalid authentication token' }, { status: 401 });
+    }
 
     let secretKey = '';
     if (gateway === 'flutterwave') secretKey = getSecretKey('FLUTTERWAVE_CLIENT_SECRET') || getSecretKey('FLUTTERWAVE_SECRET_KEY');

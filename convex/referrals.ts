@@ -41,11 +41,10 @@ export const logReferral = mutation({
 
 export const getReferralLogs = query({
   args: {
-    adminSecret: v.optional(v.string()),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await validateAdminAuth(ctx, args.adminSecret);
+    await validateAdminAuth(ctx);
     const limit = args.limit ?? 50;
 
     return await ctx.db
@@ -56,11 +55,9 @@ export const getReferralLogs = query({
 });
 
 export const getReferralStats = query({
-  args: {
-    adminSecret: v.optional(v.string()),
-  },
+  args: {},
   handler: async (ctx, args) => {
-    await validateAdminAuth(ctx, args.adminSecret);
+    await validateAdminAuth(ctx);
 
     const allLogs = await ctx.db.query("referralLogs").collect();
 

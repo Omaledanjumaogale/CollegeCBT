@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 import { query, mutation } from './_generated/server';
+import { requireAdmin, requireAuth } from './authGuard';
 
 /**
  * Save or update a client's VAPID Push Subscription
@@ -10,6 +11,11 @@ export const saveSubscription = mutation({
     subscription: v.string(), // JSON string representation of PushSubscription
   },
   handler: async (ctx, args) => {
+    const identity = await requireAuth(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error('Unauthorized push subscription update.');
+    }
+
     const existing = await ctx.db
       .query('pushSubscriptions')
       .withIndex('by_user', (q) => q.eq('userId', args.userId))
@@ -47,6 +53,11 @@ export const saveSubscription = mutation({
 export const deleteSubscription = mutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    const identity = await requireAuth(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error('Unauthorized push subscription delete.');
+    }
+
     const existing = await ctx.db
       .query('pushSubscriptions')
       .withIndex('by_user', (q) => q.eq('userId', args.userId))
@@ -80,6 +91,7 @@ export const triggerPush = mutation({
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const subscription = await ctx.db
       .query('pushSubscriptions')
       .withIndex('by_user', (q) => q.eq('userId', args.userId))

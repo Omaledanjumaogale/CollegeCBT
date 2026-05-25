@@ -2,10 +2,8 @@
 	import { useQuery } from 'convex-svelte';
 	import { api } from '$lib/services/convexClient';
 
-	let { data } = $props();
-
-	const healthQuery = useQuery(api.admin.getSystemHealth, () => ({ adminSecret: data?.adminSecret }));
-	const recentLogsQuery = useQuery(api.admin.getRecentActivity, () => ({ limit: 20, adminSecret: data?.adminSecret }));
+	const healthQuery = useQuery(api.admin.getSystemHealth, {});
+	const recentLogsQuery = useQuery(api.admin.getRecentActivity, () => ({ limit: 20 }));
 
 	let health = $derived(healthQuery.data);
 	let recentLogs = $derived(recentLogsQuery.data);

@@ -5,14 +5,11 @@
 	import { showToast } from '$lib/stores';
 	import Tooltip from '$lib/components/Tooltip.svelte';
 
-	// ── Props ──
-	let { data } = $props();
-
 	// ── Real-time Analytics ──
-	const statsQuery = useQuery(api.admin.getDashboardStats, () => ({ adminSecret: data?.adminSecret }));
-	const activityQuery = useQuery(api.admin.getRecentActivity, () => ({ limit: 12, adminSecret: data?.adminSecret }));
-	const healthQuery = useQuery(api.admin.getSystemHealth, () => ({ adminSecret: data?.adminSecret }));
-	const maintenanceQuery = useQuery(api.admin.getConfigFlag, () => ({ key: 'maintenance_mode', adminSecret: data?.adminSecret }));
+	const statsQuery = useQuery(api.admin.getDashboardStats, {});
+	const activityQuery = useQuery(api.admin.getRecentActivity, () => ({ limit: 12 }));
+	const healthQuery = useQuery(api.admin.getSystemHealth, {});
+	const maintenanceQuery = useQuery(api.admin.getConfigFlag, () => ({ key: 'maintenance_mode' }));
 
 	// ── Metrics Computed via .data property (Svelte 5 runes mode) ──
 	let stats = $derived(statsQuery.data);
@@ -67,7 +64,7 @@
 		isFlushing = true;
 		try {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			const result: any = await convex.mutation(api.admin.flushCache, { adminSecret: data?.adminSecret });
+			const result: any = await convex.mutation(api.admin.flushCache, {});
 			showToast('✅ Cache Flushed', `${result?.flushed ?? 0} entries cleared from global cache.`, 'success');
 		} catch (err) {
 			showToast('❌ Flush Failed', 'Could not flush cache. Check logs.', 'error');
@@ -81,7 +78,7 @@
 		isTogglingMaintenance = true;
 		try {
 			const next = !maintenanceEnabled;
-			await convex.mutation(api.admin.setMaintenanceMode, { enabled: next, adminSecret: data?.adminSecret });
+			await convex.mutation(api.admin.setMaintenanceMode, { enabled: next });
 			showToast(
 				next ? '🛑 Maintenance ON' : '✅ Maintenance OFF',
 				next ? 'AI generation is now blocked for all users.' : 'System returned to normal operation.',
@@ -128,10 +125,9 @@
 					</div>
 					
 					<div class="space-y-1">
-						<div class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-0.5">
-							<Tooltip text={k.tooltip}>
-								{k.label}
-							</Tooltip>
+						<div class="text-[10px] font-bold text-white/30 uppercase tracking-widest mb-0.5 flex items-center gap-1">
+							<span>{k.label}</span>
+							<Tooltip text={k.tooltip} />
 						</div>
 						<div class="text-3xl font-display text-white tracking-tight">{k.value}</div>
 						<p class="text-[10px] text-white/20 italic">{k.sub}</p>
@@ -235,9 +231,10 @@
 				<div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-600 to-lime-500"></div>
 				
 				<div class="flex items-center justify-between mb-8">
-					<Tooltip text="Real-time stream of student activity, credentials registry, crawler logs, and database mutations.">
+					<div class="flex items-center gap-1">
 						<h3 class="font-bold text-white text-sm">System Pulse</h3>
-					</Tooltip>
+						<Tooltip text="Real-time stream of student activity, credentials registry, crawler logs, and database mutations." />
+					</div>
 					<div class="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-violet-600/20 text-[9px] font-black text-violet-400 uppercase tracking-widest">Live</div>
 				</div>
 

@@ -32,15 +32,30 @@ self.addEventListener('activate', (event) => {
 // 3. Network-First for App Logic, Cache-First for Assets
 self.addEventListener('fetch', (event) => {
 	const url = new URL(event.request.url);
+	const isNavigation = event.request.mode === 'navigate';
+	const isPrivateRoute =
+		url.pathname.startsWith('/admin') ||
+		url.pathname.startsWith('/dashboard') ||
+		url.pathname.startsWith('/auth') ||
+		url.pathname.startsWith('/checkout') ||
+		url.pathname.startsWith('/api');
 	
 	// Skip Convex and Firebase requests (let them handle their own real-time logic)
-	if (url.origin.includes('convex.cloud') || url.origin.includes('googleapis.com')) {
+	if (
+		url.origin.includes('convex.cloud') ||
+		url.origin.includes('convex.site') ||
+		url.origin.includes('googleapis.com') ||
+		url.origin.includes('firebaseio.com') ||
+		isPrivateRoute ||
+		event.request.method !== 'GET'
+	) {
 		return;
 	}
 
 	event.respondWith(
 		fetch(event.request).catch(() => {
-			return caches.match(event.request) || caches.match('/');
+			if (isNavigation) return caches.match('/');
+			return caches.match(event.request);
 		})
 	);
 });

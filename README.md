@@ -55,6 +55,13 @@ Enterprise-grade AI Exam Preparation Platform for Nigerian Higher Institution st
 4. Run the dev server: `npm run dev`
 5. Run Convex: `npx convex dev`
 
+Required runtime values:
+
+* `PUBLIC_CONVEX_URL` must point at the active Convex deployment.
+* `PUBLIC_FIREBASE_*` values must match the Firebase app used by `convex/auth.config.js`.
+* `ADMIN_EMAIL`, `ADMIN_PASSWORD`, and `ADMIN_SESSION_SECRET` must be set before using `/admin`.
+* `PUBLIC_EWIN_REFERRAL_HTTP_URL` is optional; referral central sync is skipped when unset.
+
 ### Production Build
 
 ### Local Data Seeding

@@ -2,16 +2,24 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { env } from '$env/dynamic/private';
 
-const SUPER_ADMIN_EMAIL = env.ADMIN_EMAIL || "Omaledanjumaogale@gmail.com";
-const SUPER_ADMIN_PASSWORD = env.ADMIN_PASSWORD || "Omale51566122%%%";
-const ADMIN_SESSION_SECRET = env.ADMIN_SESSION_SECRET || "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
+function getAdminConfig() {
+	const email = env.ADMIN_EMAIL;
+	const password = env.ADMIN_PASSWORD;
+	const sessionSecret = env.ADMIN_SESSION_SECRET;
+	return email && password && sessionSecret
+		? { email, password, sessionSecret }
+		: null;
+}
 
 export const load: PageServerLoad = async ({ cookies }) => {
+	const config = getAdminConfig();
+	if (!config) return { adminConfigured: false };
+
 	const session = cookies.get('admin_session');
-	if (session === ADMIN_SESSION_SECRET) {
+	if (session === config.sessionSecret) {
 		throw redirect(303, '/admin/dashboard');
 	}
-	return {};
+	return { adminConfigured: true };
 };
 
 export const actions: Actions = {
@@ -19,9 +27,14 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const email = data.get('email');
 		const password = data.get('password');
+		const config = getAdminConfig();
 
-		if (email === SUPER_ADMIN_EMAIL && password === SUPER_ADMIN_PASSWORD) {
-			cookies.set('admin_session', ADMIN_SESSION_SECRET, {
+		if (!config) {
+			return fail(503, { error: 'Administrator login is not configured.' });
+		}
+
+		if (email === config.email && password === config.password) {
+			cookies.set('admin_session', config.sessionSecret, {
 				path: '/',
 				httpOnly: true,
 				sameSite: 'strict',

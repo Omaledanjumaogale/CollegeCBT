@@ -3,9 +3,6 @@
 	import { showToast } from '$lib/stores';
 	import { onMount } from 'svelte';
 
-	// ── Props ──
-	let { data } = $props();
-
 	// ── Feature Flags ──
 	let flags = $state([
 		{ id: 'ai_orchestration',    label: 'AI Exam Generation',     desc: 'Enable multi-model AI question generation for all users.',   enabled: true,  badge: 'Core' },

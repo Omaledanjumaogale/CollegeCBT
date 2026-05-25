@@ -6,8 +6,7 @@
 	import DataTable from '$lib/components/admin/DataTable.svelte';
 	import Drawer from '$lib/components/admin/Drawer.svelte';
 
-	// ── Props & State ──
-	let { data } = $props();
+	// ── State ──
 	let searchTerm = $state('');
 	let filterPlan = $state('');
 	let selectedUser = $state<any>(null);
@@ -16,8 +15,7 @@
 	// ── Convex Real-time Data (using .data not $store) ──
 	const usersQuery = useQuery(api.admin.getUsers, () => ({ 
 		search: searchTerm, 
-		plan: filterPlan || undefined,
-		adminSecret: data?.adminSecret
+		plan: filterPlan || undefined
 	}));
 	
 	let users = $derived(usersQuery.data ?? []);
@@ -72,7 +70,7 @@
 		if (!selectedUser) return;
 		const newRole = selectedUser.role === 'admin' ? 'user' : 'admin';
 		try {
-			await convex.mutation(api.admin.updateUserRole, { uid: selectedUser.uid, role: newRole, adminSecret: data?.adminSecret });
+			await convex.mutation(api.admin.updateUserRole, { uid: selectedUser.uid, role: newRole });
 			showToast('✅ Role Updated', `User ${selectedUser.email} is now ${newRole.toUpperCase()}.`, 'success');
 			isDrawerOpen = false;
 		} catch (e) {

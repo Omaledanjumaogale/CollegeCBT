@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 import { query, mutation } from './_generated/server';
+import { requireAdmin, requireAuth } from './authGuard';
 
 // ── User / Student Endpoints ───────────────────────────────────────────────
 
@@ -10,6 +11,15 @@ export const getMessages = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
     if (!args.userId) return [];
+    const identity = await requireAuth(ctx);
+    const user = await ctx.db
+      .query('users')
+      .withIndex('by_uid', (q) => q.eq('uid', identity.subject))
+      .first();
+    if (identity.subject !== args.userId && user?.role !== 'admin') {
+      throw new Error('Unauthorized support thread read.');
+    }
+
     return await ctx.db
       .query('supportMessages')
       .withIndex('by_user', (q) => q.eq('userId', args.userId))
@@ -29,6 +39,11 @@ export const sendMessage = mutation({
     attachmentName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const identity = await requireAuth(ctx);
+    if (identity.subject !== args.userId) {
+      throw new Error('Unauthorized support message send.');
+    }
+
     const messageId = await ctx.db.insert('supportMessages', {
       userId: args.userId,
       sender: 'student',
@@ -63,6 +78,7 @@ export const sendMessage = mutation({
 export const getActiveChats = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const messages = await ctx.db.query('supportMessages').collect();
     
     // Group messages by userId
@@ -115,6 +131,7 @@ export const sendAdminMessage = mutation({
     attachmentName: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     return await ctx.db.insert('supportMessages', {
       userId: args.userId,
       sender: 'admin',
@@ -133,6 +150,7 @@ export const sendAdminMessage = mutation({
 export const clearChatHistory = mutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const messages = await ctx.db
       .query('supportMessages')
       .withIndex('by_user', (q) => q.eq('userId', args.userId))

@@ -20,6 +20,7 @@ import type * as gradeReports from "../gradeReports.js";
 import type * as interactionSessions from "../interactionSessions.js";
 import type * as mail from "../mail.js";
 import type * as notifications from "../notifications.js";
+import type * as payments from "../payments.js";
 import type * as rateLimit from "../rateLimit.js";
 import type * as referrals from "../referrals.js";
 import type * as seed from "../seed.js";
@@ -49,6 +50,7 @@ declare const fullApi: ApiFromModules<{
   interactionSessions: typeof interactionSessions;
   mail: typeof mail;
   notifications: typeof notifications;
+  payments: typeof payments;
   rateLimit: typeof rateLimit;
   referrals: typeof referrals;
   seed: typeof seed;

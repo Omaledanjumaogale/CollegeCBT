@@ -10,8 +10,15 @@ const PLATFORM_ID = 'collegecbt';
 /**
  * E-WIN Central Convex Backend — single source of truth for all referral/commission data.
  */
-const EWIN_CONVEX_HTTP_URL = 'https://pastel-lemur-183.convex.site';
-const EWIN_CONVEX_WS_URL  = 'https://pastel-lemur-183.convex.cloud';
+const EWIN_CONVEX_HTTP_URL = import.meta.env.PUBLIC_EWIN_REFERRAL_HTTP_URL || '';
+
+type ReferralSyncPayload = {
+  userId: string;
+  email: string;
+  referralCode: string;
+  type: 'signup' | 'subscription';
+  amount?: number;
+};
 
 /**
  * Capture referral code or affiliate slug from URL parameters and persist to sessionStorage.
@@ -82,6 +89,7 @@ export async function recordReferralAfterSignup(
   userName: string,
   userEmail: string
 ): Promise<void> {
+  let savedCode: string | null = null;
   try {
     const inviteCode: string | null =
       typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ewin_invite_code') : null;
@@ -89,6 +97,7 @@ export async function recordReferralAfterSignup(
       typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('ewin_ref_slug') : null;
 
     if (!inviteCode && !refSlug) return; // No referral — nothing to record
+    savedCode = inviteCode || refSlug;
 
     // Build payload based on referral type
     const payload = inviteCode
@@ -108,21 +117,25 @@ export async function recordReferralAfterSignup(
         };
 
     // Call E-WIN Convex HTTP action endpoint
-    const response = await fetch(`${EWIN_CONVEX_HTTP_URL}/referral/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
+    if (EWIN_CONVEX_HTTP_URL) {
+      const response = await fetch(`${EWIN_CONVEX_HTTP_URL}/referral/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
 
-    if (response.ok) {
-      console.log('[E-WIN Referral] Signup recorded successfully');
-      // Clear sessionStorage after successful recording
-      if (typeof sessionStorage !== 'undefined') {
-        sessionStorage.removeItem('ewin_invite_code');
-        sessionStorage.removeItem('ewin_ref_slug');
+      if (response.ok) {
+        console.log('[E-WIN Referral] Signup recorded successfully');
+        // Clear sessionStorage after successful recording
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.removeItem('ewin_invite_code');
+          sessionStorage.removeItem('ewin_ref_slug');
+        }
+      } else {
+        console.warn(`[E-WIN Referral] Signup recording returned ${response.status}`);
       }
     } else {
-      console.warn(`[E-WIN Referral] Signup recording returned ${response.status}`);
+      console.warn('[E-WIN Referral] PUBLIC_EWIN_REFERRAL_HTTP_URL not configured. Skipping central sync.');
     }
   } catch (err) {
     // NON-FATAL: referral failure must never block user registration
@@ -131,7 +144,6 @@ export async function recordReferralAfterSignup(
 
   // Also record to local Convex for audit trail (non-fatal)
   try {
-    const savedCode = inviteCode || refSlug;
     if (savedCode) {
       await convex.mutation(api.referrals.logReferral, {
         referralCode: savedCode,
@@ -156,21 +168,25 @@ export async function recordSubscriptionCommission(
   amountNGN: number
 ): Promise<void> {
   try {
-    const response = await fetch(`${EWIN_CONVEX_HTTP_URL}/referral/subscription`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        refereeFirebaseUid: subscriberFirebaseUid,
-        platformId: PLATFORM_ID,
-        subscriptionPlan: planName,
-        subscriptionAmount: amountNGN,
-      }),
-    });
+    if (EWIN_CONVEX_HTTP_URL) {
+      const response = await fetch(`${EWIN_CONVEX_HTTP_URL}/referral/subscription`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          refereeFirebaseUid: subscriberFirebaseUid,
+          platformId: PLATFORM_ID,
+          subscriptionPlan: planName,
+          subscriptionAmount: amountNGN,
+        }),
+      });
 
-    if (response.ok) {
-      console.log(`[E-WIN Referral] Subscription commission recorded: ${planName} ₦${amountNGN}`);
+      if (response.ok) {
+        console.log(`[E-WIN Referral] Subscription commission recorded: ${planName} ₦${amountNGN}`);
+      } else {
+        console.warn(`[E-WIN Referral] Commission recording returned ${response.status}`);
+      }
     } else {
-      console.warn(`[E-WIN Referral] Commission recording returned ${response.status}`);
+      console.warn('[E-WIN Referral] PUBLIC_EWIN_REFERRAL_HTTP_URL not configured. Skipping central sync.');
     }
   } catch (err) {
     // NON-FATAL: commission failure must never block payment confirmation
@@ -188,4 +204,29 @@ export async function recordSubscriptionCommission(
   } catch (err) {
     console.warn('[E-WIN Referral] Local audit log for commission failed (non-fatal):', err);
   }
+}
+
+export async function syncReferralToEwinServer(payload: ReferralSyncPayload): Promise<void> {
+  if (payload.type === 'subscription') {
+    await recordSubscriptionCommission(
+      payload.userId,
+      payload.referralCode || PLATFORM_ID,
+      payload.amount ?? 0
+    );
+    return;
+  }
+
+  if (!EWIN_CONVEX_HTTP_URL) return;
+
+  await fetch(`${EWIN_CONVEX_HTTP_URL}/referral/signup`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      referrerCode: payload.referralCode,
+      referralType: 'invite_code',
+      refereeUid: payload.userId,
+      refereeName: payload.email,
+      refereeEmail: payload.email
+    })
+  });
 }

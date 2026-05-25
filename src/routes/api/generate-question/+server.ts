@@ -13,11 +13,11 @@ const PRO_LIMIT  = 60;    // 60 req/min for pro users
 // Prune stale entries periodically (edge-safe, no node:timers needed)
 function checkAndPrune(key: string, limit: number): { allowed: boolean; remaining: number } {
 	const now = Date.now();
-	const entry = rateLimitMap.get(key);
+	const entry = rateLimitFallback.get(key);
 
 	if (!entry || now - entry.windowStart > WINDOW_MS) {
 		// Fresh window
-		rateLimitMap.set(key, { count: 1, windowStart: now });
+		rateLimitFallback.set(key, { count: 1, windowStart: now });
 		return { allowed: true, remaining: limit - 1 };
 	}
 
@@ -82,10 +82,10 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		// Key by UID if available, otherwise fall back to IP
 		const ip = request.headers.get('cf-connecting-ip')
 			|| request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-			|| 'unknown';
+		|| 'unknown';
 		const rlKey   = uid ? `uid:${uid}` : `ip:${ip}`;
 		const limit   = userPlan === 'free' ? FREE_LIMIT : PRO_LIMIT;
-		const { allowed, remaining } = await checkRateLimit(rlKey, limit);
+		const { allowed, remaining } = checkAndPrune(rlKey, limit);
 
 		if (!allowed) {
 			return json(

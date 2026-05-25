@@ -11,6 +11,8 @@
 		});
 		return unsub;
 	});
+
+	let { children }: { children?: import('svelte').Snippet } = $props();
 </script>
 
 {#if activeTooltip.visible}

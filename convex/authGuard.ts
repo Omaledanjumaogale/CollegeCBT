@@ -66,18 +66,10 @@ export async function requireAdmin(ctx: QueryCtx | MutationCtx) {
 }
 
 /**
- * Validate admin permission via either a session token secret or Firebase Auth admin role.
+ * Validate admin permission using Convex-authenticated Firebase identity only.
+ * Browser-forwarded shared secrets are intentionally ignored.
  */
-export async function validateAdminAuth(ctx: QueryCtx | MutationCtx, adminSecret?: string) {
-  const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || "eWin$uPerAdm!n$ecr3t2026#EWIN@project";
-  if (adminSecret === ADMIN_SESSION_SECRET) {
-    return true;
-  }
-  try {
-    await requireAdmin(ctx);
-    return true;
-  } catch (err) {
-    throw new Error("Unauthorized: Elevated administrator privilege is required.");
-  }
+export async function validateAdminAuth(ctx: QueryCtx | MutationCtx, _adminSecret?: string) {
+  await requireAdmin(ctx);
+  return true;
 }
-

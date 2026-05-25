@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import { setContext, getContext } from 'svelte';
 
 type TooltipState = {
@@ -11,15 +11,16 @@ type TooltipState = {
 const TOOLTIP_CTX = 'tooltip';
 
 export function createTooltipStore() {
-	const { subscribe, set, update } = writable<TooltipState>({
+	const store = writable<TooltipState>({
 		text: '',
 		x: 0,
 		y: 0,
 		visible: false
 	});
-	setContext(TOOLTIP_CTX, { subscribe, set, update });
+	setContext(TOOLTIP_CTX, store);
+	return store;
 }
 
 export function getTooltipStore() {
-	return getContext<{ subscribe: typeof writable<TooltipState>['subscribe']; set: (v: TooltipState) => void; update: (fn: (v: TooltipState) => TooltipState) => void }>(TOOLTIP_CTX);
+	return getContext<Writable<TooltipState>>(TOOLTIP_CTX);
 }
