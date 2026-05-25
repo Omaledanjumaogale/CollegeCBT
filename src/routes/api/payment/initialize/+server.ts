@@ -1,6 +1,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
+import { verifyFirebaseIdentity } from '$lib/server/auth';
+import {
+	createPaymentReference,
+	getAppUrl,
+	getPaymentSecretKey,
+	isPlaceholderSecret
+} from '$lib/server/payments';
 
 export const _runtime = 'edge';
 export const _dynamic = 'force-dynamic';
@@ -13,26 +20,6 @@ const paymentInitSchema = z.object({
   uid: z.string().min(1),
   idToken: z.string().min(1),
 });
-
-type FirebaseLookupUser = {
-  localId?: string;
-  email?: string;
-};
-
-async function verifyFirebaseIdToken(idToken: string, apiKey: string): Promise<FirebaseLookupUser | null> {
-  if (!apiKey) return null;
-
-  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken }),
-    signal: AbortSignal.timeout(5000)
-  });
-
-  if (!response.ok) return null;
-  const data = await response.json() as { users?: FirebaseLookupUser[] };
-  return data.users?.[0] ?? null;
-}
 
 export const POST: RequestHandler = async ({ request, platform }) => {
   try {
@@ -48,35 +35,18 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
     const { gateway, amount, plan, email, uid, idToken } = validation.data;
 
-    // 1. Resolve private API keys securely
-    const env = (platform?.env || {}) as Record<string, string>;
-    
-    // Resolve helper for fallback (checking process.env and binding)
-    const getSecretKey = (key: string): string => {
-      return env[key] || process.env[key] || '';
-    };
-
-    const firebaseApiKey = env.PUBLIC_FIREBASE_API_KEY || process.env.PUBLIC_FIREBASE_API_KEY || '';
-    const verifiedUser = await verifyFirebaseIdToken(idToken, firebaseApiKey);
-    if (!verifiedUser) {
-      return json({ error: 'Invalid authentication token' }, { status: 401 });
+    const env = (platform?.env || {}) as Record<string, string | undefined>;
+    const verifiedIdentity = await verifyFirebaseIdentity(idToken, { uid, email }, env);
+    if (!verifiedIdentity.ok) {
+      return json({ error: verifiedIdentity.error }, { status: verifiedIdentity.status });
     }
 
-    if (verifiedUser.localId !== uid || verifiedUser.email !== email) {
-      return json({ error: 'Session identity mismatch' }, { status: 403 });
-    }
-
-    const appUrl = env.PUBLIC_APP_URL || 'http://localhost:5173';
-    const reference = `CBT-${uid.substring(0, 8)}-${Date.now()}`;
+    const appUrl = getAppUrl(env);
+    const reference = createPaymentReference(uid);
 
     // 3. Check if we should trigger Sandbox simulator route
-    let secretKey = '';
-    if (gateway === 'flutterwave') secretKey = getSecretKey('FLUTTERWAVE_SECRET_KEY') || getSecretKey('FLUTTERWAVE_CLIENT_SECRET');
-    if (gateway === 'korapay') secretKey = getSecretKey('KORAPAY_SECRET_KEY');
-    if (gateway === 'paystack') secretKey = getSecretKey('PAYSTACK_SECRET_KEY');
-    if (gateway === 'seerbit') secretKey = getSecretKey('SEERBIT_SECRET_KEY');
-
-    const isPlaceholder = !secretKey || secretKey.toLowerCase().includes('placeholder') || secretKey.startsWith('your-') || secretKey.trim() === '';
+    const secretKey = getPaymentSecretKey(gateway, env);
+    const isPlaceholder = isPlaceholderSecret(secretKey);
 
     if (isPlaceholder) {
       console.log(`[payment/initialize] Gateway ${gateway} API keys are placeholders. Redirecting to mock gateway simulator.`);
