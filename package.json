@@ -6,6 +6,8 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
+    "preview:cf": "wrangler pages dev .svelte-kit/cloudflare",
+    "deploy": "npm run build && wrangler pages deploy .svelte-kit/cloudflare",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "test": "npm run check",
@@ -13,6 +15,7 @@
     "sync": "svelte-kit sync"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "4.20260404.1",
     "@sveltejs/adapter-cloudflare": "4.9.0",
     "@sveltejs/kit": "2.56.1",
     "@sveltejs/vite-plugin-svelte": "4.0.4",

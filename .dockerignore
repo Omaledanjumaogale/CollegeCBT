@@ -1,0 +1,15 @@
+node_modules
+.svelte-kit
+build
+dist
+.git
+.github
+.env
+.env.local
+.env.*.local
+.wrangler
+coverage
+*.log
+TMPFILE
+dev_output.txt
+test_server*.mjs

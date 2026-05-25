@@ -1,0 +1,5 @@
+# Cloudflare Pages redirects.
+# Keep this file conservative so local SvelteKit routing remains the source of truth.
+
+# Example production redirect, enable only after the final custom domain is confirmed:
+# https://www.collegecbt.ewinproject.org/* https://collegecbt.ewinproject.org/:splat 301
