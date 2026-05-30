@@ -22,6 +22,7 @@ export default defineSchema({
   // ── User profiles ──────────────────────────────────────────────────────────
   users: defineTable({
     uid: v.string(),            // Firebase UID
+    tenantId: v.optional(v.string()),
     email: v.string(),
     displayName: v.string(),
     plan: v.union(v.literal('free'), v.literal('pro')),
@@ -49,7 +50,59 @@ export default defineSchema({
   })
     .index('by_uid', ['uid'])
     .index('by_email', ['email'])
-    .index('by_plan', ['plan']),
+    .index('by_plan', ['plan'])
+    .index('by_tenant', ['tenantId']),
+
+  // ── Enterprise Tenancy ─────────────────────────────────────────────────────
+  tenants: defineTable({
+    slug: v.string(),
+    name: v.string(),
+    status: v.union(v.literal('active'), v.literal('suspended'), v.literal('trial'), v.literal('archived')),
+    plan: v.union(v.literal('free'), v.literal('pro'), v.literal('enterprise')),
+    ownerUserId: v.optional(v.string()),
+    billingEmail: v.optional(v.string()),
+    metadata: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_slug', ['slug'])
+    .index('by_status', ['status'])
+    .index('by_owner', ['ownerUserId']),
+
+  tenantMemberships: defineTable({
+    tenantId: v.id('tenants'),
+    userId: v.string(),
+    role: v.union(v.literal('owner'), v.literal('admin'), v.literal('instructor'), v.literal('student'), v.literal('viewer')),
+    status: v.union(v.literal('active'), v.literal('invited'), v.literal('suspended')),
+    invitedBy: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_tenant', ['tenantId'])
+    .index('by_user', ['userId'])
+    .index('by_tenant_user', ['tenantId', 'userId']),
+
+  usageMetrics: defineTable({
+    tenantId: v.optional(v.id('tenants')),
+    userId: v.optional(v.string()),
+    metric: v.union(
+      v.literal('question_generated'),
+      v.literal('exam_started'),
+      v.literal('exam_completed'),
+      v.literal('resource_downloaded'),
+      v.literal('payment_attempted'),
+      v.literal('agent_invoked')
+    ),
+    quantity: v.number(),
+    unit: v.string(),
+    metadata: v.optional(v.string()),
+    periodKey: v.string(),
+    timestamp: v.number(),
+  })
+    .index('by_tenant_period', ['tenantId', 'periodKey'])
+    .index('by_user_period', ['userId', 'periodKey'])
+    .index('by_metric', ['metric'])
+    .index('by_timestamp', ['timestamp']),
 
   // ── AI grade reports ───────────────────────────────────────────────────────
   gradeReports: defineTable({
@@ -241,6 +294,46 @@ export default defineSchema({
     .index('by_reference', ['reference'])
     .index('by_platform', ['platform']),
 
+  invoices: defineTable({
+    tenantId: v.optional(v.id('tenants')),
+    userId: v.string(),
+    subscriptionReference: v.optional(v.string()),
+    invoiceNumber: v.string(),
+    status: v.union(v.literal('draft'), v.literal('open'), v.literal('paid'), v.literal('void'), v.literal('failed')),
+    currency: v.string(),
+    amount: v.number(),
+    gateway: v.union(v.literal('flutterwave'), v.literal('korapay'), v.literal('paystack'), v.literal('seerbit'), v.literal('manual')),
+    paymentReference: v.optional(v.string()),
+    issuedAt: v.number(),
+    paidAt: v.optional(v.number()),
+    dueAt: v.optional(v.number()),
+    metadata: v.optional(v.string()),
+  })
+    .index('by_user', ['userId'])
+    .index('by_tenant', ['tenantId'])
+    .index('by_invoice_number', ['invoiceNumber'])
+    .index('by_payment_reference', ['paymentReference'])
+    .index('by_status', ['status']),
+
+  paymentEvents: defineTable({
+    tenantId: v.optional(v.id('tenants')),
+    userId: v.optional(v.string()),
+    gateway: v.union(v.literal('flutterwave'), v.literal('korapay'), v.literal('paystack'), v.literal('seerbit')),
+    reference: v.string(),
+    eventType: v.string(),
+    status: v.union(v.literal('received'), v.literal('processed'), v.literal('duplicate'), v.literal('failed')),
+    amount: v.optional(v.number()),
+    currency: v.optional(v.string()),
+    payload: v.string(),
+    error: v.optional(v.string()),
+    receivedAt: v.number(),
+    processedAt: v.optional(v.number()),
+  })
+    .index('by_reference', ['reference'])
+    .index('by_gateway_status', ['gateway', 'status'])
+    .index('by_user', ['userId'])
+    .index('by_received_at', ['receivedAt']),
+
   platformAccess: defineTable({
     userId: v.string(), // Firebase UID
     platform: v.string(), // e.g. 'college_cbt'
@@ -272,6 +365,102 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index('by_user', ['userId']),
+
+  // ── Resource Library & Downloads ───────────────────────────────────────────
+  resources: defineTable({
+    tenantId: v.optional(v.id('tenants')),
+    title: v.string(),
+    description: v.optional(v.string()),
+    type: v.union(v.literal('pdf'), v.literal('image'), v.literal('csv'), v.literal('video'), v.literal('link'), v.literal('document')),
+    status: v.union(v.literal('draft'), v.literal('published'), v.literal('archived')),
+    access: v.union(v.literal('public'), v.literal('authenticated'), v.literal('pro'), v.literal('admin')),
+    url: v.string(),
+    previewUrl: v.optional(v.string()),
+    fileName: v.optional(v.string()),
+    mimeType: v.optional(v.string()),
+    sizeBytes: v.optional(v.number()),
+    tags: v.array(v.string()),
+    createdBy: v.optional(v.string()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index('by_tenant', ['tenantId'])
+    .index('by_status', ['status'])
+    .index('by_access', ['access'])
+    .index('by_type', ['type']),
+
+  downloads: defineTable({
+    tenantId: v.optional(v.id('tenants')),
+    resourceId: v.id('resources'),
+    userId: v.string(),
+    status: v.union(v.literal('queued'), v.literal('in_progress'), v.literal('completed'), v.literal('failed'), v.literal('cancelled')),
+    progress: v.number(),
+    attemptCount: v.number(),
+    error: v.optional(v.string()),
+    startedAt: v.number(),
+    completedAt: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_resource', ['resourceId'])
+    .index('by_status', ['status'])
+    .index('by_tenant', ['tenantId']),
+
+  apiKeys: defineTable({
+    tenantId: v.id('tenants'),
+    name: v.string(),
+    keyHash: v.string(),
+    prefix: v.string(),
+    status: v.union(v.literal('active'), v.literal('revoked')),
+    scopes: v.array(v.string()),
+    createdBy: v.string(),
+    createdAt: v.number(),
+    lastUsedAt: v.optional(v.number()),
+    revokedAt: v.optional(v.number()),
+  })
+    .index('by_tenant', ['tenantId'])
+    .index('by_prefix', ['prefix'])
+    .index('by_status', ['status']),
+
+  featureFlagTargets: defineTable({
+    flagKey: v.string(),
+    tenantId: v.optional(v.id('tenants')),
+    userId: v.optional(v.string()),
+    enabled: v.boolean(),
+    variant: v.optional(v.string()),
+    rolloutPercent: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index('by_flag', ['flagKey'])
+    .index('by_tenant', ['tenantId'])
+    .index('by_user', ['userId']),
+
+  errorEvents: defineTable({
+    tenantId: v.optional(v.id('tenants')),
+    userId: v.optional(v.string()),
+    source: v.union(v.literal('client'), v.literal('server'), v.literal('convex'), v.literal('worker')),
+    severity: v.union(v.literal('info'), v.literal('warning'), v.literal('error'), v.literal('critical')),
+    message: v.string(),
+    stack: v.optional(v.string()),
+    metadata: v.optional(v.string()),
+    resolvedAt: v.optional(v.number()),
+    timestamp: v.number(),
+  })
+    .index('by_timestamp', ['timestamp'])
+    .index('by_severity', ['severity'])
+    .index('by_user', ['userId'])
+    .index('by_tenant', ['tenantId']),
+
+  healthChecks: defineTable({
+    service: v.string(),
+    status: v.union(v.literal('healthy'), v.literal('degraded'), v.literal('down')),
+    latencyMs: v.optional(v.number()),
+    message: v.optional(v.string()),
+    checkedAt: v.number(),
+  })
+    .index('by_service', ['service'])
+    .index('by_status', ['status'])
+    .index('by_checked_at', ['checkedAt']),
 
   // ── E-WIN Referral Logs ─────────────────────────────────────────────────────
   referralLogs: defineTable({

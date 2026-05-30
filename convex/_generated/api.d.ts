@@ -16,6 +16,7 @@ import type * as authGuard from "../authGuard.js";
 import type * as cache from "../cache.js";
 import type * as crawler from "../crawler.js";
 import type * as crons from "../crons.js";
+import type * as enterprise from "../enterprise.js";
 import type * as gradeReports from "../gradeReports.js";
 import type * as interactionSessions from "../interactionSessions.js";
 import type * as mail from "../mail.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   cache: typeof cache;
   crawler: typeof crawler;
   crons: typeof crons;
+  enterprise: typeof enterprise;
   gradeReports: typeof gradeReports;
   interactionSessions: typeof interactionSessions;
   mail: typeof mail;

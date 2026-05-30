@@ -205,6 +205,19 @@ export const processPayment = mutation({
 
     if (existingSub) {
       console.log(`[processPayment] Reference ${args.reference} already processed`);
+      await ctx.db.insert('paymentEvents', {
+        userId: existingSub.userId,
+        gateway: args.gateway,
+        reference: args.reference,
+        eventType: 'subscription_payment',
+        status: 'duplicate',
+        amount: args.amount,
+        currency: 'NGN',
+        payload: JSON.stringify({ plan: args.plan, alreadyProcessed: true }),
+        receivedAt: Date.now(),
+        processedAt: Date.now(),
+      });
+
       const user = await ctx.db
         .query('users')
         .withIndex('by_uid', (q) => q.eq('uid', existingSub.userId))
@@ -261,6 +274,48 @@ export const processPayment = mutation({
       reference: args.reference,
       createdAt: Date.now(),
       expiresAt: expiresAt,
+    });
+
+    await ctx.db.insert('paymentEvents', {
+      userId: user.uid,
+      gateway: args.gateway,
+      reference: args.reference,
+      eventType: 'subscription_payment',
+      status: 'processed',
+      amount: args.amount,
+      currency: 'NGN',
+      payload: JSON.stringify({
+        email: args.email,
+        plan: args.plan,
+        platform: 'college_cbt',
+      }),
+      receivedAt: Date.now(),
+      processedAt: Date.now(),
+    });
+
+    await ctx.db.insert('invoices', {
+      userId: user.uid,
+      subscriptionReference: args.reference,
+      invoiceNumber: `INV-${args.reference}`,
+      status: 'paid',
+      currency: 'NGN',
+      amount: args.amount,
+      gateway: args.gateway,
+      paymentReference: args.reference,
+      issuedAt: Date.now(),
+      paidAt: Date.now(),
+      dueAt: Date.now(),
+      metadata: JSON.stringify({ plan: args.plan, platform: 'college_cbt' }),
+    });
+
+    await ctx.db.insert('usageMetrics', {
+      userId: user.uid,
+      metric: 'payment_attempted',
+      quantity: 1,
+      unit: 'event',
+      metadata: JSON.stringify({ gateway: args.gateway, reference: args.reference, amount: args.amount }),
+      periodKey: new Date().toISOString().slice(0, 7),
+      timestamp: Date.now(),
     });
 
     // 6. Sync platformAccess permissions
