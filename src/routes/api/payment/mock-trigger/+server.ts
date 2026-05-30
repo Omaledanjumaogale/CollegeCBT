@@ -1,9 +1,13 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { z } from 'zod';
-import { convex, api } from '$lib/services/convexClient';
 import { verifyFirebaseIdentity } from '$lib/server/auth';
-import { getPaymentSecretKey, isPlaceholderSecret } from '$lib/server/payments';
+import {
+  getPaymentSecretKey,
+  isPlaceholderSecret,
+  processSubscriptionPayment,
+  syncSubscriptionReferral
+} from '$lib/server/payments';
 
 export const _runtime = 'edge';
 export const _dynamic = 'force-dynamic';
@@ -49,30 +53,14 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
     console.log(`[payment/mock-trigger] Executing simulated Convex plan upgrade for reference: ${reference}`);
 
-    // Call Convex mutation to record subscription and update user profile to pro
-    const result = await convex.mutation(api.users.processPayment, {
-      email: email,
-      plan: 'pro',
-      amount: amount,
-      gateway: gateway,
-      reference: reference
-    }) as any;
+    const result = await processSubscriptionPayment({
+      email,
+      amount,
+      gateway,
+      reference
+    });
 
-    // Sync referral to E-WIN Server API (Non-fatal / Non-blocking)
-    if (result?.success && result.referralCode) {
-      try {
-        const { syncReferralToEwinServer } = await import('$lib/services/referral');
-        await syncReferralToEwinServer({
-          userId: result.userId,
-          email: result.email,
-          referralCode: result.referralCode,
-          type: 'subscription',
-          amount: amount
-        });
-      } catch (refErr) {
-        console.warn('[payment/mock-trigger] E-WIN referral sync failed (non-fatal):', refErr);
-      }
-    }
+    await syncSubscriptionReferral(result, amount, '[payment/mock-trigger]');
 
     return json({ success: true, result });
 

@@ -1,25 +1,10 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { convex, api } from '$lib/services/convexClient';
 import { env } from '$env/dynamic/private';
+import { processSubscriptionPayment, syncSubscriptionReferral, verifyHmacHex } from '$lib/server/payments';
 
 export const _runtime = 'edge';
 export const _dynamic = 'force-dynamic';
-
-/** Edge-compatible HMAC-SHA512 hex verification */
-async function verifyHmacSha512(secret: string, payload: string, expectedHex: string): Promise<boolean> {
-    const enc = new TextEncoder();
-    const key = await crypto.subtle.importKey(
-        'raw',
-        enc.encode(secret),
-        { name: 'HMAC', hash: 'SHA-512' },
-        false,
-        ['sign']
-    );
-    const sig = await crypto.subtle.sign('HMAC', key, enc.encode(payload));
-    const computed = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('');
-    return computed === expectedHex;
-}
 
 /**
  * Paystack Webhook Handler
@@ -45,7 +30,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     // ── Signature Verification ──────────────────────────────────────────────────
     let isValid = false;
     try {
-        isValid = await verifyHmacSha512(secretKey, payloadText, signature);
+        isValid = await verifyHmacHex('SHA-512', secretKey, payloadText, signature);
     } catch (err) {
         console.error('[Paystack Webhook] Verification failed:', err);
         return json({ status: 'error', message: 'Verification error' }, { status: 500 });
@@ -57,47 +42,39 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     }
 
     // ── Parse & Process ─────────────────────────────────────────────────────────
-    let payload: any;
+    let payload: {
+        event?: string;
+        data?: {
+            reference?: string;
+            amount?: number | string;
+            customer?: { email?: string };
+        };
+    };
     try {
         payload = JSON.parse(payloadText);
     } catch {
         return json({ status: 'error', message: 'Invalid JSON body' }, { status: 400 });
     }
 
-    if (payload.event === 'charge.success') {
-        const { reference, amount, customer } = payload.data;
+    const data = payload.data;
+    if (payload.event === 'charge.success' && data) {
+        const { reference, amount, customer } = data;
         const email = customer?.email;
 
-        if (email) {
+        if (email && reference) {
             console.log(`[Paystack Webhook] Payment verified: ${reference} for ${email}`);
             try {
                 // Convert amount from kobo (minor unit) to NGN (major unit)
                 const majorAmount = Number(amount) / 100;
 
-                // Call unified Convex transaction mutation to process subscription state
-                const result = await convex.mutation(api.users.processPayment, {
+                const result = await processSubscriptionPayment({
                     email,
-                    plan: 'pro',
                     amount: majorAmount,
                     gateway: 'paystack',
                     reference
-                }) as any;
+                });
 
-                // Sync referral commission to E-WIN Server (Non-fatal / Non-blocking)
-                if (result?.success && result.email) {
-                    try {
-                        const { syncReferralToEwinServer } = await import('$lib/services/referral');
-                        await syncReferralToEwinServer({
-                            userId: result.userId,
-                            email: result.email,
-                            referralCode: result.referralCode || 'webhook_auto',
-                            type: 'subscription',
-                            amount: majorAmount
-                        });
-                    } catch (refErr) {
-                        console.warn('[Paystack Webhook] E-WIN referral sync failed (non-fatal):', refErr);
-                    }
-                }
+                await syncSubscriptionReferral(result, majorAmount, '[Paystack Webhook]');
             } catch (error) {
                 console.error('[Paystack Webhook] Convex sync failed:', error);
                 return json({ status: 'error', message: 'Backend integration failed' }, { status: 500 });

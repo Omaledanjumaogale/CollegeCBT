@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { convex, api } from '$lib/services/convexClient';
 import { env } from '$env/dynamic/private';
+import { processSubscriptionPayment, syncSubscriptionReferral } from '$lib/server/payments';
 
 export const _runtime = 'edge';
 export const _dynamic = 'force-dynamic';
@@ -33,7 +33,15 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         return json({ status: 'error', message: 'Invalid signature' }, { status: 401 });
     }
 
-    let payload: any;
+    let payload: {
+        event?: string;
+        data?: {
+            status?: string;
+            tx_ref?: string;
+            amount?: number | string;
+            customer?: { email?: string };
+        };
+    };
     try {
         payload = await request.json();
     } catch {
@@ -44,33 +52,17 @@ export const POST: RequestHandler = async ({ request, platform }) => {
         const { tx_ref, amount, customer } = payload.data;
         const email = customer?.email;
 
-        if (email) {
+        if (email && tx_ref) {
             console.log(`[Flutterwave Webhook] Payment verified: ${tx_ref} for ${email}`);
             try {
-                // Call unified Convex transaction mutation to process subscription state
-                const result = await convex.mutation(api.users.processPayment, {
+                const result = await processSubscriptionPayment({
                     email,
-                    plan: 'pro',
                     amount: Number(amount),
                     gateway: 'flutterwave',
                     reference: tx_ref
-                }) as any;
+                });
 
-                // Sync referral commission to E-WIN Server (Non-fatal / Non-blocking)
-                if (result?.success && result.email) {
-                    try {
-                        const { syncReferralToEwinServer } = await import('$lib/services/referral');
-                        await syncReferralToEwinServer({
-                            userId: result.userId,
-                            email: result.email,
-                            referralCode: result.referralCode || 'webhook_auto',
-                            type: 'subscription',
-                            amount: Number(amount)
-                        });
-                    } catch (refErr) {
-                        console.warn('[Flutterwave Webhook] E-WIN referral sync failed (non-fatal):', refErr);
-                    }
-                }
+                await syncSubscriptionReferral(result, Number(amount), '[Flutterwave Webhook]');
             } catch (error) {
                 console.error('[Flutterwave Webhook] Convex sync failed:', error);
                 return json({ status: 'error', message: 'Backend integration failed' }, { status: 500 });
