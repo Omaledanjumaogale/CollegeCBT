@@ -17,7 +17,10 @@ export default defineSchema({
     grade: v.optional(v.string()),
     customTopic: v.optional(v.string()),
     timestamp: v.number(),
-  }).index('by_user', ['userId']),
+  })
+    .index('by_user', ['userId'])
+    .index('by_user_timestamp', ['userId', 'timestamp'])
+    .index('by_mode', ['mode']),
 
   // ── User profiles ──────────────────────────────────────────────────────────
   users: defineTable({

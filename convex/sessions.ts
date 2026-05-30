@@ -89,8 +89,8 @@ export const saveSession = mutation({
     // ── Rate Limit ──
     const rl = await checkRateLimitInternal(ctx, { 
       key: `saveSession:${args.userId}`, 
-      burst: 3, 
-      rate: 0.001 // 1 refill every 1000 seconds (~15 mins)
+      burst: 30,
+      rate: 0.05
     });
     if (!rl.ok) throw new Error("Please wait before saving another result.");
     await ctx.db.insert('sessions', {
@@ -107,6 +107,21 @@ export const saveSession = mutation({
       grade: args.grade,
       timestamp: args.timestamp,
     });
+
+    await ctx.db.insert('usageMetrics', {
+      userId: args.userId,
+      metric: args.mode === 'mock' ? 'exam_completed' : 'question_generated',
+      quantity: args.mode === 'mock' ? 1 : args.questionsAnswered,
+      unit: args.mode === 'mock' ? 'exam' : 'question',
+      metadata: JSON.stringify({
+        sessionId: args.sessionId,
+        course: args.course,
+        score: args.score,
+        mode: args.mode,
+      }),
+      periodKey: new Date(args.timestamp).toISOString().slice(0, 7),
+      timestamp: args.timestamp,
+    });
   },
 });
 
@@ -121,7 +136,7 @@ export const getUserSessions = query({
 
     return await ctx.db
       .query('sessions')
-      .withIndex('by_user', (q) => q.eq('userId', args.userId))
+      .withIndex('by_user_timestamp', (q) => q.eq('userId', args.userId))
       .order('desc')
       .take(50);
   },

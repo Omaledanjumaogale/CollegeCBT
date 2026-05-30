@@ -4,6 +4,7 @@
 	import { currentUser, isPro, showToast } from '$lib/stores';
 	import AcademicSelector from '$lib/components/AcademicSelector.svelte';
 	import ExamScoreBar from '$lib/components/ExamScoreBar.svelte';
+	import { saveStudySession } from '$lib/services/convexClient';
 	import { fade, slide } from 'svelte/transition';
 
 	// ── TAB STATE ──
@@ -33,6 +34,7 @@
 	let theoryRevealed = $state(false);
 	
 	let labStats = $state({ total: 0, correct: 0, wrong: 0, score: 0, streak: 0 });
+	let saveState = $state<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
 	async function generateLabQuestion() {
 		if (!academicData.course) {
@@ -74,6 +76,35 @@
 		}
 	}
 
+	async function persistStudyResult(session: {
+		course: string;
+		level: string;
+		institutionType: string;
+		questionsAnswered: number;
+		correct: number;
+		wrong: number;
+		score: number;
+		mode: 'lab' | 'mock';
+		grade?: string;
+	}) {
+		if (!$currentUser?.uid) return;
+		saveState = 'saving';
+
+		try {
+			const ok = await saveStudySession($currentUser.uid, {
+				id: `session-${Date.now()}-${crypto.randomUUID()}`,
+				...session,
+				timestamp: Date.now()
+			});
+			saveState = ok ? 'saved' : 'error';
+			if (!ok) showToast('⚠️ Sync Pending', 'Your result is visible locally but could not sync yet.', 'warning');
+		} catch (err) {
+			console.error('[CollegeCBT] Study session save failed:', err);
+			saveState = 'error';
+			showToast('⚠️ Sync Pending', 'Your result is visible locally but could not sync yet.', 'warning');
+		}
+	}
+
 	function answerMCQ(key: string) {
 		if (labAnswered || !labQuestion) return;
 		labAnswered = true;
@@ -91,23 +122,17 @@
 			showToast('❌ Incorrect', `Correct answer: ${correctKey}`, 'error');
 		}
 
-		if ($currentUser?.uid) {
-			import('$lib/services/convexClient').then(({ saveStudySession }) => {
-				saveStudySession($currentUser.uid, {
-					id: `practice-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-					course: academicData.course,
-					level: academicData.level,
-					institutionType: academicData.institutionType,
-					questionsAnswered: 1,
-					correct: isCorrect ? 1 : 0,
-					wrong: isCorrect ? 0 : 1,
-					score: isCorrect ? 100 : 0,
-					mode: 'lab',
-					grade: isCorrect ? 'A1' : 'F9',
-					timestamp: Date.now()
-				}).catch(err => console.error('[CollegeCBT] Practice session save failed:', err));
-			});
-		}
+		void persistStudyResult({
+			course: academicData.course,
+			level: academicData.level,
+			institutionType: academicData.institutionType,
+			questionsAnswered: 1,
+			correct: isCorrect ? 1 : 0,
+			wrong: isCorrect ? 0 : 1,
+			score: isCorrect ? 100 : 0,
+			mode: 'lab',
+			grade: isCorrect ? 'A1' : 'F9'
+		});
 	}
 
 	// ── MOCK STATE ──
@@ -276,24 +301,17 @@
 		mockResult = { score: correct, correct, wrong, skipped, pct, grade };
 		mockPhase = 'results';
 
-		// Save session
-		if ($currentUser?.uid) {
-			import('$lib/services/convexClient').then(({ saveStudySession }) => {
-				saveStudySession($currentUser.uid, {
-					id: `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-					course: academicData.course,
-					level: academicData.level,
-					institutionType: academicData.institutionType,
-					questionsAnswered: total,
-					correct,
-					wrong,
-					score: pct,
-					mode: 'mock',
-					grade,
-					timestamp: Date.now()
-				});
-			}).catch(err => console.error('[CollegeCBT] Failed to save session:', err));
-		}
+		void persistStudyResult({
+			course: academicData.course,
+			level: academicData.level,
+			institutionType: academicData.institutionType,
+			questionsAnswered: total,
+			correct,
+			wrong,
+			score: pct,
+			mode: 'mock',
+			grade
+		});
 	}
 
 	function getTimerColor() {
@@ -501,6 +519,12 @@
 							score={labStats.score}
 							streak={labStats.streak}
 						/>
+						<div class="flex justify-end">
+							<span class="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-widest
+								{saveState === 'saving' ? 'text-amber-300 bg-amber-500/10' : saveState === 'error' ? 'text-rose-300 bg-rose-500/10' : saveState === 'saved' ? 'text-lime-300 bg-lime-500/10' : 'text-white/35 bg-white/5'}">
+								{saveState === 'saving' ? 'Syncing result...' : saveState === 'error' ? 'Sync retry needed' : saveState === 'saved' ? 'Live dashboard updated' : 'Ready'}
+							</span>
+						</div>
 					{/if}
 
 					{#if labQuestion}

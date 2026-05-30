@@ -1,6 +1,6 @@
 <script lang="ts">
 		import { currentUser, dashboardPanel, isAuthenticated, activeModal, showToast } from '$lib/stores';
-	import type { StudySession } from '$lib/stores';
+	import type { StudySession, User } from '$lib/stores';
 	import { api } from '$lib/services/convexClient';
 	import { useQuery } from 'convex-svelte';
 	import { goto } from '$app/navigation';
@@ -19,7 +19,13 @@
 
 	// Provide sane defaults if currentUser is missing some fields
 	// ── Enterprise Profile Resolution ──
-	let mappedUser = $derived($currentUser as any);
+	type DashboardAnalytics = {
+		chartData: number[];
+		heatmap: { topic: string; pct: number; color: string; label: string }[];
+	};
+	type SessionRecord = Omit<StudySession, 'id'> & { sessionId: string; mode: StudySession['mode'] | 'custom' };
+
+	let mappedUser = $derived($currentUser as User | null);
 	let userProfile = $derived({
 		name: mappedUser?.displayName || 'Active Student',
 		email: mappedUser?.email || '',
@@ -34,7 +40,7 @@
 	const sessionsQuery = useQuery(api.sessions.getUserSessions, () => ({ userId: $currentUser?.uid || '' }));
 	const analyticsQuery = useQuery(api.sessions.getDashboardAnalytics, () => ({ userId: $currentUser?.uid || '' }));
 
-	let userSessions = $derived(sessionsQuery.data ? (sessionsQuery.data as any[]).map((s) => ({
+	let userSessions = $derived(sessionsQuery.data ? (sessionsQuery.data as SessionRecord[]).map((s) => ({
 		id: s.sessionId,
 		course: s.course,
 		level: s.level,
@@ -49,6 +55,7 @@
 	})) : []);
 
 	let loadingSessions = $derived(sessionsQuery.isLoading || analyticsQuery.isLoading);
+	let dashboardError = $derived(sessionsQuery.error || analyticsQuery.error);
 	let savingProfile = $state(false);
 
 	// Computed stats from real data
@@ -78,16 +85,17 @@
 		badgeColor: s.mode === 'mock' && s.score >= 70 ? 'badge-lime' : 'badge-violet'
 	})).slice(0, 6));
 
-	const recommendations = [
-		{ icon: '🗄️', title: 'Database Normalization', meta: 'DBMS · 300L · 45% avg', link: '/exam-lab?course=Database+Management+Systems&inst=University' },
-		{ icon: '🌐', title: 'TCP/IP Protocol Suite', meta: 'Networks · 300L · 62% avg', link: '/exam-lab?course=Computer+Networks&inst=University' },
-		{ icon: '⚡', title: 'Algorithm Complexity', meta: 'Data Structures · 300L', link: '/exam-lab?course=Data+Structures+%26+Algorithms&inst=University' },
-		{ icon: '🔍', title: 'SQL Query Optimization', meta: 'DBMS · 300L · 58% avg', link: '/exam-lab?course=Database+Management+Systems&inst=University' }
-	];
-
 	// Bar chart data (mock exam score trajectory)
 	let chartData = $state([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 	let heatmap = $state<{ topic: string; pct: number; color: string; label: string }[]>([]);
+	let recommendations = $derived((heatmap.length > 0 ? heatmap : [
+		{ topic: 'Start with your first course', pct: 0, color: '#a855f7', label: 'New' }
+	]).slice(0, 4).map((item) => ({
+		icon: item.pct >= 70 ? '✅' : item.pct >= 50 ? '⚡' : '🎯',
+		title: item.topic,
+		meta: `${item.label} · ${item.pct}% average`,
+		link: `/exam-lab?course=${encodeURIComponent(item.topic)}&mode=lab`
+	})));
 	
 	const maxVal = 100;
 	const TARGET_LINE = 75;
@@ -105,14 +113,19 @@
 	
 	$effect(() => {
 		if (analyticsQuery.data) {
-			chartData = (analyticsQuery.data as any).chartData || [0,0,0,0,0,0,0,0,0,0];
-			heatmap = (analyticsQuery.data as any).heatmap || [];
+			const analytics = analyticsQuery.data as DashboardAnalytics;
+			chartData = analytics.chartData?.length ? analytics.chartData : [0,0,0,0,0,0,0,0,0,0];
+			heatmap = analytics.heatmap || [];
 		}
 	});
 
 	// AI Logic
 	let aiAnalyzing = $state(false);
-	let aiPrediction = $state<any>(null);
+	let aiPrediction = $state<{
+		motivationScore?: number;
+		weaknesses?: string[];
+		nextSteps?: string[];
+	} | null>(null);
 
 	async function analyzePerformance() {
 		if (!$currentUser?.uid) return;
@@ -150,7 +163,7 @@
 
 	onMount(async () => {
 		setTimeout(() => {
-			const target = 78;
+			const target = avgScore || Math.min(100, Math.round((totalAnswered / 20) * 25));
 			const duration = 1200;
 			const start = Date.now();
 			const animate = () => {
@@ -304,6 +317,18 @@
 					</div>
 
 					<!-- KPIs -->
+					{#if dashboardError}
+						<div class="mb-6 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-100">
+							Live dashboard data could not be loaded. Please refresh after your session is restored.
+						</div>
+					{:else if loadingSessions}
+						<div class="mb-6 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+							{#each Array(4) as _}
+								<div class="glass-card h-28 animate-pulse"></div>
+							{/each}
+						</div>
+					{/if}
+
 					<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
 						{#each kpis as k}
 							<div class="glass-card p-4 sm:p-5 relative overflow-hidden" style="--kpi-color:{k.color};">
@@ -343,7 +368,7 @@
 						<!-- Gauge -->
 						<div class="glass-card p-5">
 							<div class="font-bold text-sm mb-1">🎯 AI Readiness Score</div>
-							<div class="text-xs text-white/40 mb-4">Based on 342 questions & 12 mock exams</div>
+							<div class="text-xs text-white/40 mb-4">Based on {totalAnswered} questions & {mockExamsCount} mock exams</div>
 							<!-- Semicircle gauge -->
 							<div class="relative w-36 h-[72px] mx-auto mb-2 overflow-hidden">
 								<div class="absolute inset-0 rounded-t-full border-[10px] border-b-0" style="border-color:rgba(255,255,255,0.06);"></div>
@@ -353,7 +378,7 @@
 							</div>
 							<div class="text-center text-xs text-white/40 mb-3">/ 100 — <span style="color:#84cc16;">Exam Ready</span></div>
 							<div class="p-2.5 rounded-lg text-xs" style="background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.2);color:#a3e635;">
-								📈 At current pace, you'll reach 85+ within 2 weeks of consistent practice.
+								📈 Live score updates as your Exam Lab and Mock Exam results sync from Convex.
 							</div>
 						</div>
 						<!-- Grade Prediction & AI Analyst -->
@@ -386,18 +411,18 @@
 										<span class="text-sm font-medium text-amber-DEFAULT">{aiPrediction.nextSteps?.[0] || 'Keep practicing!'}</span>
 									</div>
 								{:else}
-									<!-- Skeleton/Placeholder before trigger -->
+									<!-- Real telemetry before AI analysis is requested -->
 									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.25);">
 										<span class="text-sm">Predicted Grade</span>
-										<span class="font-title text-2xl" style="color:#84cc16;">B2 — 72%</span>
+										<span class="font-title text-2xl" style="color:#84cc16;">{avgScore >= 75 ? 'A1' : avgScore >= 70 ? 'B2' : avgScore >= 60 ? 'C4' : avgScore > 0 ? 'Practice' : 'New'} — {avgScore}%</span>
 									</div>
 									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);">
-										<span class="text-sm">National Standing</span>
-										<span class="text-sm text-violet-light">Top 27% of 300L CS</span>
+										<span class="text-sm">Data Confidence</span>
+										<span class="text-sm text-violet-light">{totalAnswered >= 50 ? 'High' : totalAnswered >= 10 ? 'Growing' : 'Needs more attempts'}</span>
 									</div>
 									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.25);">
 										<span class="text-sm">To reach A1 (75%+)</span>
-										<span class="text-sm text-amber-DEFAULT">12 more correct answers</span>
+										<span class="text-sm text-amber-DEFAULT">{Math.max(0, 75 - avgScore)} percentage points</span>
 									</div>
 								{/if}
 							</div>
@@ -484,12 +509,12 @@
 							<Tooltip text="This predicts your final grade based on your practice scores and subject knowledge." />
 						</div>
 						<p class="text-sm text-white/80 leading-relaxed">
-							Based on your current practice progress, you are on track to achieve a
-							<strong class="text-lime-DEFAULT">B2 grade (70–74%)</strong> in your final exams.
-							To get an <strong class="text-lime-DEFAULT">A1 (75%+)</strong>, focus more on
-							<strong>Database Normalization</strong> and SQL optimization.
-							Practicing these topics more will likely push your score higher.
-							<strong class="text-amber-DEFAULT">You are only 12 correct answers away from an A1 grade.</strong>
+							Based on your current practice progress, your real-time average score is
+							<strong class="text-lime-DEFAULT">{avgScore}%</strong>.
+							To get an <strong class="text-lime-DEFAULT">A1 (75%+)</strong>, focus on
+							<strong>{heatmap[0]?.topic || 'your next course topic'}</strong>.
+							The dashboard updates immediately after each saved Exam Lab or Mock Exam session.
+							<strong class="text-amber-DEFAULT">You need {Math.max(0, 75 - avgScore)} more percentage points to reach A1 readiness.</strong>
 						</p>
 					</div>
 
@@ -505,6 +530,18 @@
 				{#if $dashboardPanel === 'activity'}
 					<div class="font-display text-2xl mb-5">📋 Recent Activity</div>
 					<div class="space-y-3">
+						{#if loadingSessions}
+							{#each Array(4) as _}
+								<div class="glass-card h-20 animate-pulse"></div>
+							{/each}
+						{:else if recentActivity.length === 0}
+							<div class="glass-card p-8 text-center">
+								<div class="text-3xl mb-3">📝</div>
+								<div class="font-bold text-white">No practice sessions yet</div>
+								<p class="mt-2 text-sm text-white/45">Start Exam Lab or a timed mock exam and your results will appear here in real time.</p>
+								<a href="/exam-lab" class="btn-violet mt-5 inline-flex min-h-[44px] items-center justify-center px-5 text-sm">Start Practice</a>
+							</div>
+						{:else}
 						{#each recentActivity as act}
 							<div class="glass-card p-4 flex items-center gap-3">
 								<div class="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0" style="background:{act.iconBg};">{act.icon}</div>
@@ -515,6 +552,7 @@
 								<div class="badge {act.badgeColor} flex-shrink-0 text-xs">{act.badge}</div>
 							</div>
 						{/each}
+						{/if}
 					</div>
 				{/if}
 
