@@ -20,7 +20,7 @@
 	// ── Initialize Convex real-time WebSocket client ──
 	// setupConvex MUST run on every render (SSR included) to set Svelte context for useQuery.
 	// The library passes disabled: true on SSR so no WebSocket connects.
-	const CONVEX_URL = env?.PUBLIC_CONVEX_URL || '';
+	const CONVEX_URL = env?.PUBLIC_CONVEX_URL || 'https://placeholder.convex.cloud';
 	setupConvex(CONVEX_URL);
 	let client: ReturnType<typeof useConvexClient> | null = $state(null);
 	$effect(() => {
