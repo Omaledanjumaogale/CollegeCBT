@@ -125,6 +125,135 @@ export const saveSession = mutation({
   },
 });
 
+export const saveQuestionAttempt = mutation({
+  args: {
+    userId: v.string(),
+    sessionId: v.string(),
+    course: v.string(),
+    level: v.string(),
+    institutionType: v.string(),
+    topic: v.string(),
+    mode: v.union(v.literal('lab'), v.literal('mock'), v.literal('custom')),
+    type: v.union(v.literal('MCQ'), v.literal('Theory')),
+    questionHash: v.string(),
+    question: v.string(),
+    options: v.optional(v.string()),
+    correctAnswer: v.optional(v.string()),
+    selectedAnswer: v.optional(v.string()),
+    isCorrect: v.optional(v.boolean()),
+    score: v.number(),
+    maxScore: v.number(),
+    grade: v.optional(v.string()),
+    responseMs: v.optional(v.number()),
+    cacheKey: v.string(),
+    createdAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || args.userId !== identity.subject) {
+      throw new Error("Unauthorized question attempt.");
+    }
+
+    const rl = await checkRateLimitInternal(ctx, {
+      key: `saveQuestionAttempt:${args.userId}`,
+      burst: 120,
+      rate: 1,
+    });
+    if (!rl.ok) throw new Error("Please wait before saving another answer.");
+
+    const existing = await ctx.db
+      .query('questionAttempts')
+      .withIndex('by_cache_key', (q) => q.eq('cacheKey', args.cacheKey))
+      .unique();
+
+    const payload = {
+      userId: args.userId,
+      sessionId: args.sessionId,
+      course: args.course,
+      level: args.level,
+      institutionType: args.institutionType,
+      topic: args.topic,
+      mode: args.mode,
+      type: args.type,
+      questionHash: args.questionHash,
+      question: args.question,
+      options: args.options,
+      correctAnswer: args.correctAnswer,
+      selectedAnswer: args.selectedAnswer,
+      isCorrect: args.isCorrect,
+      score: args.score,
+      maxScore: args.maxScore,
+      grade: args.grade,
+      responseMs: args.responseMs,
+      cacheKey: args.cacheKey,
+      createdAt: args.createdAt,
+    };
+
+    if (existing) {
+      await ctx.db.patch(existing._id, payload);
+      return existing._id;
+    }
+
+    const id = await ctx.db.insert('questionAttempts', payload);
+
+    await ctx.db.insert('usageMetrics', {
+      userId: args.userId,
+      metric: args.mode === 'mock' ? 'exam_started' : 'question_generated',
+      quantity: 1,
+      unit: 'attempt',
+      metadata: JSON.stringify({
+        sessionId: args.sessionId,
+        course: args.course,
+        topic: args.topic,
+        type: args.type,
+        score: args.score,
+      }),
+      periodKey: new Date(args.createdAt).toISOString().slice(0, 7),
+      timestamp: args.createdAt,
+    });
+
+    return id;
+  },
+});
+
+export const getSessionAttempts = query({
+  args: {
+    userId: v.string(),
+    sessionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || args.userId !== identity.subject) {
+      throw new Error("Unauthorized read.");
+    }
+
+    return await ctx.db
+      .query('questionAttempts')
+      .withIndex('by_session', (q) => q.eq('sessionId', args.sessionId))
+      .filter((q) => q.eq(q.field('userId'), args.userId))
+      .collect();
+  },
+});
+
+export const getRecentQuestionAttempts = query({
+  args: {
+    userId: v.string(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || args.userId !== identity.subject) {
+      throw new Error("Unauthorized read.");
+    }
+
+    return await ctx.db
+      .query('questionAttempts')
+      .withIndex('by_user_created', (q) => q.eq('userId', args.userId))
+      .order('desc')
+      .take(args.limit ?? 100);
+  },
+});
+
 export const getUserSessions = query({
   args: { userId: v.string() },
   handler: async (ctx, args) => {

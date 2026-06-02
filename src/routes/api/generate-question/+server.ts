@@ -7,8 +7,8 @@ import { api, convex } from '$lib/services/convexClient';
 // Uses a Map keyed by IP or UID, pruned every 10 minutes to prevent memory leaks.
 const rateLimitFallback = new Map<string, { count: number; windowStart: number }>();
 const WINDOW_MS = 60_000; // 1 minute window
-const FREE_LIMIT = 5;     // 5 req/min for free/unauthenticated users
-const PRO_LIMIT  = 60;    // 60 req/min for pro users
+const FREE_LIMIT = 60;    // Enough headroom for a full timed mock exam.
+const PRO_LIMIT  = 180;   // Higher burst allowance for pro users and instructors.
 
 // Prune stale entries periodically (edge-safe, no node:timers needed)
 function checkAndPrune(key: string, limit: number): { allowed: boolean; remaining: number } {
@@ -91,7 +91,7 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			return json(
 				{
 					error: userPlan === 'free'
-						? 'Daily question limit reached. Upgrade to Pro for unlimited questions.'
+						? 'Question generation is busy. Please wait a minute or upgrade for higher throughput.'
 						: 'Rate limit reached. Please wait a moment.',
 					rateLimited: true,
 					plan: userPlan

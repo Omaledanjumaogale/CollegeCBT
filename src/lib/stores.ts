@@ -54,6 +54,29 @@ export interface StudySession {
 	timestamp: number;
 }
 
+export interface QuestionAttempt {
+	userId: string;
+	sessionId: string;
+	course: string;
+	level: string;
+	institutionType: string;
+	topic: string;
+	mode: 'lab' | 'mock' | 'custom';
+	type: 'MCQ' | 'Theory';
+	questionHash: string;
+	question: string;
+	options?: string;
+	correctAnswer?: string;
+	selectedAnswer?: string;
+	isCorrect?: boolean;
+	score: number;
+	maxScore: number;
+	grade?: string;
+	responseMs?: number;
+	cacheKey: string;
+	createdAt: number;
+}
+
 export interface Question {
 	id: string;
 	question: string;

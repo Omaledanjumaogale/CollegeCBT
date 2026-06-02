@@ -281,6 +281,34 @@ export default defineSchema({
     .index('by_type', ['type'])
     .index('by_other', ['isOther']),
 
+  questionAttempts: defineTable({
+    userId: v.string(),
+    sessionId: v.string(),
+    course: v.string(),
+    level: v.string(),
+    institutionType: v.string(),
+    topic: v.string(),
+    mode: v.union(v.literal('lab'), v.literal('mock'), v.literal('custom')),
+    type: v.union(v.literal('MCQ'), v.literal('Theory')),
+    questionHash: v.string(),
+    question: v.string(),
+    options: v.optional(v.string()),
+    correctAnswer: v.optional(v.string()),
+    selectedAnswer: v.optional(v.string()),
+    isCorrect: v.optional(v.boolean()),
+    score: v.number(),
+    maxScore: v.number(),
+    grade: v.optional(v.string()),
+    responseMs: v.optional(v.number()),
+    cacheKey: v.string(),
+    createdAt: v.number(),
+  })
+    .index('by_user', ['userId'])
+    .index('by_user_created', ['userId', 'createdAt'])
+    .index('by_session', ['sessionId'])
+    .index('by_cache_key', ['cacheKey'])
+    .index('by_course_topic', ['course', 'topic']),
+
   // ── Multi-Platform SaaS Subscriptions & Access Control ────────────────────
   subscriptions: defineTable({
     userId: v.string(), // Firebase UID

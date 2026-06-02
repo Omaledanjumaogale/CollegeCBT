@@ -10,8 +10,72 @@
 		level: string;
 		course: string;
 		topic: string;
-		onUpdate: (data: any) => void;
+		onUpdate: (data: {
+			institutionType: string;
+			faculty: string;
+			department: string;
+			level: string;
+			course: string;
+			topic: string;
+		}) => void;
 	}
+
+	const fallbackFaculties = [
+		'Science',
+		'Engineering',
+		'Management Sciences',
+		'Social Sciences',
+		'Arts and Humanities',
+		'Education',
+		'Health Sciences',
+		'Law',
+		'Agriculture',
+		'Environmental Studies',
+		'Vocational and Technical Education'
+	];
+
+	const fallbackDepartmentsByFaculty: Record<string, string[]> = {
+		Science: ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'Microbiology', 'Statistics'],
+		Engineering: ['Computer Engineering', 'Electrical Engineering', 'Mechanical Engineering', 'Civil Engineering', 'Chemical Engineering'],
+		'Management Sciences': ['Accounting', 'Business Administration', 'Banking and Finance', 'Marketing', 'Public Administration'],
+		'Social Sciences': ['Economics', 'Political Science', 'Sociology', 'Psychology', 'Mass Communication'],
+		'Arts and Humanities': ['English', 'History and International Studies', 'Linguistics', 'Philosophy', 'Religious Studies'],
+		Education: ['Educational Management', 'Guidance and Counselling', 'Science Education', 'Business Education', 'Early Childhood Education'],
+		'Health Sciences': ['Nursing Science', 'Medical Laboratory Science', 'Pharmacy', 'Public Health', 'Anatomy', 'Physiology'],
+		Law: ['Law'],
+		Agriculture: ['Agricultural Economics', 'Animal Science', 'Crop Science', 'Soil Science', 'Fisheries'],
+		'Environmental Studies': ['Architecture', 'Estate Management', 'Quantity Surveying', 'Urban and Regional Planning'],
+		'Vocational and Technical Education': ['Technical Education', 'Home Economics', 'Agricultural Education', 'Fine and Applied Arts']
+	};
+
+	const fallbackCoursesByDepartment: Record<string, string[]> = {
+		'Computer Science': ['Introduction to Programming', 'Data Structures and Algorithms', 'Database Systems', 'Operating Systems', 'Computer Networks', 'Software Engineering'],
+		Mathematics: ['Calculus', 'Linear Algebra', 'Real Analysis', 'Abstract Algebra', 'Numerical Analysis'],
+		Physics: ['Mechanics', 'Electricity and Magnetism', 'Thermodynamics', 'Modern Physics'],
+		Chemistry: ['Organic Chemistry', 'Inorganic Chemistry', 'Physical Chemistry', 'Analytical Chemistry'],
+		Biology: ['Cell Biology', 'Genetics', 'Ecology', 'Evolution'],
+		Accounting: ['Financial Accounting', 'Cost Accounting', 'Auditing', 'Taxation', 'Management Accounting'],
+		'Business Administration': ['Principles of Management', 'Business Law', 'Entrepreneurship', 'Operations Management'],
+		Economics: ['Microeconomics', 'Macroeconomics', 'Econometrics', 'Development Economics'],
+		'Political Science': ['Introduction to Political Science', 'Nigerian Government and Politics', 'International Relations'],
+		English: ['Use of English', 'Literary Studies', 'Phonetics and Phonology', 'Advanced Composition'],
+		'Electrical Engineering': ['Circuit Theory', 'Electronics', 'Power Systems', 'Control Systems'],
+		'Mechanical Engineering': ['Engineering Mechanics', 'Thermodynamics', 'Fluid Mechanics', 'Machine Design'],
+		'Nursing Science': ['Anatomy and Physiology', 'Medical-Surgical Nursing', 'Community Health Nursing', 'Pharmacology'],
+		Law: ['Constitutional Law', 'Criminal Law', 'Law of Contract', 'Tort Law', 'Nigerian Legal System']
+	};
+
+	const fallbackTopicsByCourse: Record<string, string[]> = {
+		'Introduction to Programming': ['Variables and Data Types', 'Control Flow', 'Functions', 'Arrays', 'Object-Oriented Programming'],
+		'Data Structures and Algorithms': ['Arrays and Linked Lists', 'Stacks and Queues', 'Trees', 'Graphs', 'Sorting and Searching'],
+		'Database Systems': ['ER Modelling', 'SQL Queries', 'Normalization', 'Transactions', 'Indexing'],
+		'Computer Networks': ['OSI Model', 'TCP/IP', 'Routing', 'Network Security', 'Wireless Networks'],
+		'Financial Accounting': ['Double Entry', 'Trial Balance', 'Final Accounts', 'Bank Reconciliation', 'Depreciation'],
+		Microeconomics: ['Demand and Supply', 'Elasticity', 'Consumer Theory', 'Market Structures'],
+		Macroeconomics: ['National Income', 'Inflation', 'Monetary Policy', 'Fiscal Policy'],
+		'Use of English': ['Comprehension', 'Summary Writing', 'Lexis and Structure', 'Essay Writing'],
+		'Constitutional Law': ['Supremacy of the Constitution', 'Separation of Powers', 'Fundamental Rights', 'Federalism']
+	};
 
 	let { 
 		institutionType = $bindable(''), 
@@ -52,6 +116,52 @@
 			: 'skip'
 	);
 
+	function mergeOptions(primary: string[] | undefined, fallback: string[]) {
+		return Array.from(new Set([...(primary || []), ...fallback])).filter(Boolean);
+	}
+
+	function canonicalFaculty(value: string) {
+		return value.replace(/^Faculty of\s+/i, '').replace(/^School of\s+/i, '').trim();
+	}
+
+	let facultyOptions = $derived(mergeOptions(faculties.data, fallbackFaculties));
+	let departmentOptions = $derived(
+		mergeOptions(
+			departments.data,
+			fallbackDepartmentsByFaculty[faculty] ||
+				fallbackDepartmentsByFaculty[canonicalFaculty(faculty)] ||
+				Object.values(fallbackDepartmentsByFaculty).flat()
+		)
+	);
+	let courseOptions = $derived(
+		mergeOptions(
+			courses.data?.map((item) => item.course),
+			fallbackCoursesByDepartment[department] || ['General Studies', 'Use of English', 'Computer Appreciation', 'Mathematics', 'Entrepreneurship']
+		)
+	);
+	let topicOptions = $derived.by(() => {
+		const selectedCourse = courses.data?.find((item) => item.course === course);
+		return mergeOptions(
+			selectedCourse?.topics,
+			fallbackTopicsByCourse[course] || ['General Concepts', 'Definitions and Scope', 'Applications', 'Exam Traps', 'Past Question Patterns']
+		);
+	});
+
+	$effect(() => {
+		if (!faculty && department) {
+			const match = Object.entries(fallbackDepartmentsByFaculty).find(([, departments]) =>
+				departments.includes(department)
+			);
+			if (match) faculty = match[0];
+		}
+		if (!department && course) {
+			const match = Object.entries(fallbackCoursesByDepartment).find(([, courses]) =>
+				courses.includes(course)
+			);
+			if (match) department = match[0];
+		}
+	});
+
 	// ── Other / Custom Inputs ──────────────────────────────────────────────────
 	let otherFaculty = $state('');
 	let otherDept = $state('');
@@ -59,6 +169,14 @@
 	let otherTopic = $state('');
 
 	$effect(() => {
+		const hasCustomInput =
+			faculty === 'Other' ||
+			department === 'Other' ||
+			course === 'Other' ||
+			topic === 'Other';
+
+		if (!hasCustomInput) return;
+
 		onUpdate({
 			institutionType,
 			faculty: faculty === 'Other' ? otherFaculty : faculty,
@@ -84,11 +202,15 @@
 		<label for="acs-inst-type" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">1. Institution Type</label>
 		<select id="acs-inst-type" bind:value={institutionType} onchange={() => resetFrom('type')} class="form-select">
 			<option value="">Select Type</option>
-			{#if instTypes.data}
-				{#each instTypes.data as t}
-					<option value={t}>{t}</option>
-				{/each}
-			{/if}
+				{#if instTypes.data}
+					{#each instTypes.data as t}
+						<option value={t}>{t}</option>
+					{/each}
+				{:else}
+					{#each ['University', 'Polytechnic', 'College of Education', 'Monotechnic/Specialized'] as t}
+						<option value={t}>{t}</option>
+					{/each}
+				{/if}
 			<option value="Other">Other / Specialized</option>
 		</select>
 	</div>
@@ -99,11 +221,9 @@
 			<label for="acs-faculty" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">2. Faculty / School</label>
 			<select id="acs-faculty" bind:value={faculty} onchange={() => resetFrom('faculty')} class="form-select">
 				<option value="">Select Faculty</option>
-				{#if faculties.data}
-					{#each faculties.data as f}
-						<option value={f}>{f}</option>
-					{/each}
-				{/if}
+				{#each facultyOptions as f}
+					<option value={f}>{f}</option>
+				{/each}
 				<option value="Other">Other (Input Below)</option>
 			</select>
 			{#if faculty === 'Other'}
@@ -124,11 +244,9 @@
 			<label for="acs-dept" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">3. Department</label>
 			<select id="acs-dept" bind:value={department} onchange={() => resetFrom('dept')} class="form-select">
 				<option value="">Select Department</option>
-				{#if departments.data}
-					{#each departments.data as d}
-						<option value={d}>{d}</option>
-					{/each}
-				{/if}
+				{#each departmentOptions as d}
+					<option value={d}>{d}</option>
+				{/each}
 				<option value="Other">Other (Input Below)</option>
 			</select>
 			{#if department === 'Other'}
@@ -169,11 +287,9 @@
 			<label for="acs-course" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">5. Subject / Course Module</label>
 			<select id="acs-course" bind:value={course} onchange={() => resetFrom('course')} class="form-select">
 				<option value="">Select Subject</option>
-				{#if courses.data}
-					{#each courses.data as c}
-						<option value={c.course}>{c.course}</option>
-					{/each}
-				{/if}
+				{#each courseOptions as c}
+					<option value={c}>{c}</option>
+				{/each}
 				<option value="Other">Other / Specific Topic (Input Below)</option>
 			</select>
 			{#if course === 'Other'}
@@ -194,14 +310,9 @@
 			<label for="acs-topic" class="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">6. Specific Topic (Optional)</label>
 			<select id="acs-topic" bind:value={topic} class="form-select">
 				<option value="General">General / All Topics</option>
-				{#if courses.data}
-					{@const currentCourseObj = courses.data.find(c => c.course === course)}
-					{#if currentCourseObj?.topics}
-						{#each currentCourseObj.topics as t}
-							<option value={t}>{t}</option>
-						{/each}
-					{/if}
-				{/if}
+				{#each topicOptions as t}
+					<option value={t}>{t}</option>
+				{/each}
 				<option value="Other">Enter Specific Topic Below</option>
 			</select>
 			{#if topic === 'Other'}

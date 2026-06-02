@@ -5,7 +5,14 @@ import { z } from 'zod';
 export const generateQuestionSchema = z.object({
   course: z.string().min(2, "Course name is required"),
   level: z.string().optional(),
-  institutionType: z.enum(['University', 'Polytechnic', 'College of Education', 'Professional']),
+  institutionType: z.enum([
+    'University',
+    'Polytechnic',
+    'College of Education',
+    'Monotechnic/Specialized',
+    'Professional',
+    'Other'
+  ]),
   topic: z.string().optional(),
   difficulty: z.enum(['easy', 'medium', 'hard', 'mixed']).default('mixed'),
   type: z.enum(['MCQ', 'Theory']).default('MCQ'),

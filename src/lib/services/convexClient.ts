@@ -1,7 +1,7 @@
 import { ConvexHttpClient } from 'convex/browser';
 import { api } from '$convex/_generated/api';
 import { env } from '$env/dynamic/public';
-import type { StudySession } from '$lib/stores';
+import type { QuestionAttempt, StudySession } from '$lib/stores';
 import type { Id } from '$convex/_generated/dataModel';
 
 export { api };
@@ -41,6 +41,27 @@ export async function saveStudySession(userId: string, session: StudySession): P
 	} catch (err) {
 		console.error('[CollegeCBT Convex] Save session error:', err);
 		return false;
+	}
+}
+
+export async function saveQuestionAttempt(attempt: QuestionAttempt): Promise<boolean> {
+	try {
+		if (!attempt.userId) return false;
+		await convex.mutation(api.sessions.saveQuestionAttempt, attempt);
+		return true;
+	} catch (err) {
+		console.error('[CollegeCBT Convex] Save question attempt error:', err);
+		return false;
+	}
+}
+
+export async function getRecentQuestionAttempts(userId: string, limit = 100) {
+	try {
+		if (!userId) return [];
+		return await convex.query(api.sessions.getRecentQuestionAttempts, { userId, limit });
+	} catch (err) {
+		console.error('[CollegeCBT Convex] Get question attempts error:', err);
+		return [];
 	}
 }
 
