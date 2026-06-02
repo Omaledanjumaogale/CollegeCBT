@@ -8,7 +8,7 @@ export { api };
 
 // Edge-compatible Convex client using $env/dynamic/public (resolved safely at runtime).
 // No process.env usage — fully safe for Cloudflare Workers edge runtime.
-const convexUrl = env?.PUBLIC_CONVEX_URL || '';
+const convexUrl = env?.PUBLIC_CONVEX_URL || 'https://placeholder.convex.cloud';
 
 export const convex = new ConvexHttpClient(convexUrl);
 
