@@ -66,6 +66,7 @@
 						{ name: 'FAQ', link: '/faq' },
 						{ name: 'Terms of Use', link: '/terms' },
 						{ name: 'Privacy Policy', link: '/privacy' },
+						{ name: 'Security', link: '/security' },
 						{ name: 'Contact Us', link: 'mailto:support@collegecbt.dev' }
 					] as link}
 						<li><a href={link.link} class="text-sm font-bold uppercase tracking-wider transition-colors"

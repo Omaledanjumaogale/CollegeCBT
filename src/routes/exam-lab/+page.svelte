@@ -4,7 +4,12 @@
 	import { currentUser, showToast } from '$lib/stores';
 	import AcademicSelector from '$lib/components/AcademicSelector.svelte';
 	import ExamScoreBar from '$lib/components/ExamScoreBar.svelte';
-	import { saveQuestionAttempt, saveStudySession } from '$lib/services/convexClient';
+	import {
+		completeExamRun,
+		saveQuestionAttempt,
+		saveStudySession,
+		startExamRun
+	} from '$lib/services/convexClient';
 	import { fade, slide } from 'svelte/transition';
 
 	// ── TAB STATE ──
@@ -17,12 +22,13 @@
 		department: '',
 		level: '',
 		course: '',
-		topic: ''
+		topic: '',
+		examType: 'Adaptive Practice'
 	});
 
 	// ── LAB STATE ──
 	type OptionKey = 'A' | 'B' | 'C' | 'D';
-	type MCQ = { question: string; options: Record<OptionKey,string>; answer?: OptionKey; correct?: OptionKey; explanation?: string; topic?: string; examiner_note?: string; explanations?: Record<string,string> };
+	type MCQ = { question: string; options: Record<OptionKey,string>; answer?: OptionKey; correct?: OptionKey; explanation?: string; topic?: string; examiner_note?: string; explanations?: Record<string,string>; questionHash?: string; selectionKey?: string };
 	type Theory = { question: string; model_answer: string; key_points: {point:string;marks:number}[]; topic?: string; examiner_notes?: string };
 	
 	let labQuestion = $state<MCQ | null>(null);
@@ -40,7 +46,10 @@
 	let activeMockSessionId = $state(`mock-${Date.now()}`);
 	let questionStartedAt = $state(Date.now());
 	const localAttemptCacheKey = 'collegecbt_exam_attempt_cache_v1';
+	const localQuestionHashKey = 'collegecbt_exam_question_hashes_v1';
 	const labDraftKey = 'collegecbt_exam_lab_draft_v1';
+	let recentQuestionHashes = $state<string[]>([]);
+	let mockDeadlineAt = $state<number | null>(null);
 
 	const difficultyOptions = [
 		{ value: 'mixed', label: 'Mixed Difficulty' },
@@ -50,6 +59,18 @@
 	] as const;
 	let labDifficulty = $state<'mixed' | 'easy' | 'medium' | 'hard'>('mixed');
 	let mockDifficulty = $state<'mixed' | 'easy' | 'medium' | 'hard'>('mixed');
+	const examTypeOptions = [
+		'Adaptive Practice',
+		'Semester Exam',
+		'Departmental Test',
+		'WAEC Style',
+		'JAMB/Post-UTME',
+		'NABTEB/Technical',
+		'Professional Certification',
+		'Scholarship Screening',
+		'Entrance Exam',
+		'Revision Drill'
+	];
 
 	function safeJsonParse<T>(value: string | null): T | null {
 		if (!value) return null;
@@ -75,6 +96,14 @@
 		localStorage.setItem(localAttemptCacheKey, JSON.stringify(next));
 	}
 
+	function rememberQuestionHash(hash?: string) {
+		if (!hash) return;
+		recentQuestionHashes = [hash, ...recentQuestionHashes.filter((item) => item !== hash)].slice(0, 80);
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem(localQuestionHashKey, JSON.stringify(recentQuestionHashes));
+		}
+	}
+
 	function cacheDraft() {
 		if (typeof localStorage === 'undefined') return;
 		localStorage.setItem(labDraftKey, JSON.stringify({
@@ -85,8 +114,48 @@
 			labDifficulty,
 			mockDifficulty,
 			mockQCount,
-			mockTimePerQ
+			mockTimePerQ,
+			recentQuestionHashes
 		}));
+	}
+
+	function buildGenerationPayload(kind: 'lab' | 'mock', type: 'MCQ' | 'Theory') {
+		return {
+			course: academicData.course,
+			level: academicData.level,
+			institutionType: academicData.institutionType,
+			faculty: academicData.faculty || undefined,
+			department: academicData.department || undefined,
+			topic: academicData.topic || undefined,
+			examType: academicData.examType || undefined,
+			difficulty: kind === 'mock' ? mockDifficulty : labDifficulty,
+			type,
+			sessionId: kind === 'mock' ? activeMockSessionId : activeLabSessionId,
+			excludeHashes: recentQuestionHashes,
+			uid: $currentUser?.uid
+		};
+	}
+
+	async function startOwnedRun(kind: 'lab' | 'mock', questionCount: number, deadlineAt?: number) {
+		const userId = $currentUser?.uid;
+		if (!userId) return false;
+		const now = Date.now();
+		return await startExamRun({
+			userId,
+			clientSessionId: kind === 'mock' ? activeMockSessionId : activeLabSessionId,
+			mode: kind,
+			course: academicData.course,
+			level: academicData.level || '100 Level',
+			institutionType: academicData.institutionType,
+			faculty: academicData.faculty || undefined,
+			department: academicData.department || undefined,
+			topic: academicData.topic || undefined,
+			examType: academicData.examType || undefined,
+			difficulty: kind === 'mock' ? mockDifficulty : labDifficulty,
+			questionCount,
+			deadlineAt,
+			startedAt: now
+		});
 	}
 
 	async function recordAttempt(input: {
@@ -102,10 +171,11 @@
 		maxScore: number;
 		grade?: string;
 		topic?: string;
+		questionHash?: string;
 	}) {
 		const userId = $currentUser?.uid;
 		const now = Date.now();
-		const questionHash = hashString(`${input.question}:${input.correctAnswer ?? ''}:${input.topic ?? ''}`);
+		const questionHash = input.questionHash || hashString(`${input.question}:${input.correctAnswer ?? ''}:${input.topic ?? ''}`);
 		const cacheKey = `${userId || 'guest'}:${input.sessionId}:${questionHash}:${input.selectedAnswer ?? 'draft'}`;
 		const attempt = {
 			userId: userId || 'guest',
@@ -143,8 +213,8 @@
 		saveState = ok ? 'saved' : 'error';
 	}
 
-	function applyAcademicUpdate(data: typeof academicData) {
-		const next = { ...data };
+	function applyAcademicUpdate(data: Partial<typeof academicData>) {
+		const next = { ...academicData, ...data };
 		if (!next.faculty && academicData.faculty && next.institutionType === academicData.institutionType) {
 			next.faculty = academicData.faculty;
 		}
@@ -189,22 +259,16 @@
 		userTheoryAnswer = '';
 
 		try {
+			void startOwnedRun('lab', 1);
 			const res = await fetch('/api/generate-question', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					course: academicData.course,
-					level: academicData.level,
-					institutionType: academicData.institutionType,
-					topic: academicData.topic || undefined,
-					difficulty: labDifficulty,
-					type: labQtype,
-					uid: $currentUser?.uid
-				}),
+				body: JSON.stringify(buildGenerationPayload('lab', labQtype)),
 			});
 			const data = await res.json();
 			if (data.error) throw new Error(data.error);
 
+			rememberQuestionHash(data.questionHash);
 			if (labQtype === 'MCQ') labQuestion = data;
 			else labTheory = data;
 			
@@ -236,6 +300,10 @@
 			const ok = await saveStudySession($currentUser.uid, {
 				id: `session-${Date.now()}-${crypto.randomUUID()}`,
 				...session,
+				faculty: academicData.faculty || undefined,
+				department: academicData.department || undefined,
+				topic: academicData.topic || undefined,
+				examType: academicData.examType || undefined,
 				timestamp: Date.now()
 			});
 			saveState = ok ? 'saved' : 'error';
@@ -287,7 +355,8 @@
 			score: isCorrect ? 1 : 0,
 			maxScore: 1,
 			grade: isCorrect ? 'A1' : 'F9',
-			topic: labQuestion.topic
+			topic: labQuestion.topic,
+			questionHash: labQuestion.questionHash
 		});
 	}
 
@@ -305,7 +374,8 @@
 			score,
 			maxScore: 1,
 			grade: score >= 1 ? 'A1' : score >= 0.5 ? 'C4' : 'Practice',
-			topic: labTheory.topic
+			topic: labTheory.topic,
+			questionHash: labTheory.question
 		});
 		if ($currentUser?.uid) {
 			void persistStudyResult({
@@ -370,6 +440,8 @@
 		mockQuestionStates = [];
 		mockResult = { score: 0, correct: 0, wrong: 0, skipped: 0, pct: 0, grade: 'F9' };
 		questionStartedAt = Date.now();
+		mockDeadlineAt = Date.now() + mockQCount * mockTimePerQ * 1000;
+		void startOwnedRun('mock', mockQCount, mockDeadlineAt);
 		cacheDraft();
 
 		// Generate questions in batches
@@ -387,20 +459,19 @@
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
 							body: JSON.stringify({
-								course: academicData.course,
-								level: academicData.level,
-								institutionType: academicData.institutionType,
-								topic: academicData.topic || undefined,
-								difficulty: mockDifficulty,
-								type: 'MCQ',
-								uid: $currentUser?.uid
+								...buildGenerationPayload('mock', 'MCQ'),
+								excludeHashes: [
+									...recentQuestionHashes,
+									...mockQuestions.flatMap((question) => question.questionHash ? [question.questionHash] : [])
+								]
 							}),
 						}).then(r => r.json())
 					);
 				}
 				const results = await Promise.all(promises);
 				for (const data of results) {
-					if (!data.error) {
+					if (!data.error && !mockQuestions.some((question) => question.questionHash === data.questionHash)) {
+						rememberQuestionHash(data.questionHash);
 						mockQuestions = [...mockQuestions, data];
 						mockAnswers = [...mockAnswers, null];
 						mockQuestionStates = [...mockQuestionStates, null];
@@ -423,19 +494,20 @@
 	}
 
 	function startMockTimer() {
+		mockDeadlineAt = Date.now() + mockTimePerQ * 1000;
 		mockTimeLeft = mockTimePerQ;
 		if (mockTimer) clearInterval(mockTimer);
 		mockTimer = setInterval(() => {
-			mockTimeLeft--;
-			if (mockTimeLeft <= 0) {
-				// Auto-skip on timeout
+			if (!mockDeadlineAt) return;
+			mockTimeLeft = Math.max(0, Math.ceil((mockDeadlineAt - Date.now()) / 1000));
+			if (mockTimeLeft <= 0 && mockPhase === 'active') {
 				handleSkip();
 			}
-		}, 1000);
+		}, 250);
 	}
 
 	function resetMockTimer() {
-		mockTimeLeft = mockTimePerQ;
+		startMockTimer();
 	}
 
 	function handleAnswer(key: OptionKey) {
@@ -472,7 +544,8 @@
 			score: isCorrect ? 1 : 0,
 			maxScore: 1,
 			grade: isCorrect ? 'A1' : 'F9',
-			topic: q.topic
+			topic: q.topic,
+			questionHash: q.questionHash
 		});
 
 		// Auto-advance to next question
@@ -517,6 +590,7 @@
 			clearInterval(mockTimer);
 			mockTimer = null;
 		}
+		mockDeadlineAt = null;
 		// Record any unanswered as skipped
 		let correct = 0, wrong = 0, skipped = 0;
 		mockQuestions.forEach((q, i) => {
@@ -549,6 +623,18 @@
 			mode: 'mock',
 			grade
 		});
+		if ($currentUser?.uid) {
+			void completeExamRun({
+				userId: $currentUser.uid,
+				clientSessionId: activeMockSessionId,
+				score: pct,
+				correct,
+				wrong,
+				skipped,
+				grade,
+				completedAt: Date.now()
+			});
+		}
 	}
 
 	function getTimerColor() {
@@ -598,6 +684,7 @@
 			mockDifficulty?: typeof mockDifficulty;
 			mockQCount?: number;
 			mockTimePerQ?: number;
+			recentQuestionHashes?: string[];
 		}>(localStorage.getItem(labDraftKey));
 		if (draft) {
 			if (draft.academicData) academicData = { ...academicData, ...draft.academicData };
@@ -608,7 +695,10 @@
 			if (draft.mockDifficulty) mockDifficulty = draft.mockDifficulty;
 			if (draft.mockQCount) mockQCount = draft.mockQCount;
 			if (draft.mockTimePerQ) mockTimePerQ = draft.mockTimePerQ;
+			if (draft.recentQuestionHashes) recentQuestionHashes = draft.recentQuestionHashes;
 		}
+		const cachedHashes = safeJsonParse<string[]>(localStorage.getItem(localQuestionHashKey));
+		if (cachedHashes) recentQuestionHashes = cachedHashes.slice(0, 80);
 
 		const p = $page.url.searchParams;
 		const course = p.get('course');
@@ -664,6 +754,7 @@
 			</button>
 			<button 
 				onclick={() => { activeTab = 'mock'; mockPhase = 'config'; }}
+				data-testid="tab-mock"
 				class="min-h-[44px] rounded-xl px-3 py-3 text-xs font-bold transition-all sm:text-sm {activeTab === 'mock' ? 'bg-white text-secondary shadow-xl' : 'text-white/40 hover:text-white'}"
 			>
 				Mock Exam
@@ -683,14 +774,26 @@
 				</h2>
 
 				<AcademicSelector
-					bind:institutionType={academicData.institutionType}
-					bind:faculty={academicData.faculty}
-					bind:department={academicData.department}
-					bind:level={academicData.level}
-					bind:course={academicData.course}
-					bind:topic={academicData.topic}
+					institutionType={academicData.institutionType}
+					faculty={academicData.faculty}
+					department={academicData.department}
+					level={academicData.level}
+					course={academicData.course}
+					topic={academicData.topic}
 					onUpdate={applyAcademicUpdate}
 				/>
+
+				<div class="mt-6">
+					<label for="exam-type" class="text-[10px] font-bold text-white/30 uppercase tracking-widest block mb-4">Exam / Practice Type</label>
+					<select id="exam-type" bind:value={academicData.examType} class="form-select text-sm font-bold">
+						{#each examTypeOptions as option}
+							<option value={option}>{option}</option>
+						{/each}
+					</select>
+					<p class="mt-2 text-[11px] leading-relaxed text-white/35">
+						Questions are routed with this selection, then cached and randomized for scoring.
+					</p>
+				</div>
 
 				{#if activeTab === 'lab'}
 					<div class="mt-8 pt-8 border-t border-white/5 space-y-6">

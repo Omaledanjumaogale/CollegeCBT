@@ -1,5 +1,6 @@
 import { redirect, type Handle } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
+import { verifyFirebaseIdToken } from '$lib/server/auth';
 
 function getAdminSessionSecret() {
 	const secret = env.ADMIN_SESSION_SECRET;
@@ -11,6 +12,20 @@ function getAdminSessionSecret() {
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const { url, cookies } = event;
+	const platformEnv = (event.platform?.env || {}) as Record<string, string | undefined>;
+	const firebaseSession = cookies.get('collegecbt_session');
+
+	if (firebaseSession) {
+		const verified = await verifyFirebaseIdToken(firebaseSession, platformEnv);
+		if (verified?.localId) {
+			event.locals.user = {
+				id: verified.localId,
+				email: verified.email
+			};
+		} else {
+			cookies.delete('collegecbt_session', { path: '/' });
+		}
+	}
 
 	// ─── Admin Route Protection ──────────────────────────────────────────────
 	if (url.pathname.startsWith('/admin')) {
@@ -29,8 +44,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	// ─── Dashboard Route Protection (Optional Server-side check) ──────────────
 	if (url.pathname.startsWith('/dashboard')) {
-		// Currently the app uses client-side Firebase auth.
-		// A server-issued Firebase session cookie should replace this in the next auth hardening pass.
+		if (!event.locals.user) {
+			throw redirect(303, `/auth/login?redirect=${encodeURIComponent(url.pathname + url.search)}`);
+		}
 	}
 
 	// ─── Security & SEO/AEO Crawl Headers ───────────────────────────────────

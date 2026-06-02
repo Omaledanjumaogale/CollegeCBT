@@ -9,6 +9,19 @@ let db: Firestore | null = null;
 let initialized = false;
 let initPromise: Promise<Auth | null> | null = null;
 
+async function syncServerSession(idToken: string | null) {
+	if (typeof window === 'undefined') return;
+	try {
+		await fetch('/api/auth/session', {
+			method: idToken ? 'POST' : 'DELETE',
+			headers: idToken ? { 'Content-Type': 'application/json' } : undefined,
+			body: idToken ? JSON.stringify({ idToken }) : undefined
+		});
+	} catch (err) {
+		console.warn('[CollegeCBT] Server session sync failed:', err);
+	}
+}
+
 // ── Internal Firebase singleton bootstrap ─────────────────────────────────────
 async function getFirebase(): Promise<Auth | null> {
 	if (initialized) return auth;
@@ -87,9 +100,10 @@ async function getFirebase(): Promise<Auth | null> {
 
 					// ── Sync with Convex Platform DB ───────────────────────────────
 					// Attach Firebase ID Token so ctx.auth works in Convex mutations
+					const idToken = await firebaseUser.getIdToken();
+					await syncServerSession(idToken);
 					try {
 						const { convex, api } = await import('./convexClient');
-						const idToken = await firebaseUser.getIdToken();
 						// Attach token so Convex server-side auth can verify identity
 						if (typeof (convex as any).setAuth === 'function') {
 							(convex as any).setAuth(async () => idToken);
@@ -114,6 +128,7 @@ async function getFirebase(): Promise<Auth | null> {
 					}
 				} else {
 					currentUser.set(null);
+					await syncServerSession(null);
 					// Clear Convex token
 					try {
 						const { convex } = await import('./convexClient');
@@ -155,6 +170,7 @@ export async function signUpWithEmail(
 			// Demo mode
 			const user: User = { uid: `demo-${Date.now()}`, email, displayName, plan: 'free', ...profileData };
 			currentUser.set(user);
+			await syncServerSession(null);
 			showToast('✅ Account Created!', 'Welcome to CollegeCBT! (Demo mode)', 'success');
 			return { success: true };
 		}
@@ -210,6 +226,7 @@ export async function signInWithEmail(
 			// Demo mode
 			const user: User = { uid: `demo-${Date.now()}`, email, displayName: email.split('@')[0], plan: 'free' };
 			currentUser.set(user);
+			await syncServerSession(null);
 			showToast('🎓 Welcome back!', 'Login successful (Demo mode).', 'success');
 			return { success: true };
 		}
@@ -238,12 +255,14 @@ export async function signOut(): Promise<void> {
 		const authInstance = await getFirebase();
 		if (!authInstance) {
 			currentUser.set(null);
+			await syncServerSession(null);
 			showToast('👋 Signed out', 'See you next time!', 'info');
 			return;
 		}
 		const { signOut: firebaseSignOut } = await import('firebase/auth');
 		await firebaseSignOut(authInstance);
 		currentUser.set(null);
+		await syncServerSession(null);
 		showToast('👋 Signed out', 'See you next time!', 'info');
 	} catch (err) {
 		console.error('[CollegeCBT] Sign out error:', err);

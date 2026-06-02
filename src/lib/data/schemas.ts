@@ -13,9 +13,14 @@ export const generateQuestionSchema = z.object({
     'Professional',
     'Other'
   ]),
+  faculty: z.string().optional(),
+  department: z.string().optional(),
   topic: z.string().optional(),
+  examType: z.string().min(1).max(80).optional(),
   difficulty: z.enum(['easy', 'medium', 'hard', 'mixed']).default('mixed'),
   type: z.enum(['MCQ', 'Theory']).default('MCQ'),
+  sessionId: z.string().optional(),
+  excludeHashes: z.array(z.string()).max(100).optional(),
   uid: z.string().optional() // Firebase UID for plan verification
 });
 

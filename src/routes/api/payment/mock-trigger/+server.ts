@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { verifyFirebaseIdentity } from '$lib/server/auth';
 import {
   getPaymentSecretKey,
+  isProductionRuntime,
   isPlaceholderSecret,
   processSubscriptionPayment,
   syncSubscriptionReferral
@@ -42,6 +43,13 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
     const secretKey = getPaymentSecretKey(gateway, env);
     const isPlaceholder = isPlaceholderSecret(secretKey);
+
+    if (isProductionRuntime(env)) {
+      console.warn(`[payment/mock-trigger] Blocked mock trigger in production runtime for gateway: ${gateway}`);
+      return json({
+        error: 'Mock payment simulation is disabled in production.'
+      }, { status: 403 });
+    }
 
     // If it's NOT a placeholder key, we should NOT allow mock trigger! This prevents abuse on live production platforms
     if (!isPlaceholder) {

@@ -71,6 +71,10 @@ export const saveSession = mutation({
     course: v.string(),
     level: v.string(),
     institutionType: v.string(),
+    faculty: v.optional(v.string()),
+    department: v.optional(v.string()),
+    topic: v.optional(v.string()),
+    examType: v.optional(v.string()),
     questionsAnswered: v.number(),
     correct: v.number(),
     wrong: v.number(),
@@ -99,6 +103,10 @@ export const saveSession = mutation({
       course: args.course,
       level: args.level,
       institutionType: args.institutionType,
+      faculty: args.faculty,
+      department: args.department,
+      topic: args.topic,
+      examType: args.examType,
       questionsAnswered: args.questionsAnswered,
       correct: args.correct,
       wrong: args.wrong,
@@ -116,12 +124,140 @@ export const saveSession = mutation({
       metadata: JSON.stringify({
         sessionId: args.sessionId,
         course: args.course,
+        topic: args.topic,
+        examType: args.examType,
         score: args.score,
         mode: args.mode,
       }),
       periodKey: new Date(args.timestamp).toISOString().slice(0, 7),
       timestamp: args.timestamp,
     });
+  },
+});
+
+export const startExamRun = mutation({
+  args: {
+    userId: v.string(),
+    clientSessionId: v.string(),
+    mode: v.union(v.literal('lab'), v.literal('mock'), v.literal('custom')),
+    course: v.string(),
+    level: v.string(),
+    institutionType: v.string(),
+    faculty: v.optional(v.string()),
+    department: v.optional(v.string()),
+    topic: v.optional(v.string()),
+    examType: v.optional(v.string()),
+    difficulty: v.string(),
+    questionCount: v.number(),
+    deadlineAt: v.optional(v.number()),
+    startedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || args.userId !== identity.subject) {
+      throw new Error("Unauthorized exam session start.");
+    }
+
+    const existing = await ctx.db
+      .query('examRuns')
+      .withIndex('by_client_session', (q) => q.eq('clientSessionId', args.clientSessionId))
+      .first();
+
+    const payload = {
+      userId: args.userId,
+      clientSessionId: args.clientSessionId,
+      mode: args.mode,
+      status: 'started' as const,
+      course: args.course,
+      level: args.level,
+      institutionType: args.institutionType,
+      faculty: args.faculty,
+      department: args.department,
+      topic: args.topic,
+      examType: args.examType,
+      difficulty: args.difficulty,
+      questionCount: args.questionCount,
+      startedAt: args.startedAt,
+      deadlineAt: args.deadlineAt,
+    };
+
+    if (existing) {
+      if (existing.userId !== args.userId) throw new Error("Exam session ownership mismatch.");
+      await ctx.db.patch(existing._id, payload);
+      return existing._id;
+    }
+
+    const id = await ctx.db.insert('examRuns', payload);
+    await ctx.db.insert('auditLogs', {
+      userId: args.userId,
+      action: 'exam_run_started',
+      status: 'success',
+      metadata: JSON.stringify({
+        clientSessionId: args.clientSessionId,
+        mode: args.mode,
+        course: args.course,
+        level: args.level,
+        topic: args.topic,
+        examType: args.examType,
+      }),
+      timestamp: args.startedAt,
+    });
+    return id;
+  },
+});
+
+export const completeExamRun = mutation({
+  args: {
+    userId: v.string(),
+    clientSessionId: v.string(),
+    score: v.number(),
+    correct: v.number(),
+    wrong: v.number(),
+    skipped: v.number(),
+    grade: v.string(),
+    completedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || args.userId !== identity.subject) {
+      throw new Error("Unauthorized exam session completion.");
+    }
+
+    const existing = await ctx.db
+      .query('examRuns')
+      .withIndex('by_client_session', (q) => q.eq('clientSessionId', args.clientSessionId))
+      .first();
+
+    if (!existing || existing.userId !== args.userId) {
+      throw new Error("Exam session not found for this user.");
+    }
+
+    await ctx.db.patch(existing._id, {
+      status: 'completed',
+      score: args.score,
+      correct: args.correct,
+      wrong: args.wrong,
+      skipped: args.skipped,
+      grade: args.grade,
+      completedAt: args.completedAt,
+    });
+
+    await ctx.db.insert('auditLogs', {
+      userId: args.userId,
+      action: 'exam_run_completed',
+      status: 'success',
+      metadata: JSON.stringify({
+        clientSessionId: args.clientSessionId,
+        score: args.score,
+        correct: args.correct,
+        wrong: args.wrong,
+        skipped: args.skipped,
+        grade: args.grade,
+      }),
+      timestamp: args.completedAt,
+    });
+
+    return existing._id;
   },
 });
 

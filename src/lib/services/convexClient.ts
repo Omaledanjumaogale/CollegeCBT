@@ -29,6 +29,10 @@ export async function saveStudySession(userId: string, session: StudySession): P
 			course: session.course,
 			level: session.level,
 			institutionType: session.institutionType,
+			faculty: session.faculty,
+			department: session.department,
+			topic: session.topic,
+			examType: session.examType,
 			questionsAnswered: session.questionsAnswered,
 			correct: session.correct,
 			wrong: session.wrong,
@@ -40,6 +44,52 @@ export async function saveStudySession(userId: string, session: StudySession): P
 		return true;
 	} catch (err) {
 		console.error('[CollegeCBT Convex] Save session error:', err);
+		return false;
+	}
+}
+
+export async function startExamRun(input: {
+	userId: string;
+	clientSessionId: string;
+	mode: 'lab' | 'mock' | 'custom';
+	course: string;
+	level: string;
+	institutionType: string;
+	faculty?: string;
+	department?: string;
+	topic?: string;
+	examType?: string;
+	difficulty: string;
+	questionCount: number;
+	deadlineAt?: number;
+	startedAt: number;
+}): Promise<boolean> {
+	try {
+		if (!input.userId) return false;
+		await convex.mutation(api.sessions.startExamRun, input);
+		return true;
+	} catch (err) {
+		console.error('[CollegeCBT Convex] Start exam run error:', err);
+		return false;
+	}
+}
+
+export async function completeExamRun(input: {
+	userId: string;
+	clientSessionId: string;
+	score: number;
+	correct: number;
+	wrong: number;
+	skipped: number;
+	grade: string;
+	completedAt: number;
+}): Promise<boolean> {
+	try {
+		if (!input.userId) return false;
+		await convex.mutation(api.sessions.completeExamRun, input);
+		return true;
+	} catch (err) {
+		console.error('[CollegeCBT Convex] Complete exam run error:', err);
 		return false;
 	}
 }

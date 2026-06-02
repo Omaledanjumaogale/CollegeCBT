@@ -45,6 +45,10 @@ export interface StudySession {
 	course: string;
 	level: string;
 	institutionType: string;
+	faculty?: string;
+	department?: string;
+	topic?: string;
+	examType?: string;
 	questionsAnswered: number;
 	correct: number;
 	wrong: number;

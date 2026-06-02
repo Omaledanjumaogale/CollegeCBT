@@ -36,6 +36,7 @@ self.addEventListener('fetch', (event) => {
 	const isPrivateRoute =
 		url.pathname.startsWith('/admin') ||
 		url.pathname.startsWith('/dashboard') ||
+		url.pathname.startsWith('/exam-lab') ||
 		url.pathname.startsWith('/auth') ||
 		url.pathname.startsWith('/checkout') ||
 		url.pathname.startsWith('/api');

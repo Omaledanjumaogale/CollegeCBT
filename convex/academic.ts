@@ -199,15 +199,39 @@ export const saveGeneratedQuestion = mutation({
     course: v.string(),
     level: v.string(),
     institutionType: v.string(),
+    faculty: v.optional(v.string()),
+    department: v.optional(v.string()),
     topic: v.string(),
+    examType: v.optional(v.string()),
     difficulty: v.string(),
     type: v.union(v.literal('MCQ'), v.literal('Theory')),
     content: v.string(),
     provider: v.string(),
+    questionHash: v.optional(v.string()),
+    selectionKey: v.optional(v.string()),
     isOther: v.boolean(),
     userId: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    const existing = args.questionHash
+      ? await ctx.db
+          .query('questionBank')
+          .withIndex('by_question_hash', q => q.eq('questionHash', args.questionHash))
+          .first()
+      : null;
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        content: args.content,
+        topic: args.topic,
+        difficulty: args.difficulty,
+        examType: args.examType,
+        selectionKey: args.selectionKey,
+        timestamp: Date.now()
+      });
+      return existing._id;
+    }
+
     return await ctx.db.insert('questionBank', {
       ...args,
       hitCount: 0,
@@ -222,6 +246,11 @@ export const getRandomQuestion = query({
     level: v.string(),
     institutionType: v.string(),
     topic: v.optional(v.string()),
+    faculty: v.optional(v.string()),
+    department: v.optional(v.string()),
+    examType: v.optional(v.string()),
+    difficulty: v.optional(v.string()),
+    excludeHashes: v.optional(v.array(v.string())),
     type: v.union(v.literal('MCQ'), v.literal('Theory')),
   },
   handler: async (ctx, args) => {
@@ -237,8 +266,15 @@ export const getRandomQuestion = query({
     if (args.topic) {
       q = q.filter(q => q.eq(q.field('topic'), args.topic));
     }
-
-    const matches = await q.collect();
+    const excluded = new Set(args.excludeHashes ?? []);
+    const matches = (await q.collect()).filter((item) => {
+      if (item.questionHash && excluded.has(item.questionHash)) return false;
+      if (args.faculty && item.faculty && item.faculty !== args.faculty) return false;
+      if (args.department && item.department && item.department !== args.department) return false;
+      if (args.examType && item.examType && item.examType !== args.examType) return false;
+      if (args.difficulty && args.difficulty !== 'mixed' && item.difficulty !== 'mixed' && item.difficulty !== args.difficulty) return false;
+      return true;
+    });
     if (matches.length === 0) return null;
     return matches[Math.floor(Math.random() * matches.length)];
   }

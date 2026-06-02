@@ -42,6 +42,13 @@ export function getAppUrl(platformEnv?: RuntimeEnv) {
 	return getRuntimeEnv(platformEnv).PUBLIC_APP_URL || 'http://localhost:5173';
 }
 
+export function isProductionRuntime(platformEnv?: RuntimeEnv) {
+	const env = getRuntimeEnv(platformEnv);
+	const appEnv = (env.PUBLIC_APP_ENV || '').toLowerCase();
+	const appUrl = env.PUBLIC_APP_URL || '';
+	return appEnv === 'production' || appUrl.startsWith('https://collegecbt.') || appUrl.includes('ewinproject.org');
+}
+
 export function createPaymentReference(uid: string) {
 	return `CBT-${uid.substring(0, 8)}-${Date.now()}`;
 }

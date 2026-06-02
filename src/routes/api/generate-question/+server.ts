@@ -3,6 +3,21 @@ import type { RequestHandler } from './$types';
 import { generateQuestionSchema } from '$lib/data/schemas';
 import { api, convex } from '$lib/services/convexClient';
 
+type OptionKey = 'A' | 'B' | 'C' | 'D';
+type GeneratedMCQ = {
+	question: string;
+	options: Record<OptionKey, string>;
+	correct?: OptionKey;
+	answer?: OptionKey;
+	explanations?: Record<string, string>;
+	explanation?: string;
+	examiner_note?: string;
+	topic?: string;
+	course?: string;
+	questionHash?: string;
+	selectionKey?: string;
+};
+
 // ─── Edge-compatible in-memory rate limiter ───────────────────────────────────
 // Uses a Map keyed by IP or UID, pruned every 10 minutes to prevent memory leaks.
 const rateLimitFallback = new Map<string, { count: number; windowStart: number }>();
@@ -27,6 +42,98 @@ function checkAndPrune(key: string, limit: number): { allowed: boolean; remainin
 
 	entry.count++;
 	return { allowed: true, remaining: limit - entry.count };
+}
+
+function hashString(input: string) {
+	let hash = 0;
+	for (let i = 0; i < input.length; i++) {
+		hash = (Math.imul(31, hash) + input.charCodeAt(i)) | 0;
+	}
+	return Math.abs(hash).toString(36);
+}
+
+function buildSelectionKey(input: {
+	institutionType: string;
+	faculty?: string;
+	department?: string;
+	level: string;
+	course: string;
+	topic?: string;
+	examType?: string;
+	difficulty?: string;
+}) {
+	return [
+		input.institutionType,
+		input.faculty || 'any-faculty',
+		input.department || 'any-department',
+		input.level,
+		input.course,
+		input.topic || 'general',
+		input.examType || 'practice',
+		input.difficulty || 'mixed'
+	].map((part) => part.trim().toLowerCase()).join('|');
+}
+
+function shuffleItems<T>(items: T[]) {
+	const next = [...items];
+	for (let i = next.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[next[i], next[j]] = [next[j], next[i]];
+	}
+	return next;
+}
+
+function normalizeMCQ(raw: GeneratedMCQ): GeneratedMCQ {
+	const canonicalKeys: OptionKey[] = ['A', 'B', 'C', 'D'];
+	const originalCorrect = raw.correct || raw.answer || 'A';
+	const entries = canonicalKeys.map((key) => ({
+		originalKey: key,
+		value: raw.options[key],
+		explanation: raw.explanations?.[key]
+	}));
+	const shuffled = shuffleItems(entries);
+	const remappedOptions = Object.fromEntries(
+		shuffled.map((entry, index) => [canonicalKeys[index], entry.value])
+	) as Record<OptionKey, string>;
+	const correctIndex = shuffled.findIndex((entry) => entry.originalKey === originalCorrect);
+	const remappedCorrect = canonicalKeys[Math.max(0, correctIndex)];
+	const remappedExplanations: Record<string, string> = {};
+
+	if (raw.explanations?.correct) remappedExplanations.correct = raw.explanations.correct;
+	shuffled.forEach((entry, index) => {
+		if (entry.explanation) remappedExplanations[canonicalKeys[index]] = entry.explanation;
+	});
+
+	return {
+		...raw,
+		options: remappedOptions,
+		correct: remappedCorrect,
+		answer: remappedCorrect,
+		explanations: Object.keys(remappedExplanations).length > 0 ? remappedExplanations : raw.explanations
+	};
+}
+
+function prepareQuestionForDelivery<T extends Record<string, unknown>>(
+	raw: T,
+	selectionKey: string,
+	questionType: 'MCQ' | 'Theory'
+) {
+	const questionText = String(raw.question || '');
+	const topic = String(raw.topic || 'General');
+	const questionHash = hashString(`${selectionKey}:${topic}:${questionText}`);
+	const enriched = {
+		...raw,
+		topic,
+		questionHash,
+		selectionKey,
+		generatedAt: Date.now()
+	};
+
+	if (questionType === 'MCQ' && raw.options && typeof raw.options === 'object') {
+		return normalizeMCQ(enriched as unknown as GeneratedMCQ);
+	}
+
+	return enriched;
 }
 
 // ─── Plan verification against Firestore ─────────────────────────────────────
@@ -64,7 +171,31 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			}, { status: 400 });
 		}
 
-		const { course, level, institutionType, topic, difficulty, type, uid } = validation.data;
+		const {
+			course,
+			level,
+			institutionType,
+			faculty,
+			department,
+			topic,
+			examType,
+			difficulty,
+			type,
+			sessionId,
+			excludeHashes,
+			uid
+		} = validation.data;
+		const safeLevel = level || '100 Level';
+		const selectionKey = buildSelectionKey({
+			institutionType,
+			faculty,
+			department,
+			level: safeLevel,
+			course,
+			topic,
+			examType,
+			difficulty
+		});
 
 		// Get Cloudflare env bindings
 		const env = platform?.env as Record<string, string> | undefined;
@@ -134,9 +265,14 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 			if (course !== 'Other' && topic !== 'Other') {
 				existingQuestion = await convex.query(api.academic.getRandomQuestion, {
 					course,
-					level: level || '100 Level',
+					level: safeLevel,
 					institutionType,
+					faculty,
+					department,
 					topic: (topic && topic !== 'all') ? topic : undefined,
+					examType,
+					difficulty,
+					excludeHashes,
 					type: questionType as 'MCQ' | 'Theory'
 				});
 			}
@@ -151,22 +287,30 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 		const shouldGenerate = !existingQuestion || Math.random() < 0.3 || course === 'Other' || topic === 'Other';
 
 		if (!shouldGenerate && existingQuestion) {
-			// Record usage and return
-			await convex.mutation(api.academic.incrementQuestionHit, { id: (existingQuestion as any)._id });
-			return json(JSON.parse((existingQuestion as any).content), { headers: responseHeaders });
+			await convex.mutation(api.academic.incrementQuestionHit, { id: existingQuestion._id });
+			return json(
+				prepareQuestionForDelivery(JSON.parse(existingQuestion.content), selectionKey, questionType as 'MCQ' | 'Theory'),
+				{ headers: responseHeaders }
+			);
 		}
 
 		// 3. AI Generation (hitting token limits to grow the bank)
 		if (!apiKey || apiKey.includes('placeholder') || !apiKey.startsWith('sk-ant-')) {
 			return json(
-				questionType === 'Theory' ? getDemoTheory(course) : getDemoMCQ(course),
+				prepareQuestionForDelivery(
+					questionType === 'Theory'
+						? getDemoTheory(course, topic, examType)
+						: getDemoMCQ(course, topic, examType),
+					selectionKey,
+					questionType as 'MCQ' | 'Theory'
+				),
 				{ headers: responseHeaders }
 			);
 		}
 
 		const prompt = questionType === 'Theory'
-			? buildTheoryPrompt(course, level || '100 Level', institutionType, topic, difficulty)
-			: buildMCQPrompt(course, level || '100 Level', institutionType, topic, difficulty);
+			? buildTheoryPrompt(course, safeLevel, institutionType, faculty, department, topic, examType, difficulty, sessionId)
+			: buildMCQPrompt(course, safeLevel, institutionType, faculty, department, topic, examType, difficulty, sessionId, excludeHashes);
 
 		const aiResponse = await fetch('https://api.anthropic.com/v1/messages', {
 			method: 'POST',
@@ -180,15 +324,26 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 				max_tokens: questionType === 'Theory' ? 1500 : 1200,
 				messages: [{ role: 'user', content: prompt }]
 			}),
-			signal: AbortSignal.timeout(20_000)
+			signal: AbortSignal.timeout(8_000)
 		});
 
 		if (!aiResponse.ok) {
 			console.error('[CollegeCBT] Anthropic API error:', aiResponse.status);
 			// Fallback to bank if possible before demo
-			if (existingQuestion) return json(JSON.parse((existingQuestion as any).content), { headers: responseHeaders });
+			if (existingQuestion) {
+				return json(
+					prepareQuestionForDelivery(JSON.parse(existingQuestion.content), selectionKey, questionType as 'MCQ' | 'Theory'),
+					{ headers: responseHeaders }
+				);
+			}
 			return json(
-				questionType === 'Theory' ? getDemoTheory(course) : getDemoMCQ(course),
+				prepareQuestionForDelivery(
+					questionType === 'Theory'
+						? getDemoTheory(course, topic, examType)
+						: getDemoMCQ(course, topic, examType),
+					selectionKey,
+					questionType as 'MCQ' | 'Theory'
+				),
 				{ headers: responseHeaders }
 			);
 		}
@@ -198,39 +353,57 @@ export const POST: RequestHandler = async ({ request, platform }) => {
 
 		try {
 			const cleaned = rawText.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
-			const parsed = JSON.parse(cleaned);
+			const parsed = prepareQuestionForDelivery(JSON.parse(cleaned), selectionKey, questionType as 'MCQ' | 'Theory');
 
 			// 4. Archive into the Question Bank for future randomization
 			// We do this in a fire-and-forget or awaited mutation to grow the bank.
 			await convex.mutation(api.academic.saveGeneratedQuestion, {
 				course: parsed.course || course,
-				level: level || '100 Level',
+				level: safeLevel,
 				institutionType,
+				faculty,
+				department,
 				topic: parsed.topic || topic || 'General',
+				examType,
 				difficulty: difficulty || 'mixed',
 				type: questionType as 'MCQ' | 'Theory',
 				content: JSON.stringify(parsed),
 				provider: 'claude-3-5-haiku',
+				questionHash: String(parsed.questionHash || ''),
+				selectionKey,
 				isOther: course === 'Other' || topic === 'Other',
 				userId: uid
 			});
 
 			return json(parsed, { headers: responseHeaders });
 		} catch {
-			if (existingQuestion) return json(JSON.parse((existingQuestion as any).content), { headers: responseHeaders });
+			if (existingQuestion) {
+				return json(
+					prepareQuestionForDelivery(JSON.parse(existingQuestion.content), selectionKey, questionType as 'MCQ' | 'Theory'),
+					{ headers: responseHeaders }
+				);
+			}
 			return json(
-				questionType === 'Theory' ? getDemoTheory(course) : getDemoMCQ(course),
+				prepareQuestionForDelivery(
+					questionType === 'Theory'
+						? getDemoTheory(course, topic, examType)
+						: getDemoMCQ(course, topic, examType),
+					selectionKey,
+					questionType as 'MCQ' | 'Theory'
+				),
 				{ headers: responseHeaders }
 			);
 		}
 
 	} catch (err) {
 		console.error('[CollegeCBT] Question generation fatal error:', err);
-		return json({ 
-			error: 'Engine failure. Reverting to backup protocols.', 
-			fallback: true,
-			data: getDemoMCQ('General')
-		}, { status: 500 });
+		return json(
+			{
+				...prepareQuestionForDelivery(getDemoMCQ('General'), 'fallback|general', 'MCQ'),
+				fallback: true
+			},
+			{ status: 200 }
+		);
 	}
 };
 
@@ -246,15 +419,31 @@ async function importPublicEnv(key: string): Promise<string> {
 
 // ─── Prompt Builders ──────────────────────────────────────────────────────────
 function buildMCQPrompt(
-	course: string, level: string, instType: string,
-	topic?: string, difficulty?: string
+	course: string,
+	level: string,
+	instType: string,
+	faculty?: string,
+	department?: string,
+	topic?: string,
+	examType?: string,
+	difficulty?: string,
+	sessionId?: string,
+	excludeHashes: string[] = []
 ): string {
 	const topicLine = topic ? ` Specific topic: ${topic}.` : '';
 	const diffLine  = difficulty && difficulty !== 'mixed' ? ` Difficulty: ${difficulty}.` : '';
-	return `You are a Nigerian ${instType} exam expert. Generate ONE exam-standard multiple-choice question for: "${course}" at ${level} level.${topicLine}${diffLine}
+	const deptLine = department ? ` Department: ${department}.` : '';
+	const facultyLine = faculty ? ` Faculty/School: ${faculty}.` : '';
+	const examLine = examType ? ` Exam type: ${examType}.` : ' Exam type: adaptive practice.';
+	const antiRepeat = excludeHashes.length > 0
+		? ` Avoid repeating concepts from these recent hashes: ${excludeHashes.slice(0, 12).join(', ')}.`
+		: '';
+	return `You are the CollegeCBT AI Exam Agent for a Nigerian ${instType}. Generate ONE exam-standard multiple-choice question for: "${course}" at ${level} level.${facultyLine}${deptLine}${topicLine}${examLine}${diffLine} Session: ${sessionId || 'practice'}.${antiRepeat}
 
 Requirements:
 - Contextual to Nigerian academic curriculum
+- Strictly specific to the selected institution type, faculty, department, level, course, topic, and exam type
+- Use a fresh scenario, number, case, definition angle, or application pattern every time
 - One unambiguously correct answer
 - Three plausible but incorrect options based on common student mistakes
 - Full explanations for each option
@@ -264,15 +453,26 @@ Return ONLY valid JSON (no markdown, no backticks, no extra text):
 }
 
 function buildTheoryPrompt(
-	course: string, level: string, instType: string,
-	topic?: string, difficulty?: string
+	course: string,
+	level: string,
+	instType: string,
+	faculty?: string,
+	department?: string,
+	topic?: string,
+	examType?: string,
+	difficulty?: string,
+	sessionId?: string
 ): string {
 	const topicLine = topic ? ` Specific topic: ${topic}.` : '';
 	const diffLine  = difficulty && difficulty !== 'mixed' ? ` Difficulty: ${difficulty}.` : '';
-	return `You are a Nigerian ${instType} exam expert. Generate ONE essay/theory question for: "${course}" at ${level} level.${topicLine}${diffLine}
+	const deptLine = department ? ` Department: ${department}.` : '';
+	const facultyLine = faculty ? ` Faculty/School: ${faculty}.` : '';
+	const examLine = examType ? ` Exam type: ${examType}.` : ' Exam type: adaptive practice.';
+	return `You are the CollegeCBT AI Theory Tutor for a Nigerian ${instType}. Generate ONE essay/theory question for: "${course}" at ${level} level.${facultyLine}${deptLine}${topicLine}${examLine}${diffLine} Session: ${sessionId || 'practice'}.
 
 Requirements:
 - Contextual to Nigerian academic curriculum and examination standards
+- Strictly specific to the selected faculty, department, level, course, topic, and exam type
 - Clear marking scheme with point allocation
 - Comprehensive model answer
 
@@ -281,31 +481,42 @@ Return ONLY valid JSON (no markdown, no backticks):
 }
 
 // ─── Demo Fallbacks ───────────────────────────────────────────────────────────
-function getDemoMCQ(course: string) {
+function getDemoMCQ(course: string, topic = 'Core Concepts', examType = 'Practice') {
+	const scenarios = [
+		'a student project team',
+		'a Nigerian campus records office',
+		'a small fintech training task',
+		'a departmental practical class',
+		'a CBT revision session'
+	];
+	const scenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+	const caseId = Math.floor(Math.random() * 900) + 100;
 	return {
-		question: `In the context of ${course}, which of the following best describes the concept of encapsulation in object-oriented design?`,
+		question: `For a ${examType} question in ${course}, case ${caseId}: which statement best applies "${topic}" to ${scenario}?`,
 		options: {
-			A: 'The bundling of data and methods that operate on the data within a single unit, restricting direct access to the internals.',
-			B: 'A technique where an algorithm divides a problem into sub-problems of the same type and solves them recursively.',
-			C: 'The process of converting data into a format suitable for database storage to reduce redundancy.',
-			D: 'A sorting algorithm that achieves O(n log n) average time complexity by partitioning arrays.'
+			A: `It connects the core principle in ${topic} to a real use case, explains the mechanism, and states the expected outcome.`,
+			B: `It lists unrelated definitions from ${course} without applying them to the selected topic.`,
+			C: `It focuses only on memorising terminology and ignores the level-specific application required by the examiner.`,
+			D: `It replaces the selected topic with a broad general discussion that cannot be scored precisely.`
 		},
 		correct: 'A',
 		explanations: {
-			correct: 'Encapsulation is a core OOP principle where data (attributes) and methods are bundled inside a class, and internal state is hidden from outside access.',
-			A: 'Correct — Encapsulation hides internal data and exposes only a controlled public interface.',
-			B: 'This describes recursion or the divide-and-conquer algorithm design paradigm, not encapsulation.',
-			C: 'This describes database normalization, which eliminates data redundancy — not OOP.',
-			D: 'This describes QuickSort or MergeSort performance characteristics — algorithm analysis, not OOP principles.'
+			correct: 'A strong exam answer must apply the selected topic to a concrete context and explain the result.',
+			A: 'Correct — it is topic-specific, applied, and measurable.',
+			B: 'This is too broad and does not prove understanding of the selected topic.',
+			C: 'This misses the examiner focus on application and level-appropriate reasoning.',
+			D: 'This drifts away from the selected course/topic combination.'
 		},
-		examiner_note: 'Students commonly confuse encapsulation with abstraction. Abstraction hides complexity conceptually; encapsulation hides it through access modifiers in code.',
-		topic: 'Core Concepts'
+		examiner_note: `This fallback is generated only when the live AI provider is unavailable. It still preserves the selected course, topic, and exam type for scoring practice.`,
+		topic
 	};
 }
 
-function getDemoTheory(course: string) {
+function getDemoTheory(course: string, topic = 'Applied Concepts', examType = 'Practice') {
+	const contexts = ['a Nigerian higher institution', 'a departmental case study', 'a professional training setting', 'a final-year project review'];
+	const context = contexts[Math.floor(Math.random() * contexts.length)];
 	return {
-		question: `With reference to ${course}, discuss the fundamental principles that underpin modern practice in Nigeria. Illustrate your answer with relevant examples from the Nigerian context. (20 marks)`,
+		question: `With reference to ${course}, discuss how "${topic}" should be applied in ${context} for a ${examType}. Support your answer with relevant examples. (20 marks)`,
 		key_points: [
 			{ point: 'Define the core concept with academic precision, citing at least one scholarly definition.', marks: 4 },
 			{ point: 'Explain at least 3 practical applications within the Nigerian professional context.', marks: 6 },
@@ -315,6 +526,6 @@ function getDemoTheory(course: string) {
 		model_answer: `The field of ${course} encompasses foundational principles that inform both theoretical understanding and practical application within the Nigerian academic and professional landscape. These principles guide practitioners across Nigeria's key sectors including telecommunications, financial services, healthcare, and public administration.\n\nIn Nigeria, these concepts are applied daily within organizations such as the Central Bank of Nigeria, NNPC, NCC, and leading universities. However, practical challenges persist — including inadequate infrastructure, skills gaps in rural areas, and policy inconsistencies. Addressing these through targeted education, organizational reform, and private-sector partnerships remains critical.`,
 		examiner_notes: 'Award marks for academic structure, clarity of definition, relevance to Nigerian context, and use of specific local examples. Penalise vague generalities.',
 		mark_scheme: 'Total: 20 marks. Definition & scholarly citation: 4m. Practical applications (3 minimum): 6m. Specific Nigerian examples: 6m. Critical evaluation of limitations: 4m.',
-		topic: 'Applied Concepts & Nigerian Context'
+		topic
 	};
 }

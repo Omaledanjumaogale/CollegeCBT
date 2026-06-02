@@ -9,6 +9,10 @@ export default defineSchema({
     course: v.string(),
     level: v.string(),
     institutionType: v.string(),
+    faculty: v.optional(v.string()),
+    department: v.optional(v.string()),
+    topic: v.optional(v.string()),
+    examType: v.optional(v.string()),
     questionsAnswered: v.number(),
     correct: v.number(),
     wrong: v.number(),
@@ -20,7 +24,36 @@ export default defineSchema({
   })
     .index('by_user', ['userId'])
     .index('by_user_timestamp', ['userId', 'timestamp'])
+    .index('by_session_user', ['sessionId', 'userId'])
     .index('by_mode', ['mode']),
+
+  examRuns: defineTable({
+    userId: v.string(),
+    clientSessionId: v.string(),
+    mode: v.union(v.literal('lab'), v.literal('mock'), v.literal('custom')),
+    status: v.union(v.literal('started'), v.literal('completed'), v.literal('abandoned')),
+    course: v.string(),
+    level: v.string(),
+    institutionType: v.string(),
+    faculty: v.optional(v.string()),
+    department: v.optional(v.string()),
+    topic: v.optional(v.string()),
+    examType: v.optional(v.string()),
+    difficulty: v.string(),
+    questionCount: v.number(),
+    startedAt: v.number(),
+    deadlineAt: v.optional(v.number()),
+    completedAt: v.optional(v.number()),
+    score: v.optional(v.number()),
+    correct: v.optional(v.number()),
+    wrong: v.optional(v.number()),
+    skipped: v.optional(v.number()),
+    grade: v.optional(v.string()),
+  })
+    .index('by_user', ['userId'])
+    .index('by_client_session', ['clientSessionId'])
+    .index('by_user_status', ['userId', 'status'])
+    .index('by_user_started', ['userId', 'startedAt']),
 
   // ── User profiles ──────────────────────────────────────────────────────────
   users: defineTable({
@@ -267,11 +300,16 @@ export default defineSchema({
     course: v.string(),
     level: v.string(),
     institutionType: v.string(),
+    faculty: v.optional(v.string()),
+    department: v.optional(v.string()),
     topic: v.string(),
+    examType: v.optional(v.string()),
     difficulty: v.string(),
     type: v.union(v.literal('MCQ'), v.literal('Theory')),
     content: v.string(), // JSON stringified question object
     provider: v.string(), // e.g., 'claude-3-5-sonnet'
+    questionHash: v.optional(v.string()),
+    selectionKey: v.optional(v.string()),
     hitCount: v.number(), // Track randomization frequency
     isOther: v.boolean(), // Flag for user-inputted "Other" topics/subjects
     userId: v.optional(v.string()), // Crediting originator if applicable
@@ -279,6 +317,8 @@ export default defineSchema({
   }).index('by_course', ['course'])
     .index('by_topic', ['topic'])
     .index('by_type', ['type'])
+    .index('by_selection', ['selectionKey', 'type'])
+    .index('by_question_hash', ['questionHash'])
     .index('by_other', ['isOther']),
 
   questionAttempts: defineTable({

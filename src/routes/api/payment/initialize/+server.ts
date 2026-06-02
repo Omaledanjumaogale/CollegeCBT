@@ -6,7 +6,8 @@ import {
 	createPaymentReference,
 	getAppUrl,
 	getPaymentSecretKey,
-	isPlaceholderSecret
+	isPlaceholderSecret,
+	isProductionRuntime
 } from '$lib/server/payments';
 
 export const _runtime = 'edge';
@@ -49,6 +50,12 @@ export const POST: RequestHandler = async ({ request, platform }) => {
     const isPlaceholder = isPlaceholderSecret(secretKey);
 
     if (isPlaceholder) {
+      if (isProductionRuntime(env)) {
+        console.error(`[payment/initialize] Refusing mock checkout for ${gateway} in production runtime.`);
+        return json({
+          error: 'Payment gateway is not configured for production checkout.'
+        }, { status: 503 });
+      }
       console.log(`[payment/initialize] Gateway ${gateway} API keys are placeholders. Redirecting to mock gateway simulator.`);
       const mockCheckoutUrl = `/checkout/mock-gateway?gateway=${gateway}&reference=${reference}&amount=${amount}&email=${encodeURIComponent(email)}`;
       return json({ checkoutUrl: mockCheckoutUrl, simulated: true });

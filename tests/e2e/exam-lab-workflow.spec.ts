@@ -9,11 +9,12 @@ test.describe('exam lab and mock exam workflow', () => {
 			localStorage.removeItem('collegecbt_exam_attempt_cache_v1');
 		});
 		await page.reload();
+		await page.waitForLoadState('networkidle');
 
 		await page.locator('#acs-inst-type').selectOption('University');
 		await expect(page.locator('#acs-faculty')).toBeVisible();
 		await expect(page.locator('#acs-faculty')).toHaveValue('');
-		await page.locator('#acs-faculty').selectOption({ label: 'Science' });
+		await page.locator('#acs-faculty').selectOption('Science');
 		await expect(page.locator('#acs-dept')).toBeVisible();
 		await page.locator('#acs-dept').selectOption('Computer Science');
 		await expect(page.locator('#acs-level')).toBeVisible();
@@ -29,7 +30,7 @@ test.describe('exam lab and mock exam workflow', () => {
 		await page.getByTestId('lab-option-A').click();
 		await expect(page.getByText('Answer Explanation')).toBeVisible();
 
-		await page.getByRole('button', { name: 'Mock Exam' }).click();
+		await page.getByTestId('tab-mock').click();
 		await page.locator('#exam-size').selectOption('5');
 		await page.locator('#time-per-q').selectOption('60');
 		await page.locator('#mock-difficulty').selectOption('easy');
