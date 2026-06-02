@@ -1,11 +1,11 @@
 <script lang="ts">
 	const features = [
-		{ icon: '🤖', title: 'AI Question Bank', desc: 'Unlimited, fresh questions created on-demand by AI for any topic or course. It learns from your syllabus to give you exactly what you need.', color: '#7c3aed', tag: 'Smart AI Questions' },
-		{ icon: '⏱️', title: 'Mock Exam Engine', desc: 'Real exam simulation with a timed countdown (90 seconds per question) and official grading (A1–F9) so you know exactly how you’d score today.', color: '#84cc16', tag: 'Real Exam Setup' },
-		{ icon: '📊', title: 'Smart Progress Reports', desc: 'See your Exam Readiness Score (0–100), predicted grades, and topic-level charts. Download your performance certificate when you are ready.', color: '#f59e0b', tag: 'Track Success' },
-		{ icon: '🎯', title: 'Detailed Explanations', desc: 'Every wrong option explained — understand exactly why your answer was wrong and learn the logic behind the correct choice.', color: '#22d3ee', tag: 'Understand Better' },
-		{ icon: '🏛️', title: '550+ Institutions', desc: 'Covers Universities, Polytechnics, and Colleges of Education across Nigeria. Every course and every level from 100L up.', color: '#a855f7', tag: 'Built for Nigeria' },
-		{ icon: '📝', title: 'Written / Essay Practice', desc: 'Written questions with suggested answers and marking schemes — see exactly how to answer to get full marks from your lecturers.', color: '#e11d48', tag: 'A+ Written Guide' }
+		{ icon: '🤖', title: 'AI Question Bank', desc: 'Unlimited, fresh questions created on-demand by AI for any topic or course. Tailored to your syllabus so you always have the right practice material.', color: '#16a34a', tag: 'Smart AI Questions' },
+		{ icon: '⏱️', title: 'Mock Exam', desc: 'Real exam conditions with a timed countdown (90 seconds per question) and official grading (A1–F9) so you know exactly where you stand today.', color: '#ea580c', tag: 'Real Exam Setup' },
+		{ icon: '📊', title: 'Progress Reports', desc: 'See your Exam Score (0–100), predicted grades, and topic-level charts. Download your performance certificate when you are ready.', color: '#d97706', tag: 'Track Your Progress' },
+		{ icon: '🎯', title: 'Full Explanations', desc: 'Every wrong option explained — understand why your answer was wrong and learn the logic behind the correct choice.', color: '#0891b2', tag: 'Understand Better' },
+		{ icon: '🏗️', title: '550+ Institutions', desc: 'Covers Universities, Polytechnics, and Colleges of Education across Nigeria. Every course and level from 100L up.', color: '#7c3aed', tag: 'Built for Nigeria' },
+		{ icon: '📝', title: 'Written / Essay Practice', desc: 'Written questions with suggested answers and marking schemes — see exactly how to answer for full marks from your lecturers.', color: '#e11d48', tag: 'A+ Written Guide' }
 	];
 </script>
 
@@ -16,10 +16,10 @@
 	<div class="page-container">
 		<div class="text-center mb-20">
 			<div class="section-tag">✨ Platform Features</div>
-			<h2 id="features-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 text-white leading-tight">
+			<h2 id="features-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 leading-tight" style="color:var(--text);">
 				Everything You Need to
 				<br />
-				<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Excel in Exams</span>
+				<span style="background:linear-gradient(135deg,#16a34a,#ea580c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Pass Your Exams</span>
 			</h2>
 			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
 				Six core features designed to help you master your courses and pass your exams with confidence.
@@ -38,8 +38,8 @@
 							{feat.icon}
 						</div>
 						
-						<h3 class="font-display font-bold text-xl sm:text-2xl mb-4 text-white group-hover:text-white transition-colors">{feat.title}</h3>
-						<p class="text-white/55 text-sm sm:text-base leading-relaxed mb-8 font-medium flex-1 group-hover:text-white/70 transition-colors">{feat.desc}</p>
+						<h3 class="font-display font-bold text-xl sm:text-2xl mb-4 transition-colors" style="color:var(--text);">{feat.title}</h3>
+						<p class="text-sm sm:text-base leading-relaxed mb-8 font-medium flex-1 transition-colors" style="color:var(--text-muted);">{feat.desc}</p>
 						
 						<div class="pt-6 border-t border-white/5 w-full flex items-center justify-between">
 							<span class="text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest transition-all duration-300" style="background:{feat.color}15; color:{feat.color}; group-hover:scale-105">{feat.tag}</span>

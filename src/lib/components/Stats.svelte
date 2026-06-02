@@ -59,11 +59,11 @@
 					<div class="text-3xl mb-3 flex justify-center">{stat.icon}</div>
 					<div 
 						class="font-display text-4xl sm:text-5xl mb-2" 
-						style="background: linear-gradient(135deg, #a3e635, #bef264); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+						style="background: linear-gradient(135deg, var(--violet), var(--lime)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
 					>
 						{stat.num}{stat.suffix}
 					</div>
-					<div class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white/40">
+					<div class="text-[10px] sm:text-xs font-bold uppercase tracking-widest" style="color:var(--text-muted);">
 						{stat.label}
 					</div>
 				</div>

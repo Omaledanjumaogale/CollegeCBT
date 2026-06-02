@@ -61,13 +61,13 @@
 		<div class="grid lg:grid-cols-2 gap-14 items-center">
 			<!-- Left: Copy -->
 			<div class="flex flex-col items-start text-left">
-				<div class="badge badge-lime text-xs mb-5 inline-flex">
+				<div class="badge badge-lime text-xs mb-5 inline-flex" style="background:rgba(234,88,12,0.1);border-color:rgba(234,88,12,0.3);color:#ea580c;">
 					🇳🇬 Nigeria's #1 AI Exam Prep · Guaranteed Success
 				</div>
-				<h1 id="hero-heading" class="font-display text-5xl sm:text-6xl lg:text-7xl leading-[1.05] tracking-tight mb-6 text-white" style="letter-spacing:-0.03em;">
+				<h1 id="hero-heading" class="font-display text-5xl sm:text-6xl lg:text-7xl leading-[1.05] tracking-tight mb-6" style="letter-spacing:-0.03em;color:var(--text);">
 					Pass Any Exam.
 					<br />
-					<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Guaranteed by AI.</span>
+					<span style="background:linear-gradient(135deg,#16a34a,#ea580c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Guaranteed by AI.</span>
 				</h1>
 				<p class="text-white/60 text-lg sm:text-xl max-w-2xl mb-8 leading-relaxed">
 					CollegeCBT uses AI to create practice questions for every course in Nigerian universities, polytechnics, and colleges. Practice with real exam scenarios and get full explanations for every answer.
@@ -155,9 +155,9 @@
 					<!-- Explanation -->
 					{#if demoAnswered}
 						<div class="p-4 rounded-xl mb-4 text-xs leading-relaxed animate-fade-up" 
-							style="background: {demoCorrect ? 'rgba(132, 204, 22, 0.08)' : 'rgba(225, 29, 72, 0.08)'}; 
-									border: 1px solid {demoCorrect ? 'rgba(132, 204, 22, 0.25)' : 'rgba(225, 29, 72, 0.25)'}">
-							<div class="font-bold mb-1" style="color: {demoCorrect ? '#84cc16' : '#f87171'}">
+							style="background: {demoCorrect ? 'rgba(22,163,74,0.08)' : 'rgba(225,29,72,0.08)'}; 
+									border: 1px solid {demoCorrect ? 'rgba(22,163,74,0.25)' : 'rgba(225,29,72,0.25)'}">
+							<div class="font-bold mb-1" style="color: {demoCorrect ? '#16a34a' : '#f87171'}">
 								{demoCorrect ? '🎯 Correct!' : '❌ Not Quite Right'}
 							</div>
 							<p class="text-white/65">{demoQ.explanation.replace('❌', '\n❌').replace('✅', '✅')}</p>
@@ -170,11 +170,11 @@
 				<ReadinessCard />
 
 				<!-- Floating Decorative Elements -->
-				<div class="absolute -top-6 -right-4 glass-card px-4 py-2 hidden sm:flex items-center gap-3 border-lime-500/30 animate-pulse-subtle scale-90">
-					<span class="text-lime-500 text-xl">🔥</span>
+				<div class="absolute -top-6 -right-4 glass-card px-4 py-2 hidden sm:flex items-center gap-3 animate-pulse-subtle scale-90" style="border-color:rgba(234,88,12,0.3);">
+					<span style="color:#ea580c;" class="text-xl">🔥</span>
 					<div>
-						<div class="text-xs font-bold text-white leading-tight">14 Day Streak</div>
-						<div class="text-[10px] text-white/40 font-medium">Results Guaranteed</div>
+						<div class="text-xs font-bold leading-tight" style="color:var(--text);">14 Day Streak</div>
+						<div class="text-[10px] font-medium" style="color:var(--text-muted);">Results Guaranteed</div>
 					</div>
 				</div>
 				<div class="absolute -bottom-6 -left-6 glass-card px-4 py-2 hidden sm:flex items-center gap-3 border-amber-500/30 animate-pulse-subtle delay-700 scale-90">

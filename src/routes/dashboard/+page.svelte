@@ -69,10 +69,10 @@
 	})());
 
 	let kpis = $derived([
-		{ icon: '📝', value: totalAnswered.toString(), label: 'Questions Answered', change: 'Total', color: '#a78bfa' },
-		{ icon: '🏆', value: mockExamsCount.toString(), label: 'Mock Exams Taken', change: 'Exams', color: '#84cc16' },
-		{ icon: '📈', value: `${avgScore}%`, label: 'Average Score', change: 'Real-time', color: '#f59e0b' },
-		{ icon: '🎯', value: avgScore > 0 ? (avgScore + 5).toString() : '0', label: 'AI Readiness Score', change: 'Target: 85+', color: '#22d3ee' }
+		{ icon: '📝', value: totalAnswered.toString(), label: 'Questions Answered', change: 'Total', color: 'var(--violet)' },
+		{ icon: '🏆', value: mockExamsCount.toString(), label: 'Mock Exams Taken', change: 'Exams', color: 'var(--lime)' },
+		{ icon: '📈', value: `${avgScore}%`, label: 'Average Score', change: 'Live', color: 'var(--amber)' },
+		{ icon: '🎯', value: avgScore > 0 ? (avgScore + 5).toString() : '0', label: 'Exam Score', change: 'Target: 85+', color: 'var(--violet)' }
 	]);
 
 	// Recent activity — exclusively real data
@@ -205,14 +205,14 @@
 			// Background and border
 			doc.setFillColor(13, 8, 32); 
 			doc.rect(0, 0, 297, 210, 'F');
-			doc.setDrawColor(124, 58, 237);
+			doc.setDrawColor(22, 163, 74);
 			doc.setLineWidth(1);
 			doc.rect(10, 10, 277, 190);
 
 			// Title
-			doc.setTextColor(132, 204, 22);
+			doc.setTextColor(22, 163, 74);
 			doc.setFontSize(28);
-			doc.text('CollegeCBT Certificate of Readiness', 148, 40, { align: 'center' });
+			doc.text('CollegeCBT Certificate of Success', 148, 40, { align: 'center' });
 
 			// Content
 			doc.setTextColor(255, 255, 255);
@@ -223,7 +223,7 @@
 			doc.text($currentUser?.displayName || userProfile.name, 148, 90, { align: 'center' });
 			
 			doc.setFontSize(14);
-			doc.text('has achieved an exceptional AI Readiness Score and practice trajectory.', 148, 110, { align: 'center' });
+			doc.text('has achieved an exceptional Exam Score and practice trajectory.', 148, 110, { align: 'center' });
 			
 			// Stats
 			doc.setFontSize(12);
@@ -244,8 +244,8 @@
 </script>
 
 <svelte:head>
-	<title>Student Dashboard — CollegeCBT | AI Readiness Score & Results</title>
-	<meta name="description" content="Track your exam performance, AI readiness score, grade predictions, and topic performance on the CollegeCBT dashboard." />
+	<title>Student Dashboard — CollegeCBT | Exam Score & Results</title>
+	<meta name="description" content="Track your exam performance, exam score, grade predictions, and topic performance on the CollegeCBT dashboard." />
 	<meta name="robots" content="noindex, nofollow" />
 </svelte:head>
 
@@ -254,7 +254,7 @@
 		<div class="mb-4">
 			<div class="section-tag">📊 Student Dashboard</div>
 			<h1 class="font-display text-3xl sm:text-4xl mb-1">Your Practice Dashboard</h1>
-			<p class="text-white/40 text-sm">Track performance, readiness score, topic performance and grade predictions — all powered by AI.</p>
+			<p class="text-white/40 text-sm">Track performance, exam score, topic performance and grade predictions.</p>
 		</div>
 
 		<div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-8">
@@ -335,10 +335,10 @@
 								<div class="absolute top-0 left-0 right-0 h-0.5" style="background:{k.color};"></div>
 								<div class="text-xl sm:text-2xl mb-1.5">{k.icon}</div>
 								<div class="font-title text-2xl sm:text-3xl" style="color:{k.color};">{k.value}</div>
-								{#if k.label === 'AI Readiness Score'}
+								{#if k.label === 'Exam Score'}
 									<div class="flex items-center gap-1 mt-0.5">
 										<div class="text-[10px] sm:text-xs text-white/40">{k.label}</div>
-										<Tooltip text="Our proprietary AI-driven projection of your likely performance in an actual examination setting, based on mastery and consistency." />
+										<Tooltip text="Our projection of your likely performance in an actual examination setting, based on mastery and consistency." />
 									</div>
 								{:else if k.label === 'Average Score'}
 									<div class="flex items-center gap-1 mt-0.5">
@@ -348,7 +348,7 @@
 								{:else if k.label === 'Questions Answered'}
 									<div class="flex items-center gap-1 mt-0.5">
 										<div class="text-[10px] sm:text-xs text-white/40">{k.label}</div>
-										<Tooltip text="The total number of AI-generated and curriculum-based questions you have attempted in the Exam Lab." />
+										<Tooltip text="The total number of curriculum-based questions you have attempted in the Exam Lab." />
 									</div>
 								{:else if k.label === 'Mock Exams Taken'}
 									<div class="flex items-center gap-1 mt-0.5">
@@ -367,25 +367,25 @@
 					<div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
 						<!-- Gauge -->
 						<div class="glass-card p-5">
-							<div class="font-bold text-sm mb-1">🎯 AI Readiness Score</div>
+							<div class="font-bold text-sm mb-1">🎯 Exam Score</div>
 							<div class="text-xs text-white/40 mb-4">Based on {totalAnswered} questions & {mockExamsCount} mock exams</div>
 							<!-- Semicircle gauge -->
 							<div class="relative w-36 h-[72px] mx-auto mb-2 overflow-hidden">
 								<div class="absolute inset-0 rounded-t-full border-[10px] border-b-0" style="border-color:rgba(255,255,255,0.06);"></div>
 								<div class="absolute inset-0 rounded-t-full border-[10px] border-b-0 transition-transform duration-1000 origin-bottom"
-									style="border-color:#84cc16;transform:rotate({(gaugeAngle - 180)}deg);"></div>
-								<div class="absolute bottom-1 left-0 right-0 text-center font-title text-3xl" style="color:#84cc16;">{gaugeNum}</div>
+									style="border-color:var(--violet);transform:rotate({(gaugeAngle - 180)}deg);"></div>
+								<div class="absolute bottom-1 left-0 right-0 text-center font-title text-3xl" style="color:var(--violet);">{gaugeNum}</div>
 							</div>
-							<div class="text-center text-xs text-white/40 mb-3">/ 100 — <span style="color:#84cc16;">Exam Ready</span></div>
-							<div class="p-2.5 rounded-lg text-xs" style="background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.2);color:#a3e635;">
+							<div class="text-center text-xs text-white/40 mb-3">/ 100 — <span style="color:var(--violet);">Exam Ready</span></div>
+							<div class="p-2.5 rounded-lg text-xs" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);color:var(--violet);">
 								📈 Live score updates as your Exam Lab and Mock Exam results sync from Convex.
 							</div>
 						</div>
 						<!-- Grade Prediction & AI Analyst -->
 						<div class="glass-card p-5">
 							<div class="flex items-center justify-between mb-1">
-								<div class="font-bold text-sm">🔮 AI Performance Analysis</div>
-								<button onclick={analyzePerformance} disabled={aiAnalyzing} class="btn-micro-feedback rounded-lg px-2.5 py-1 text-xs" style="background:rgba(124,58,237,0.15);color:#a855f7;border:1px solid rgba(124,58,237,0.3);">
+								<div class="font-bold text-sm">🔮 Performance Analysis</div>
+								<button onclick={analyzePerformance} disabled={aiAnalyzing} class="btn-micro-feedback rounded-lg px-2.5 py-1 text-xs" style="background:rgba(22,163,74,0.12);color:var(--violet);border:1px solid rgba(22,163,74,0.3);">
 									{#if aiAnalyzing}
 										<span class="animate-pulse">🧠 Processing...</span>
 									{:else}
@@ -398,11 +398,11 @@
 							<div class="space-y-2.5">
 								{#if aiPrediction}
 									<!-- Dynamic AI insights via JSON parse -->
-									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.25);">
+									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.25);">
 										<span class="text-sm">Motivation Score</span>
-										<span class="font-title text-2xl text-lime-DEFAULT">{aiPrediction.motivationScore}/100</span>
+										<span class="font-title text-2xl" style="color:var(--violet);">{aiPrediction.motivationScore}/100</span>
 									</div>
-									<div class="p-3 rounded-xl" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);">
+									<div class="p-3 rounded-xl" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.25);">
 										<span class="text-xs font-semibold uppercase tracking-wider block mb-1">Top Weakness</span>
 										<span class="text-sm font-medium">{aiPrediction.weaknesses?.[0] || 'Need more data'}</span>
 									</div>
@@ -412,11 +412,11 @@
 									</div>
 								{:else}
 									<!-- Real telemetry before AI analysis is requested -->
-									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(132,204,22,0.08);border:1px solid rgba(132,204,22,0.25);">
+									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.25);">
 										<span class="text-sm">Predicted Grade</span>
-										<span class="font-title text-2xl" style="color:#84cc16;">{avgScore >= 75 ? 'A1' : avgScore >= 70 ? 'B2' : avgScore >= 60 ? 'C4' : avgScore > 0 ? 'Practice' : 'New'} — {avgScore}%</span>
+										<span class="font-title text-2xl" style="color:var(--violet);">{avgScore >= 75 ? 'A1' : avgScore >= 70 ? 'B2' : avgScore >= 60 ? 'C4' : avgScore > 0 ? 'Practice' : 'New'} — {avgScore}%</span>
 									</div>
-									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.25);">
+									<div class="flex items-center justify-between p-3 rounded-xl" style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.25);">
 										<span class="text-sm">Data Confidence</span>
 										<span class="text-sm text-violet-light">{totalAnswered >= 50 ? 'High' : totalAnswered >= 10 ? 'Growing' : 'Needs more attempts'}</span>
 									</div>
@@ -441,7 +441,7 @@
 								<div class="flex-1 flex flex-col items-center relative min-w-0">
 									<span class="absolute -top-5 text-[10px] font-mono text-violet-light">{val}%</span>
 									<div class="w-full rounded-t-md transition-all duration-700 min-h-[4px]"
-										style="height:{(val/maxVal)*100}%;background:linear-gradient(180deg,#a855f7,#7c3aed);">
+										style="height:{(val/maxVal)*100}%;background:linear-gradient(180deg,var(--violet-light),var(--violet));">
 									</div>
 									<span class="absolute -bottom-5 text-[10px] text-white/30">M{i+1}</span>
 								</div>
@@ -502,16 +502,16 @@
 						</div>
 					</div>
 
-					<!-- AI Prediction -->
-					<div class="glass-card p-5 mb-5" style="background:rgba(124,58,237,0.1);border-color:rgba(124,58,237,0.25);">
-						<div class="font-bold text-sm text-violet-light mb-3 flex items-center justify-between">
-							<div class="flex items-center gap-2">🤖 AI Target Grade</div>
+					<!-- Target Grade -->
+					<div class="glass-card p-5 mb-5" style="background:rgba(22,163,74,0.08);border-color:rgba(22,163,74,0.25);">
+						<div class="font-bold text-sm mb-3 flex items-center justify-between" style="color:var(--violet-light);">
+							<div class="flex items-center gap-2">🤖 Target Grade</div>
 							<Tooltip text="This predicts your final grade based on your practice scores and subject knowledge." />
 						</div>
 						<p class="text-sm text-white/80 leading-relaxed">
 							Based on your current practice progress, your real-time average score is
-							<strong class="text-lime-DEFAULT">{avgScore}%</strong>.
-							To get an <strong class="text-lime-DEFAULT">A1 (75%+)</strong>, focus on
+							<strong class="text-lime-DEFAULT" style="color:var(--violet);">{avgScore}%</strong>.
+							To get an <strong class="text-lime-DEFAULT" style="color:var(--violet);">A1 (75%+)</strong>, focus on
 							<strong>{heatmap[0]?.topic || 'your next course topic'}</strong>.
 							The dashboard updates immediately after each saved Exam Lab or Mock Exam session.
 							<strong class="text-amber-DEFAULT">You need {Math.max(0, 75 - avgScore)} more percentage points to reach A1 readiness.</strong>
@@ -657,8 +657,8 @@
 
 <style>
 	.dash-btn-active {
-		background: rgba(124, 58, 237, 0.12);
-		border: 1px solid rgba(124, 58, 237, 0.25);
+		background: rgba(22, 163, 74, 0.12);
+		border: 1px solid rgba(22, 163, 74, 0.25);
 		color: var(--violet-light);
 	}
 	.dash-btn-inactive {

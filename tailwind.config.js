@@ -6,26 +6,41 @@ export default {
 		extend: {
 			colors: {
 				primary: {
-					DEFAULT: '#7c3aed', // matches violet
-					light: '#a78bfa'
+					DEFAULT: '#16a34a', // Forest Green
+					light: '#4ade80',
+					dark: '#166534'
 				},
 				secondary: {
-					DEFAULT: '#0d0820', // matches ink.dark
-					surface: '#120e2e'
+					DEFAULT: '#ea580c', // Vibrant Orange
+					light: '#f97316',
+					surface: '#fff7ed'
 				},
 				accent: {
-					DEFAULT: '#84cc16', // matches lime
-					light: '#a3e635'
+					DEFAULT: '#ea580c', // Orange accent
+					light: '#f97316'
 				},
+				/* Legacy aliases — kept so existing Tailwind classes don't break */
 				violet: {
-					DEFAULT: '#7c3aed',
-					light: '#a78bfa',
-					dark: '#6d28d9'
+					DEFAULT: '#16a34a', // → Forest Green
+					light: '#4ade80',
+					dark: '#166534'
 				},
 				lime: {
-					DEFAULT: '#84cc16',
-					light: '#a3e635',
-					dark: '#65a30d'
+					DEFAULT: '#ea580c', // → Vibrant Orange
+					light: '#f97316',
+					dark: '#c2410c'
+				},
+				/* Brand greens */
+				forest: {
+					DEFAULT: '#166534',
+					light: '#16a34a',
+					bright: '#4ade80'
+				},
+				/* Brand oranges */
+				orange: {
+					DEFAULT: '#ea580c',
+					light: '#f97316',
+					bright: '#fb923c'
 				},
 				amber: {
 					DEFAULT: '#f59e0b',
@@ -36,14 +51,10 @@ export default {
 					DEFAULT: '#e11d48',
 					light: '#fb7185'
 				},
-				forest: {
-					DEFAULT: '#064E3B',
-					light: '#10B981'
-				},
 				ink: {
-					dark: '#0d0820',
-					surface: '#120e2e',
-					card: '#1a1535'
+					dark: '#071a0d',
+					surface: '#0a2010',
+					card: '#0f2d16'
 				}
 			},
 			fontFamily: {
@@ -54,7 +65,8 @@ export default {
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-				'mesh-violet': 'radial-gradient(ellipse 80% 60% at 5% 0%, rgba(124,58,237,0.25) 0%, transparent 55%)'
+				'mesh-green': 'radial-gradient(ellipse 80% 60% at 5% 0%, rgba(22,163,74,0.18) 0%, transparent 55%)',
+				'mesh-orange': 'radial-gradient(ellipse 60% 50% at 95% 100%, rgba(234,88,12,0.12) 0%, transparent 55%)'
 			},
 			animation: {
 				float: 'float 4s ease-in-out infinite',
@@ -87,8 +99,8 @@ export default {
 				}
 			},
 			boxShadow: {
-				violet: '0 0 30px rgba(124,58,237,0.35)',
-				lime: '0 0 20px rgba(132,204,22,0.3)',
+				green: '0 0 30px rgba(22,163,74,0.35)',
+				orange: '0 0 20px rgba(234,88,12,0.3)',
 				amber: '0 0 20px rgba(245,158,11,0.3)'
 			}
 		}

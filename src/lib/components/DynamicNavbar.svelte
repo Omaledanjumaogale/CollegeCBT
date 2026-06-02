@@ -69,8 +69,8 @@
 	<div class="page-container h-full">
 		<div class="flex items-center justify-between h-full gap-4">
 			<!-- Logo -->
-			<a href="/" class="flex-shrink-0 font-display text-2xl leading-none hover:opacity-90 transition-opacity" style="background:linear-gradient(135deg,var(--text) 40%,var(--violet-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-				College<span style="-webkit-text-fill-color:var(--lime-light);">CBT</span>
+			<a href="/" class="flex-shrink-0 font-display text-2xl leading-none hover:opacity-90 transition-opacity">
+				<span style="color:var(--text);">College</span><span style="color:var(--lime);">CBT</span>
 			</a>
 
 			<!-- Right side: Auth buttons + Hamburger -->
@@ -135,7 +135,7 @@
 			<!-- User info bar (mobile) -->
 			{#if $currentUser}
 				<div class="px-6 py-4 flex items-center gap-3" style="border-bottom: 1px solid var(--glass-border);">
-					<div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style="background:linear-gradient(135deg,var(--violet),var(--violet-light));">
+					<div class="w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0" style="background:linear-gradient(135deg,var(--violet),var(--lime));">
 						🎓
 					</div>
 					<div class="min-w-0">
