@@ -50,15 +50,15 @@
 
 <div class="glass-card overflow-hidden">
 	<!-- Tab Bar -->
-	<div class="flex overflow-x-auto hide-scrollbar border-b border-white/10 p-2 gap-2 bg-black/20">
+	<div class="flex overflow-x-auto hide-scrollbar border-b p-2 gap-2" style="border-color:var(--glass-border);">
 		{#each types as t}
 			<div class="flex items-center gap-1">
 				<button
 					class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all"
 					style="
-						background:{activeType === t.id ? 'rgba(124,58,237,0.2)' : 'transparent'};
-						color:{activeType === t.id ? '#c4b5fd' : 'rgba(255,255,255,0.6)'};
-						border:1px solid {activeType === t.id ? 'rgba(124,58,237,0.3)' : 'transparent'};
+						background:{activeType === t.id ? 'rgba(22,163,74,0.12)' : 'transparent'};
+						color:{activeType === t.id ? 'var(--violet)' : 'var(--text-muted)'};
+						border:1px solid {activeType === t.id ? 'rgba(22,163,74,0.25)' : 'transparent'};
 					"
 					onclick={() => {
 						activeType = t.id;
@@ -83,7 +83,7 @@
 		<div class="flex flex-col md:flex-row gap-4 mb-6">
 			<!-- Search -->
 			<div class="relative flex-1">
-				<span class="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+				<span class="absolute left-3 top-1/2 -translate-y-1/2" style="color:var(--text-muted);">🔍</span>
 				<input
 					type="text"
 					bind:value={searchQuery}
@@ -110,14 +110,15 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
 				{#each displayedCourses as course}
 					<button
-						class="text-left p-4 rounded-xl border transition-all group relative overflow-hidden {selectedCourse === course ? 'border-lime-500 bg-lime-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-violet-500/30'}"
+						class="text-left p-4 rounded-xl border transition-all group relative overflow-hidden"
+						style="{selectedCourse === course ? 'border-color:var(--violet);background:rgba(22,163,74,0.08);' : 'border-color:var(--glass-border);background:var(--glass);'}"
 						onclick={() => selectCourse(course)}
 					>
 						<div class="absolute top-0 right-0 p-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0">
-							<span class="text-violet-400">→</span>
+							<span style="color:var(--violet);">→</span>
 						</div>
-						<div class="font-medium text-white mb-1 pr-4">{course}</div>
-						<div class="text-[11px] text-white/40 uppercase tracking-wider">
+						<div class="font-medium mb-1 pr-4" style="color:var(--text);">{course}</div>
+						<div class="text-[11px] uppercase tracking-wider" style="color:var(--text-muted);">
 							{activeType} {activeType !== 'JAMB' ? `· ${selectedLevel || 'All Levels'}` : ''}
 						</div>
 					</button>
@@ -127,19 +128,19 @@
 				<SelectedCourseBar course={selectedCourse} level={selectedLevel} institutionType={activeType} />
 			{/if}
 		{:else}
-			<div class="text-center py-10 border border-dashed border-white/10 rounded-2xl">
+			<div class="text-center py-10 border border-dashed rounded-2xl" style="border-color:var(--glass-border);">
 				<div class="text-3xl mb-2 opacity-50">📂</div>
-				<p class="text-white/50 text-sm">No courses found matching "{searchQuery}"</p>
+				<p class="text-sm" style="color:var(--text-muted);">No courses found matching "{searchQuery}"</p>
 			</div>
 		{/if}
 		
-		<div class="mt-6 flex justify-between items-center p-4 bg-violet-900/20 border border-violet-500/20 rounded-xl">
+		<div class="mt-6 flex justify-between items-center p-4 rounded-xl" style="background:rgba(22,163,74,0.07);border:1px solid rgba(22,163,74,0.2);">
 			<div>
 				<div class="flex items-center gap-2 mb-1">
-					<h4 class="font-bold text-violet-100 text-sm">Custom Exam Need?</h4>
+					<h4 class="font-bold text-sm" style="color:var(--text);">Custom Exam Need?</h4>
 					<Tooltip text="Use our advanced AI generator to create questions for any specific module or topic not listed here." />
 				</div>
-				<p class="text-xs text-violet-300/70">Can't find your specific topic or course? Use our AI generator.</p>
+				<p class="text-xs" style="color:var(--text-muted);">Can't find your specific topic or course? Use our AI generator.</p>
 			</div>
 			<a href="/dashboard/custom-exam" class="btn-violet px-4 py-2 text-xs whitespace-nowrap">Build Custom →</a>
 		</div>

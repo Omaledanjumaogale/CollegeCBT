@@ -13,13 +13,12 @@
 	<div class="page-container">
 		<div class="text-center mb-20">
 			<div class="section-tag">🚀 Getting Started</div>
-			<h2 id="how-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 text-white leading-tight">
-				From Zero to 75%
-				<br />
-				<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> in 4 Steps</span>
+			<h2 id="how-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 leading-tight" style="color:var(--text);">
+				Get Exam-Ready in
+				<span style="background:linear-gradient(135deg,var(--violet),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> 3 Simple Steps</span>
 			</h2>
-			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-semibold">
-				The complete CollegeCBT journey — from choosing your course to walking into the real exam with absolute certainty.
+			<p class="max-w-2xl mx-auto text-lg leading-relaxed font-semibold" style="color:var(--text-muted);">
+				From setting up your profile to mastering topics with AI — your pathway to better exam scores is clear, fast, and proven.
 			</p>
 		</div>
 
@@ -39,8 +38,8 @@
 							{item.step}
 						</div>
 					</div>
-					<h3 class="font-display font-bold text-xl sm:text-2xl mb-4 text-white">{item.title}</h3>
-					<p class="text-white/55 text-sm sm:text-base leading-relaxed font-medium">{item.desc}</p>
+					<h3 class="font-display font-bold text-xl sm:text-2xl mb-4" style="color:var(--text);">{item.title}</h3>
+					<p class="text-sm sm:text-base leading-relaxed font-medium" style="color:var(--text-muted);">{item.desc}</p>
 				</div>
 			{/each}
 		</div>

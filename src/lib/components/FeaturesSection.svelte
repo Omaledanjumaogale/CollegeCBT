@@ -21,7 +21,7 @@
 				<br />
 				<span style="background:linear-gradient(135deg,#16a34a,#ea580c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Pass Your Exams</span>
 			</h2>
-			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-medium">
+			<p class="max-w-2xl mx-auto text-lg leading-relaxed font-medium" style="color:var(--text-muted);">
 				Six core features designed to help you master your courses and pass your exams with confidence.
 			</p>
 		</div>
@@ -41,7 +41,7 @@
 						<h3 class="font-display font-bold text-xl sm:text-2xl mb-4 transition-colors" style="color:var(--text);">{feat.title}</h3>
 						<p class="text-sm sm:text-base leading-relaxed mb-8 font-medium flex-1 transition-colors" style="color:var(--text-muted);">{feat.desc}</p>
 						
-						<div class="pt-6 border-t border-white/5 w-full flex items-center justify-between">
+						<div class="pt-6 border-t w-full flex items-center justify-between" style="border-color:var(--glass-border);">
 							<span class="text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-widest transition-all duration-300" style="background:{feat.color}15; color:{feat.color}; group-hover:scale-105">{feat.tag}</span>
 							<a href="/exam-lab" class="text-xs font-bold transition-all duration-300 hover:translate-x-1 flex items-center gap-1.5" style="color:{feat.color};">
 								Try it free 

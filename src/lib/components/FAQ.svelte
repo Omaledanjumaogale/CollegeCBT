@@ -15,12 +15,12 @@
 	<div class="page-container max-w-4xl px-4">
 		<div class="text-center mb-16">
 			<div class="section-tag">❓ Common Questions</div>
-			<h2 id="faq-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 text-white leading-tight">
+			<h2 id="faq-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 leading-tight" style="color:var(--text);">
 				Questions About
 				<br />
-				<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> CollegeCBT</span>
+				<span style="background:linear-gradient(135deg,var(--violet),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> CollegeCBT</span>
 			</h2>
-			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-semibold">
+			<p class="max-w-2xl mx-auto text-lg leading-relaxed font-semibold" style="color:var(--text-muted);">
 				Everything you need to know about our AI study platform and how it helps you secure target grades.
 			</p>
 		</div>
@@ -35,7 +35,7 @@
 						id="faq-btn-{i}"
 						aria-controls="faq-panel-{i}"
 					>
-						<span class="font-display font-bold text-lg sm:text-xl text-white group-hover:text-violet-light transition-colors leading-tight">
+						<span class="font-display font-bold text-lg sm:text-xl transition-colors leading-tight" style="color:var(--text);">
 							{faq.q}
 						</span>
 						<div class="flex-shrink-0 w-8 h-8 rounded-full border border-white/10 flex items-center justify-center transition-all duration-300"
@@ -48,8 +48,8 @@
 					
 					{#if openFaq === i}
 						<div id="faq-panel-{i}" role="region" aria-labelledby="faq-btn-{i}" 
-							class="px-6 sm:px-8 pb-6 sm:pb-8 text-white/55 text-sm sm:text-base leading-relaxed tracking-tight border-t border-white/5 pt-5 animate-fade-down">
-							<p class="font-medium bg-white/5 p-5 rounded-2xl border border-white/10">{faq.a}</p>
+							class="px-6 sm:px-8 pb-6 sm:pb-8 text-sm sm:text-base leading-relaxed tracking-tight border-t pt-5 animate-fade-down" style="color:var(--text-muted); border-color:var(--glass-border);">
+							<p class="font-medium p-5 rounded-2xl" style="background:var(--glass); border:1px solid var(--glass-border);">{faq.a}</p>
 						</div>
 					{/if}
 				</div>
@@ -59,7 +59,7 @@
 		<!-- Still have questions footer -->
 		<div class="mt-16 text-center">
 			<div class="p-6 rounded-[24px] bg-white/5 border border-white/5 inline-flex flex-col sm:flex-row items-center gap-6 group hover:border-violet-500 transition-all">
-				<p class="text-white/40 text-sm font-bold uppercase tracking-widest">Still have questions?</p>
+				<p class="text-sm font-bold uppercase tracking-widest" style="color:var(--text-muted);">Still have questions?</p>
 				<div class="flex items-center gap-3">
 					<a href="mailto:support@collegecbt.dev" class="text-violet-light font-black text-lg underline underline-offset-4 decoration-violet-500/20 group-hover:decoration-violet-500/80 transition-all">
 						support@collegecbt.dev

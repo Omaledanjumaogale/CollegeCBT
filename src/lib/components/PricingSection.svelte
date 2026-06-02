@@ -69,7 +69,7 @@
 				<br />
 				<span style="background:linear-gradient(135deg,#16a34a,#ea580c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Full Success.</span>
 			</h2>
-			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-semibold">
+			<p class="max-w-2xl mx-auto text-lg leading-relaxed font-semibold" style="color:var(--text-muted);">
 				Pay once a year in Nigerian Naira. No hidden fees. Pay with card, bank transfer, or USSD via Flutterwave or KoraPay.
 			</p>
 		</div>
@@ -86,14 +86,14 @@
 							<div class="absolute -top-3.5 right-6 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest text-white whitespace-nowrap shadow-xl z-20" style="background:var(--lime);">💰 {plan.saveBadge}</div>
 						{/if}
 
-						<div class="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-white/40 mb-4">{plan.name}</div>
+						<div class="text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] mb-4" style="color:var(--text-muted);">{plan.name}</div>
 						
-						<div class="font-display font-black text-6xl leading-none mb-2 text-white flex items-start">
-							<span class="font-body text-2xl font-bold align-super mt-1">₦</span>
+						<div class="font-display font-black text-6xl leading-none mb-2 flex items-start" style="color:var(--text);">
+							<span class="font-body text-2xl font-bold align-super mt-1" style="color:var(--text-muted);">₦</span>
 							{plan.price}
 						</div>
 						
-						<div class="text-[10px] sm:text-xs font-bold text-white/40 mb-10 tracking-tight leading-relaxed">{plan.period}</div>
+						<div class="text-[10px] sm:text-xs font-bold mb-10 tracking-tight leading-relaxed" style="color:var(--text-muted);">{plan.period}</div>
 						
 						<ul class="space-y-4 mb-12 flex-1 w-full">
 							{#each plan.features as f}
@@ -101,7 +101,7 @@
 									<span class="text-lg flex-shrink-0" style="color:{f.included ? '#16a34a' : 'var(--rose)'}">
 										{f.included ? '✓' : '✗'}
 									</span>
-									<span class="text-sm sm:text-base font-bold tracking-tight text-white/80">{f.text}</span>
+									<span class="text-sm sm:text-base font-bold tracking-tight" style="color:var(--text);">{f.text}</span>
 								</li>
 							{/each}
 						</ul>
@@ -124,22 +124,22 @@
 		<div class="flex flex-col sm:flex-row items-center justify-center gap-4 py-8 px-6 rounded-3xl bg-black/20 border border-white/5 animate-pulse-subtle">
 			<div class="flex items-center gap-3">
 			<div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-xs" style="background:var(--violet);">K</div>
-				<span class="font-display font-black text-xl italic text-white tracking-tighter">KoraPay</span>
-				<div class="w-px h-6 bg-white/10 mx-1"></div>
-				<span class="font-display font-black text-xl italic text-white tracking-tighter">Flutterwave</span>
+				<span class="font-display font-black text-xl italic tracking-tighter" style="color:var(--text);">KoraPay</span>
+				<div class="w-px h-6 mx-1" style="background:var(--glass-border);"></div>
+				<span class="font-display font-black text-xl italic tracking-tighter" style="color:var(--text);">Flutterwave</span>
 			</div>
-			<div class="hidden sm:block w-px h-6 bg-white/10 mx-2"></div>
-			<p class="text-white/40 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center sm:text-left leading-relaxed">
-				🔒 Secure Payments · Card · Bank Transfer · USSD · POS · Nigeria Native Infrastructure
-			</p>
+			<div class="hidden sm:block w-px h-6 mx-2" style="background:var(--glass-border);"></div>
+				<p class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-center sm:text-left leading-relaxed" style="color:var(--text-muted);">
+					🔒 Secure Payments · Card · Bank Transfer · USSD · POS · Nigeria Native Infrastructure
+				</p>
 		</div>
 
 		<!-- Departmental/Institutional Banner -->
 		<div class="mt-8 overflow-hidden relative group rounded-3xl p-8 sm:p-10 flex flex-col md:flex-row items-center gap-8 shadow-large"
 			style="background: linear-gradient(135deg, rgba(245,158,11,0.12), rgba(217,119,6,0.06)); border: 1px solid rgba(245,158,11,0.2);">
 			<div class="flex-1 text-center md:text-left">
-				<div class="font-display font-black text-2xl lg:text-3xl text-white mb-2 tracking-tight">🏫 Departments & Institutions</div>
-				<p class="text-white/55 text-base sm:text-lg leading-relaxed font-semibold">
+				<div class="font-display font-black text-2xl lg:text-3xl mb-2 tracking-tight" style="color:var(--text);">🏫 Departments &amp; Institutions</div>
+				<p class="text-base sm:text-lg leading-relaxed font-semibold" style="color:var(--text-muted);">
 					Empower up to 200 students with full CollegeCBT access. Department-level analytics, shared curriculum, and dedicated support — all for <strong>₦25,000/year</strong>.
 				</p>
 			</div>

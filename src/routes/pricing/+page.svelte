@@ -100,10 +100,10 @@
 		<!-- Header -->
 		<div class="text-center mb-12">
 			<div class="section-tag">💰 Pricing Plans</div>
-			<h1 class="font-display text-4xl sm:text-5xl mb-4">
-				Simple Pricing. <span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Nigerian Naira.</span>
+			<h1 class="font-display text-4xl sm:text-5xl mb-4" style="color:var(--text);">
+				Simple Pricing. <span style="background:linear-gradient(135deg,var(--violet),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Nigerian Naira.</span>
 			</h1>
-			<p class="text-white/50 max-w-xl mx-auto">No foreign currency conversion. Pay with Flutterwave or KoraPay — card, bank transfer, USSD, or POS. Cancel anytime.</p>
+			<p class="max-w-xl mx-auto" style="color:var(--text-muted);">No foreign currency conversion. Pay with Flutterwave or KoraPay — card, bank transfer, USSD, or POS. Cancel anytime.</p>
 		</div>
 
 		<!-- Pricing Grid -->
@@ -115,15 +115,15 @@
 						<div class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold bg-violet-DEFAULT text-white whitespace-nowrap">{plan.badge}</div>
 					{/if}
 
-					<div class="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">{plan.name}</div>
-					<div class="font-title text-6xl leading-none mb-1"><sup class="font-body font-bold text-2xl align-super">₦</sup>{plan.price}</div>
-					<div class="text-xs text-white/40 mb-6">{plan.period}</div>
+					<div class="text-xs font-bold uppercase tracking-widest mb-3" style="color:var(--text-muted);">{plan.name}</div>
+					<div class="font-title text-6xl leading-none mb-1" style="color:var(--text);"><sup class="font-body font-bold text-2xl align-super" style="color:var(--text-muted);">₦</sup>{plan.price}</div>
+					<div class="text-xs mb-6" style="color:var(--text-muted);">{plan.period}</div>
 
 					<div class="space-y-2.5 mb-7 flex-1">
 						{#each plan.features as feat}
 							<div class="flex items-start gap-2.5 text-sm">
 								<span class="flex-shrink-0 mt-0.5 font-bold {feat.included ? 'text-lime-DEFAULT' : 'text-rose-DEFAULT'}">{feat.included ? '✓' : '✗'}</span>
-								<span class="{feat.included ? 'text-white/80' : 'text-white/35'}">{feat.text}</span>
+								<span class="{feat.included ? '' : 'opacity-50'}" style="color:var(--text);">{feat.text}</span>
 							</div>
 						{/each}
 					</div>
@@ -150,16 +150,16 @@
 				<div class="font-bold text-[9px] px-2 py-1 border border-white/20 rounded">Paystack</div>
 				<div class="font-bold text-[9px] px-2 py-1 border border-white/20 rounded">Seerbit</div>
 			</div>
-			<p class="text-xs text-white/40 w-full text-center mt-2">🔒 Secure payments · Card · Bank Transfer · USSD · POS · Nigeria-native infrastructure</p>
+			<p class="text-xs w-full text-center mt-2" style="color:var(--text-muted);">🔒 Secure payments · Card · Bank Transfer · USSD · POS · Nigeria-native infrastructure</p>
 		</div>
 
 		<!-- Secure Payment Banner -->
-		<div class="glass-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4" style="background:linear-gradient(135deg,rgba(124,58,237,0.18),rgba(132,204,22,0.08)); border:1px solid rgba(132,204,22,0.25);">
+		<div class="glass-card p-6 flex flex-col sm:flex-row items-center justify-between gap-4" style="background:linear-gradient(135deg,rgba(var(--violet-rgb),0.18),rgba(var(--lime-rgb),0.08)); border:1px solid rgba(var(--lime-rgb),0.25);">
 			<div class="flex items-center gap-4">
 				<div class="text-4xl">🛡️</div>
 				<div>
-					<div class="font-bold text-lg mb-1">Secure & Guaranteed Success</div>
-					<p class="text-sm text-white/50">Your payment is processed through secure, bank-level encryption. Start your journey to A1 grades today.</p>
+					<div class="font-bold text-lg mb-1" style="color:var(--text);">Secure & Guaranteed Success</div>
+					<p class="text-sm" style="color:var(--text-muted);">Your payment is processed through secure, bank-level encryption. Start your journey to A1 grades today.</p>
 				</div>
 			</div>
 			<button

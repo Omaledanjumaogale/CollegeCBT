@@ -99,11 +99,11 @@
 		<div class="glass-card p-8 rounded-3xl">
 			<!-- Header -->
 			<div class="text-center mb-6">
-				<a href="/" class="inline-block font-display text-3xl mb-4" style="background:linear-gradient(135deg,#fff 40%,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-					College<span style="-webkit-text-fill-color:#84cc16;">CBT</span>
+				<a href="/" class="inline-block font-display text-3xl mb-4" aria-label="CollegeCBT Home">
+					<span style="color:var(--text);">College</span><span style="color:var(--lime);">CBT</span>
 				</a>
-				<h1 class="font-display text-2xl text-white mb-1">Create Your Account</h1>
-				<p class="text-white/40 text-sm">Join thousands of Nigerian students preparing smarter</p>
+				<h1 class="font-display text-2xl mb-1" style="color:var(--text);">Create Your Account</h1>
+				<p class="text-sm" style="color:var(--text-muted);">Join thousands of Nigerian students preparing smarter</p>
 			</div>
 
 			<!-- Step progress indicator -->
@@ -129,17 +129,17 @@
 			{#if step === 1}
 				<div class="space-y-4">
 					<div>
-						<label for="reg-name" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Full Name *</label>
+						<label for="reg-name" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Full Name *</label>
 						<input id="reg-name" type="text" bind:value={fullName} placeholder="e.g. Adaobi Chukwu" class="form-input" autocomplete="name" />
 					</div>
 					<div>
-						<label for="reg-dob" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Date of Birth *</label>
+						<label for="reg-dob" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Date of Birth *</label>
 						<input id="reg-dob" type="date" bind:value={dob} class="form-input" />
 					</div>
 					<div>
-						<label for="reg-nin" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">NIN (National ID Number)</label>
+						<label for="reg-nin" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">NIN (National ID Number)</label>
 						<input id="reg-nin" type="text" bind:value={nin} placeholder="11-digit NIN (optional)" class="form-input" maxlength="11" />
-						<p class="text-[11px] text-white/30 mt-1">Used for identity verification only. Optional.</p>
+						<p class="text-[11px] mt-1" style="color:var(--text-muted);">Used for identity verification only. Optional.</p>
 					</div>
 				</div>
 			{/if}
@@ -148,15 +148,15 @@
 			{#if step === 2}
 				<div class="space-y-4">
 					<div>
-						<label for="reg-email" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Email Address *</label>
+						<label for="reg-email" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Email Address *</label>
 						<input id="reg-email" type="email" bind:value={email} placeholder="you@university.edu.ng" class="form-input" autocomplete="email" />
 					</div>
 					<div>
-						<label for="reg-phone" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Phone Number *</label>
+						<label for="reg-phone" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Phone Number *</label>
 						<input id="reg-phone" type="tel" bind:value={phone} placeholder="080x xxx xxxx" class="form-input" autocomplete="tel" />
 					</div>
 					<div>
-						<label for="reg-password" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Password *</label>
+						<label for="reg-password" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Password *</label>
 						<div class="relative">
 							<input id="reg-password" type={showPassword ? 'text' : 'password'} bind:value={password} placeholder="Create a strong password" class="form-input pr-12" autocomplete="new-password" />
 							<button type="button" onclick={() => showPassword = !showPassword} class="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors" aria-label="Toggle password visibility">
@@ -174,7 +174,7 @@
 						{/if}
 					</div>
 					<div>
-						<label for="reg-confirm" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Confirm Password *</label>
+						<label for="reg-confirm" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Confirm Password *</label>
 						<input id="reg-confirm" type="password" bind:value={confirmPassword} placeholder="Repeat your password" class="form-input" autocomplete="new-password" />
 						{#if confirmPassword && password !== confirmPassword}
 							<p class="text-xs text-rose-400 mt-1">❌ Passwords do not match</p>
@@ -189,7 +189,7 @@
 			{#if step === 3}
 				<form onsubmit={handleSubmit} class="space-y-4">
 					<div>
-						<label for="reg-inst-type" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Institution Type *</label>
+						<label for="reg-inst-type" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Institution Type *</label>
 						<select id="reg-inst-type" bind:value={institutionType} class="form-select">
 							<option value="">Select Type</option>
 							{#each institutionTypes as t}
@@ -198,19 +198,19 @@
 						</select>
 					</div>
 					<div>
-						<label for="reg-inst-name" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Institution Name</label>
+						<label for="reg-inst-name" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Institution Name</label>
 						<input id="reg-inst-name" type="text" bind:value={institutionName} placeholder="e.g. University of Lagos, FUTO, BUK" class="form-input" />
 					</div>
 					<div>
-						<label for="reg-faculty" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Faculty / School</label>
+						<label for="reg-faculty" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Faculty / School</label>
 						<input id="reg-faculty" type="text" bind:value={faculty} placeholder="e.g. Faculty of Engineering" class="form-input" />
 					</div>
 					<div>
-						<label for="reg-dept" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Department *</label>
+						<label for="reg-dept" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Department *</label>
 						<input id="reg-dept" type="text" bind:value={department} placeholder="e.g. Computer Science, Nursing" class="form-input" />
 					</div>
 					<div>
-						<label for="reg-level" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Current Level *</label>
+						<label for="reg-level" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Current Level *</label>
 						<select id="reg-level" bind:value={level} class="form-select">
 							<option value="">Select Level</option>
 							{#each levels as l}
@@ -262,9 +262,9 @@
 			{/if}
 
 			<!-- Footer - already have account -->
-			<p class="text-center text-sm text-white/40 mt-6">
+			<p class="text-center text-sm mt-6" style="color:var(--text-muted);">
 				Already have an account?
-				<a href="/auth/login" class="text-violet-light hover:text-white font-semibold transition-colors ml-1">
+				<a href="/auth/login" class="hover:underline font-semibold transition-colors ml-1" style="color:var(--violet);">
 					Sign in →
 				</a>
 			</p>

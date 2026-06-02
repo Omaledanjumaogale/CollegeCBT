@@ -14,12 +14,12 @@
 	<div class="page-container">
 		<div class="text-center mb-16">
 			<div class="section-tag">📊 Student Dashboard Preview</div>
-			<h2 id="dash-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 text-white leading-tight">
+			<h2 id="dash-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 leading-tight" style="color:var(--text);">
 				Your Personal
 				<br />
-				<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Results Command Centre</span>
+				<span style="background:linear-gradient(135deg,var(--violet),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Results Command Centre</span>
 			</h2>
-			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-semibold">
+			<p class="max-w-2xl mx-auto text-lg leading-relaxed font-semibold" style="color:var(--text-muted);">
 				Track performance, AI readiness score, topic performance, and grade predictions from your personalised dashboard — updated in real-time.
 			</p>
 		</div>
@@ -52,7 +52,7 @@
 
 			<!-- Grade Prediction Card -->
 			<div class="glass-card p-8 lg:p-10 flex flex-col transition-all duration-300 hover:shadow-2xl hover:border-violet-500/20">
-				<div class="font-display font-bold text-lg sm:text-xl mb-6 text-white flex items-center gap-2">
+				<div class="font-display font-bold text-lg sm:text-xl mb-6 flex items-center gap-2" style="color:var(--text);">
 					<span>🔮</span> Predicted Grade — <span class="text-violet-light underline underline-offset-4 decoration-violet-500/40">DBMS</span>
 				</div>
 				<div class="space-y-4 flex-1">
@@ -73,7 +73,7 @@
 
 			<!-- Topic Heatmap Card -->
 			<div class="glass-card p-8 lg:p-10 flex flex-col transition-all duration-300 hover:shadow-2xl hover:border-amber-500/20">
-				<div class="font-display font-bold text-lg sm:text-xl mb-8 text-white flex items-center gap-2">
+				<div class="font-display font-bold text-lg sm:text-xl mb-8 flex items-center gap-2" style="color:var(--text);">
 					<span>🌡️</span> Personal Topic Performance
 				</div>
 				<div class="space-y-6 flex-1">
@@ -98,7 +98,7 @@
 			<a href="/dashboard" class="btn-violet px-10 py-5 text-lg font-black tracking-tight rounded-[20px] transition-all duration-500 shadow-violet group-hover:scale-105">
 				📊 Access Full Command Centre →
 			</a>
-			<div class="mt-6 flex justify-center items-center gap-4 text-xs font-bold text-white/30 uppercase tracking-widest pointer-events-none">
+			<div class="mt-6 flex justify-center items-center gap-4 text-xs font-bold uppercase tracking-widest pointer-events-none" style="color:var(--text-muted);">
 				<span>Real-time Sync</span>
 				<div class="w-1.5 h-1.5 rounded-full bg-lime-500 animate-pulse"></div>
 				<span>Convex Backend</span>

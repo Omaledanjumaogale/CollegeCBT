@@ -69,13 +69,13 @@
 					<br />
 					<span style="background:linear-gradient(135deg,#16a34a,#ea580c);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Guaranteed by AI.</span>
 				</h1>
-				<p class="text-white/60 text-lg sm:text-xl max-w-2xl mb-8 leading-relaxed">
+				<p class="text-lg sm:text-xl max-w-2xl mb-8 leading-relaxed" style="color:var(--text-muted);">
 					CollegeCBT uses AI to create practice questions for every course in Nigerian universities, polytechnics, and colleges. Practice with real exam scenarios and get full explanations for every answer.
 				</p>
 
 				<!-- Accreditation Badges -->
 				<div class="flex items-center gap-2 flex-wrap mb-8">
-					<span class="text-white/30 text-xs font-semibold uppercase tracking-wider">Aligned to:</span>
+					<span class="text-xs font-semibold uppercase tracking-wider" style="color:var(--text-muted);">Aligned to:</span>
 					<span class="badge badge-violet">NUC</span>
 					<span class="badge badge-amber">NBTE</span>
 					<span class="badge badge-lime">NCCE</span>
@@ -92,7 +92,7 @@
 				</div>
 
 				<!-- Social proof strip -->
-				<div class="flex flex-wrap gap-5 items-center text-sm text-white/40 font-medium">
+				<div class="flex flex-wrap gap-5 items-center text-sm font-medium" style="color:var(--text-muted);">
 					<span>✅ No Credit Card required</span>
 					<span class="hidden sm:inline">·</span>
 					<span>✅ All Nigerian Institutions</span>
@@ -112,26 +112,26 @@
 						</div>
 						<!-- Countdown Timer -->
 						<div class="flex items-center gap-1.5" aria-label="Time remaining">
-							<div class="relative w-10 h-10 rounded-full flex items-center justify-center bg-white/5 border border-white/10">
-								<svg class="absolute inset-0 w-full h-full -rotate-90">
-									<circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2" class="text-white/10" />
-									<circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2" 
-										stroke-dasharray="113" 
-										stroke-dashoffset={113 - (demoTimer / 90) * 113}
-										class={demoTimer <= 15 ? 'text-rose-500' : 'text-amber-500'} 
-										style="transition: stroke-dashoffset 1s linear;"
-									/>
-								</svg>
-								<span class="text-xs font-mono font-bold" class:text-rose-500={demoTimer <= 15} class:text-amber-500={demoTimer > 15}>{demoTimer}</span>
-							</div>
-							<span class="text-[10px] text-white/35 font-bold uppercase tracking-tighter">sec</span>
+							<div class="relative w-10 h-10 rounded-full flex items-center justify-center" style="background:rgba(22,163,74,0.08);border:1px solid var(--glass-border);">
+							<svg class="absolute inset-0 w-full h-full -rotate-90">
+								<circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--glass-border)" />
+								<circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2" 
+									stroke-dasharray="113" 
+									stroke-dashoffset={113 - (demoTimer / 90) * 113}
+									class={demoTimer <= 15 ? 'text-rose-500' : 'text-amber-500'} 
+									style="transition: stroke-dashoffset 1s linear;"
+								/>
+							</svg>
+							<span class="text-xs font-mono font-bold" class:text-rose-500={demoTimer <= 15} class:text-amber-500={demoTimer > 15}>{demoTimer}</span>
+						</div>
+						<span class="text-[10px] font-bold uppercase tracking-tighter" style="color:var(--text-muted);">sec</span>
 						</div>
 					</div>
 
 					<!-- Question -->
-					<div class="p-4 rounded-xl mb-4 bg-white/5 border border-white/10">
-						<div class="text-[10px] text-white/35 uppercase tracking-widest font-bold mb-2">Computer Networks · MCQ</div>
-						<p class="text-white/90 text-sm leading-relaxed font-semibold">{demoQ.text}</p>
+					<div class="p-4 rounded-xl mb-4" style="background:rgba(22,163,74,0.06);border:1px solid var(--glass-border);">
+						<div class="text-[10px] uppercase tracking-widest font-bold mb-2" style="color:var(--text-muted);">Computer Networks · MCQ</div>
+						<p class="text-sm leading-relaxed font-semibold" style="color:var(--text);">{demoQ.text}</p>
 					</div>
 
 					<!-- Options -->
@@ -144,7 +144,7 @@
 								disabled={demoAnswered}
 								class="mcq-option {demoAnswered && isCorrect ? 'correct' : (demoAnswered && isSelected && !isCorrect ? 'wrong' : '')}"
 							>
-								<span class="font-bold mr-2 text-white/40">{opt.key}.</span>
+								<span class="font-bold mr-2" style="color:var(--text-muted);">{opt.key}.</span>
 								<span class="flex-1">{opt.text}</span>
 								{#if demoAnswered && isCorrect}<span class="text-xs">✅</span>{/if}
 								{#if demoAnswered && isSelected && !isCorrect}<span class="text-xs">❌</span>{/if}
@@ -160,11 +160,11 @@
 							<div class="font-bold mb-1" style="color: {demoCorrect ? '#16a34a' : '#f87171'}">
 								{demoCorrect ? '🎯 Correct!' : '❌ Not Quite Right'}
 							</div>
-							<p class="text-white/65">{demoQ.explanation.replace('❌', '\n❌').replace('✅', '✅')}</p>
+							<p style="color:var(--text-muted);">{demoQ.explanation.replace('❌', '\n❌').replace('✅', '✅')}</p>
 						</div>
 						<button onclick={resetDemo} class="w-full btn-ghost py-2.5 text-sm">↩ Try Another Question</button>
 					{:else}
-						<div class="text-xs text-white/30 text-center font-medium italic">Click an option above — experience the real Exam Lab</div>
+						<div class="text-xs text-center font-medium italic" style="color:var(--text-muted);">Click an option above — experience the real Exam Lab</div>
 					{/if}
 				</div>
 				<ReadinessCard />
@@ -180,8 +180,8 @@
 				<div class="absolute -bottom-6 -left-6 glass-card px-4 py-2 hidden sm:flex items-center gap-3 border-amber-500/30 animate-pulse-subtle delay-700 scale-90">
 					<span class="text-amber-500 text-xl">⏱️</span>
 					<div>
-						<div class="text-xs font-bold text-white leading-tight">Mock Exam Ready</div>
-						<div class="text-[10px] text-white/40 font-medium">90s per question</div>
+						<div class="text-xs font-bold leading-tight" style="color:var(--text);">Mock Exam Ready</div>
+						<div class="text-[10px] font-medium" style="color:var(--text-muted);">90s per question</div>
 					</div>
 				</div>
 			</div>

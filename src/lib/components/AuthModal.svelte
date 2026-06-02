@@ -231,7 +231,7 @@
 						<div class="text-center py-4">
 							<div class="text-6xl mb-4">🎉</div>
 							<h2 class="font-display text-2xl mb-2">Welcome to CollegeCBT!</h2>
-							<p class="text-white/50 text-sm mb-6">Your account is ready. Check your email to verify, then start practising.</p>
+							<p class="text-sm mb-6" style="color:var(--text-muted);">Your account is ready. Check your email to verify, then start practising.</p>
 							<div class="flex gap-3 justify-center flex-wrap">
 								<a href="/exam-lab" onclick={close} class="btn-lime px-6 py-2.5 text-sm">🤖 Go to Exam Lab →</a>
 								<a href="/dashboard" onclick={close} class="btn-ghost px-5 py-2.5 text-sm">📊 My Dashboard</a>
@@ -243,28 +243,20 @@
 							<div class="text-xs font-700 uppercase tracking-widest mb-4" style="color:#A3E635;">Personal Information</div>
 							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div>
-									<label for="su-fullname" class="text-xs text-white/45 mb-1.5 block font-600">Full Name *</label>
-									<input id="su-fullname" type="text" bind:value={suFullName} placeholder="Emeka Okonkwo" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-phone" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Mobile Number *</label>
+									<input id="su-phone" type="tel" bind:value={suPhone} placeholder="+234 800 000 0000" class="form-input"/>
 								</div>
 								<div>
-									<label for="su-dob" class="text-xs text-white/45 mb-1.5 block font-600">Date of Birth *</label>
-									<input id="su-dob" type="date" bind:value={suDob} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-whatsapp" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">WhatsApp Number</label>
+									<input id="su-whatsapp" type="tel" bind:value={suWhatsapp} placeholder="+234 800 000 0000" class="form-input"/>
 								</div>
 								<div>
-									<label for="su-phone" class="text-xs text-white/45 mb-1.5 block font-600">Mobile Number *</label>
-									<input id="su-phone" type="tel" bind:value={suPhone} placeholder="+234 800 000 0000" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-nin" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">NIN (National ID) *</label>
+									<input id="su-nin" type="text" bind:value={suNin} placeholder="12345678901" maxlength="11" class="form-input"/>
 								</div>
 								<div>
-									<label for="su-whatsapp" class="text-xs text-white/45 mb-1.5 block font-600">WhatsApp Number</label>
-									<input id="su-whatsapp" type="tel" bind:value={suWhatsapp} placeholder="+234 800 000 0000" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
-								</div>
-								<div>
-									<label for="su-nin" class="text-xs text-white/45 mb-1.5 block font-600">NIN (National ID) *</label>
-									<input id="su-nin" type="text" bind:value={suNin} placeholder="12345678901" maxlength="11" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
-								</div>
-								<div>
-									<label for="su-email" class="text-xs text-white/45 mb-1.5 block font-600">Email Address *</label>
-									<input id="su-email" type="email" bind:value={suEmail} placeholder="emeka@university.edu.ng" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-email" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Email Address *</label>
+									<input id="su-email" type="email" bind:value={suEmail} placeholder="emeka@university.edu.ng" class="form-input"/>
 								</div>
 							</div>
 						</div>
@@ -274,8 +266,8 @@
 							<div class="text-xs font-700 uppercase tracking-widest mb-4" style="color:#A3E635;">Location Details</div>
 							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div>
-									<label for="su-state-res" class="text-xs text-white/45 mb-1.5 block font-600">State of Residence *</label>
-									<select id="su-state-res" bind:value={suStateRes} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+									<label for="su-state-res" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">State of Residence *</label>
+									<select id="su-state-res" bind:value={suStateRes} class="form-select">
 										<option value="">Select State…</option>
 										{#each NIGERIA_STATES as state}
 											<option value={state}>{state}</option>
@@ -283,8 +275,8 @@
 									</select>
 								</div>
 								<div>
-									<label for="su-state-origin" class="text-xs text-white/45 mb-1.5 block font-600">State of Origin *</label>
-									<select id="su-state-origin" bind:value={suStateOrigin} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+									<label for="su-state-origin" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">State of Origin *</label>
+									<select id="su-state-origin" bind:value={suStateOrigin} class="form-select">
 										<option value="">Select State…</option>
 										{#each NIGERIA_STATES as state}
 											<option value={state}>{state}</option>
@@ -292,12 +284,12 @@
 									</select>
 								</div>
 								<div>
-									<label for="su-lga" class="text-xs text-white/45 mb-1.5 block font-600">LGA (Local Govt. Area) *</label>
-									<input id="su-lga" type="text" bind:value={suLga} placeholder="e.g. Ikeja, Enugu North" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-lga" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">LGA (Local Govt. Area) *</label>
+									<input id="su-lga" type="text" bind:value={suLga} placeholder="e.g. Ikeja, Enugu North" class="form-input"/>
 								</div>
 								<div>
-									<label for="su-address" class="text-xs text-white/45 mb-1.5 block font-600">Residential Address *</label>
-									<input id="su-address" type="text" bind:value={suAddress} placeholder="No. 12, University Road, Zaria" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-address" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Residential Address *</label>
+									<input id="su-address" type="text" bind:value={suAddress} placeholder="No. 12, University Road, Zaria" class="form-input"/>
 								</div>
 							</div>
 						</div>
@@ -307,8 +299,8 @@
 							<div class="text-xs font-700 uppercase tracking-widest mb-4" style="color:#A3E635;">Academic Profile</div>
 							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div>
-									<label for="su-inst-type" class="text-xs text-white/45 mb-1.5 block font-600">Institution Type *</label>
-									<select id="su-inst-type" bind:value={suInstType} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+									<label for="su-inst-type" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Institution Type *</label>
+									<select id="su-inst-type" bind:value={suInstType} class="form-select">
 										<option value="">Select Type…</option>
 										{#each INSTITUTION_TYPES as type}
 											<option value={type}>{type}</option>
@@ -316,8 +308,8 @@
 									</select>
 								</div>
 								<div>
-									<label for="su-inst-name" class="text-xs text-white/45 mb-1.5 block font-600">Institution Name *</label>
-									<select id="su-inst-name" bind:value={suInstName} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+									<label for="su-inst-name" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Institution Name *</label>
+									<select id="su-inst-name" bind:value={suInstName} class="form-select">
 										<option value="">Select Institution…</option>
 										{#each UNIVERSITIES_LIST as uni}
 											<option value={uni}>{uni}</option>
@@ -326,13 +318,13 @@
 								</div>
 								{#if suInstName === 'Other (Please specify)'}
 									<div transition:slide>
-										<label for="su-other-inst" class="text-xs text-white/45 mb-1.5 block font-600">Specify Institution *</label>
-										<input id="su-other-inst" type="text" bind:value={suOtherInstName} placeholder="Enter your institution name" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+										<label for="su-other-inst" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Specify Institution *</label>
+										<input id="su-other-inst" type="text" bind:value={suOtherInstName} placeholder="Enter your institution name" class="form-input"/>
 									</div>
 								{/if}
 								<div>
-									<label for="su-faculty" class="text-xs text-white/45 mb-1.5 block font-600">Faculty / School *</label>
-									<select id="su-faculty" bind:value={suFaculty} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+									<label for="su-faculty" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Faculty / School *</label>
+									<select id="su-faculty" bind:value={suFaculty} class="form-select">
 										<option value="">Select Faculty…</option>
 										{#each facultyList as f}
 											<option value={f}>{f}</option>
@@ -340,8 +332,8 @@
 									</select>
 								</div>
 								<div>
-									<label for="su-dept" class="text-xs text-white/45 mb-1.5 block font-600">Department / Course *</label>
-									<select id="su-dept" bind:value={suDept} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+									<label for="su-dept" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Department / Course *</label>
+									<select id="su-dept" bind:value={suDept} class="form-select">
 										<option value="">Select Department…</option>
 										{#each departmentList as d}
 											<option value={d}>{d}</option>
@@ -350,8 +342,8 @@
 									</select>
 								</div>
 								<div>
-									<label for="su-level" class="text-xs text-white/45 mb-1.5 block font-600">Current Level *</label>
-									<select id="su-level" bind:value={suLevel} class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]">
+									<label for="su-level" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Current Level *</label>
+									<select id="su-level" bind:value={suLevel} class="form-select">
 										<option value="">Select Level…</option>
 										{#each levelList as l}
 											<option value={l}>{l}</option>
@@ -364,8 +356,8 @@
 									</select>
 								</div>
 								<div>
-									<label for="su-matric" class="text-xs text-white/45 mb-1.5 block font-600">Matric / Student ID</label>
-									<input id="su-matric" type="text" bind:value={suMatric} placeholder="Optional" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-matric" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Matric / Student ID</label>
+									<input id="su-matric" type="text" bind:value={suMatric} placeholder="Optional" class="form-input"/>
 								</div>
 							</div>
 						</div>
@@ -375,18 +367,18 @@
 							<div class="text-xs font-700 uppercase tracking-widest mb-4" style="color:#A3E635;">Account Security</div>
 							<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 								<div>
-									<label for="su-password" class="text-xs text-white/45 mb-1.5 block font-600">Password *</label>
-									<input id="su-password" type="password" bind:value={suPassword} placeholder="Minimum 8 characters" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-password" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Password *</label>
+									<input id="su-password" type="password" bind:value={suPassword} placeholder="Minimum 8 characters" class="form-input"/>
 									{#if suPassword}
-										<div class="mt-2 h-1 rounded-full overflow-hidden bg-white/10">
+										<div class="mt-2 h-1 rounded-full overflow-hidden" style="background:var(--glass-border);">
 											<div class="h-full rounded-full transition-all duration-300" style="width:{pwStrength.width};background:{pwStrength.color};"></div>
 										</div>
 										<p class="text-[11px] mt-1" style="color:{pwStrength.color};">{pwStrength.label} password</p>
 									{/if}
 								</div>
 								<div>
-									<label for="su-confirm" class="text-xs text-white/45 mb-1.5 block font-600">Confirm Password *</label>
-									<input id="su-confirm" type="password" bind:value={suConfirmPassword} placeholder="Re-enter password" class="w-full px-4 py-3 text-sm rounded-xl border border-white/10 bg-black/20 text-white outline-none focus:border-[#A3E635] focus:ring-1 focus:ring-[#A3E635]"/>
+									<label for="su-confirm" class="text-xs font-semibold mb-1.5 block uppercase tracking-wider" style="color:var(--text-muted);">Confirm Password *</label>
+									<input id="su-confirm" type="password" bind:value={suConfirmPassword} placeholder="Re-enter password" class="form-input"/>
 									{#if suConfirmPassword && suPassword !== suConfirmPassword}
 										<p class="text-[11px] mt-1 text-rose-400">Passwords do not match</p>
 									{:else if suConfirmPassword && suPassword === suConfirmPassword}
@@ -396,7 +388,7 @@
 							</div>
 						</div>
 
-						<p class="text-xs text-white/30 mb-5">
+						<p class="text-xs mb-5" style="color:var(--text-muted);">
 							<label class="flex items-start gap-3 mb-4 cursor-pointer">
 								<input type="checkbox" bind:checked={suTerms} class="mt-0.5 accent-lime-600 flex-shrink-0 w-4 h-4" />
 								<span>By creating an account you agree to our <a href="/terms" class="text-[#A3E635] hover:underline">Terms of Service</a> and <a href="/privacy" class="text-[#A3E635] hover:underline">Privacy Policy</a>. Your NIN and personal data are secured and will not be shared.</span>
@@ -407,7 +399,7 @@
 							{#if loading}<span class="w-5 h-5 border-2 border-green-900/30 border-t-green-900 rounded-full animate-spin"></span>{:else}🚀 Create Free Account{/if}
 						</button>
 						
-						<p class="text-center text-white/30 text-xs mt-4">
+						<p class="text-center text-xs mt-4" style="color:var(--text-muted);">
 							Already have an account? <button onclick={() => switchTab('login')} class="text-[#A3E635] hover:underline">Sign In</button>
 						</p>
 					{/if}
@@ -418,10 +410,10 @@
 {/if}
 
 <style>
-	.tab-active { background-color: #064E3B; color: white; }
-	.tab-inactive { color: rgba(255,255,255,0.6); }
-	.tab-inactive:hover { color: white; background: rgba(255,255,255,0.05); }
+	.tab-active { background-color: var(--violet); color: white; }
+	.tab-inactive { color: var(--text-muted); }
+	.tab-inactive:hover { color: var(--text); background: var(--glass); }
 	.modal-scroll::-webkit-scrollbar { width: 4px; }
 	.modal-scroll::-webkit-scrollbar-track { background: transparent; }
-	.modal-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+	.modal-scroll::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
 </style>

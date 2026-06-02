@@ -47,18 +47,18 @@
 		<div class="glass-card p-8 rounded-3xl">
 			<!-- Header -->
 			<div class="text-center mb-8">
-				<a href="/" class="inline-block font-display text-3xl mb-6" style="background:linear-gradient(135deg,#fff 40%,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-					College<span style="-webkit-text-fill-color:#84cc16;">CBT</span>
+				<a href="/" class="inline-block font-display text-3xl mb-6" aria-label="CollegeCBT Home">
+					<span style="color:var(--text);">College</span><span style="color:var(--lime);">CBT</span>
 				</a>
-				<h1 class="font-display text-2xl text-white mb-2">Welcome Back</h1>
-				<p class="text-white/40 text-sm">Sign in to continue your exam preparation</p>
+				<h1 class="font-display text-2xl mb-2" style="color:var(--text);">Welcome Back</h1>
+				<p class="text-sm" style="color:var(--text-muted);">Sign in to continue your exam preparation</p>
 			</div>
 
 			<!-- Form -->
 			<form onsubmit={handleLogin} class="space-y-5">
 				<!-- Email -->
 				<div>
-					<label for="login-email" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Email Address</label>
+					<label for="login-email" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Email Address</label>
 					<input
 						id="login-email"
 						type="email"
@@ -72,7 +72,7 @@
 
 				<!-- Password -->
 				<div>
-					<label for="login-password" class="block text-xs font-semibold text-white/50 uppercase tracking-wider mb-2">Password</label>
+					<label for="login-password" class="block text-xs font-semibold uppercase tracking-wider mb-2" style="color:var(--text-muted);">Password</label>
 					<div class="relative">
 						<input
 							id="login-password"
@@ -122,23 +122,23 @@
 
 			<!-- Divider -->
 			<div class="flex items-center gap-3 my-6">
-				<div class="flex-1 h-px bg-white/10"></div>
-				<span class="text-white/30 text-xs">OR</span>
-				<div class="flex-1 h-px bg-white/10"></div>
+				<div class="flex-1 h-px" style="background:var(--glass-border);"></div>
+				<span class="text-xs" style="color:var(--text-muted);">OR</span>
+				<div class="flex-1 h-px" style="background:var(--glass-border);"></div>
 			</div>
 
 			<!-- Register link -->
-			<p class="text-center text-sm text-white/40">
+			<p class="text-center text-sm" style="color:var(--text-muted);">
 				Don't have an account?
-				<a href="/auth/register" class="text-violet-light hover:text-white font-semibold transition-colors ml-1">
+				<a href="/auth/register" class="hover:underline font-semibold transition-colors ml-1" style="color:var(--violet);">
 					Create one free →
 				</a>
 			</p>
 
 			<!-- Admin link -->
-			<p class="text-center text-xs text-white/20 mt-4">
+			<p class="text-center text-xs mt-4" style="color:var(--text-muted);">
 				Institution admin?
-				<a href="/admin/login" class="text-white/35 hover:text-white/60 transition-colors ml-1">
+				<a href="/admin/login" class="hover:underline transition-colors ml-1" style="color:var(--text-muted);">
 					Admin Portal →
 				</a>
 			</p>
@@ -153,7 +153,7 @@
 			] as feat}
 				<div class="glass-card p-3 rounded-2xl">
 					<div class="text-xl mb-1">{feat.icon}</div>
-					<div class="text-[10px] text-white/40 font-medium">{feat.text}</div>
+					<div class="text-[10px] font-medium" style="color:var(--text-muted);">{feat.text}</div>
 				</div>
 			{/each}
 		</div>

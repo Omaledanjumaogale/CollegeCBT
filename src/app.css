@@ -59,26 +59,33 @@ body:not([data-theme="dark"]) .text-white {
 body:not([data-theme="dark"]) .text-white\/10,
 body:not([data-theme="dark"]) .text-white\/20,
 body:not([data-theme="dark"]) .text-white\/30,
+body:not([data-theme="dark"]) .text-white\/35,
 body:not([data-theme="dark"]) .text-white\/40,
 body:not([data-theme="dark"]) .text-white\/50,
 body:not([data-theme="dark"]) .text-white\/55,
 body:not([data-theme="dark"]) .text-white\/60,
+body:not([data-theme="dark"]) .text-white\/65,
 body:not([data-theme="dark"]) .text-white\/70,
 body:not([data-theme="dark"]) .text-white\/80,
 body:not([data-theme="dark"]) .text-white\/90 {
   color: var(--text-muted) !important;
 }
+body:not([data-theme="dark"]) .bg-white\/3,
 body:not([data-theme="dark"]) .bg-white\/5,
 body:not([data-theme="dark"]) .bg-white\/8,
 body:not([data-theme="dark"]) .bg-white\/10,
 body:not([data-theme="dark"]) .bg-white\/15,
-body:not([data-theme="dark"]) .bg-white\/3 {
-  background-color: rgba(22, 163, 74, 0.06) !important;
+body:not([data-theme="dark"]) .bg-white\/20 {
+  background-color: rgba(22, 163, 74, 0.05) !important;
+}
+body:not([data-theme="dark"]) .bg-black\/20,
+body:not([data-theme="dark"]) .bg-black\/70 {
+  background-color: rgba(15, 23, 42, 0.06) !important;
 }
 body:not([data-theme="dark"]) .border-white\/5,
-body:not([data-theme="dark"]) .border-white\/10,
 body:not([data-theme="dark"]) .border-white\/6,
 body:not([data-theme="dark"]) .border-white\/8,
+body:not([data-theme="dark"]) .border-white\/10,
 body:not([data-theme="dark"]) .border-white\/12,
 body:not([data-theme="dark"]) .border-white\/15,
 body:not([data-theme="dark"]) .border-white\/20 {
@@ -92,6 +99,39 @@ body:not([data-theme="dark"]) .text-slate-300 {
 body:not([data-theme="dark"]) .text-slate-400,
 body:not([data-theme="dark"]) .text-slate-500 {
   color: var(--text-muted) !important;
+}
+/* Fix Violet-themed text (used as purple in CurriculumBrowser etc) in light mode */
+body:not([data-theme="dark"]) .text-violet-100,
+body:not([data-theme="dark"]) .text-violet-200,
+body:not([data-theme="dark"]) .text-violet-300 {
+  color: var(--text) !important;
+}
+body:not([data-theme="dark"]) .text-violet-400,
+body:not([data-theme="dark"]) .text-violet-300\/70 {
+  color: var(--text-muted) !important;
+}
+/* Hero/Demo card question text */
+body:not([data-theme="dark"]) .text-white\/90 {
+  color: var(--text) !important;
+}
+/* Demo card background panels */
+body:not([data-theme="dark"]) .bg-violet-900\/20 {
+  background-color: rgba(22, 163, 74, 0.07) !important;
+}
+body:not([data-theme="dark"]) .border-violet-500\/20 {
+  border-color: rgba(22, 163, 74, 0.2) !important;
+}
+body:not([data-theme="dark"]) .border-dashed.border-white\/10 {
+  border-color: var(--glass-border) !important;
+}
+/* ReadinessCard floating bottom badge (black bg) */
+body:not([data-theme="dark"]) .bg-black\/70 {
+  background: var(--bg-alt) !important;
+  border: 1px solid var(--glass-border) !important;
+}
+/* Tab bar in CurriculumBrowser */
+body:not([data-theme="dark"]) .hide-scrollbar {
+  background-color: rgba(22, 163, 74, 0.04) !important;
 }
 
 /* ── GLOBAL ANTI-OVERFLOW ── */

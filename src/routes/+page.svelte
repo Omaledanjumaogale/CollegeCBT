@@ -81,12 +81,12 @@
 		<div class="page-container">
 			<div class="text-center mb-16">
 				<div class="section-tag">📚 Nigerian Higher Education Curriculum</div>
-				<h2 class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 text-white leading-tight">
-					<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">550+ Institutions.</span>
+				<h2 class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 leading-tight" style="color:var(--text);">
+					<span style="background:linear-gradient(135deg,var(--violet),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">550+ Institutions.</span>
 					<br />
 					Every Level. Every Course.
 				</h2>
-				<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-semibold">
+				<p class="max-w-2xl mx-auto text-lg leading-relaxed font-semibold" style="color:var(--text-muted);">
 					Browse the full curriculum for Nigerian Universities, Polytechnics, and Colleges of Education. Select any course to generate context-aware AI practice questions.
 				</p>
 			</div>
@@ -101,7 +101,7 @@
 				] as s}
 					<div class="glass-card p-6 text-center border-white/5 bg-white/5 transition-transform hover:scale-105">
 						<div class="font-display font-title text-3xl mb-1" style="color:{s.color};">{s.num}</div>
-						<div class="text-[10px] text-white/50 mb-3 font-bold uppercase tracking-widest leading-none">{s.lbl}</div>
+						<div class="text-[10px] mb-3 font-bold uppercase tracking-widest leading-none" style="color:var(--text-muted);">{s.lbl}</div>
 						<span class="text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-tighter" style="background:{s.color}15; color:{s.color}; border: 1px solid {s.color}25;">{s.badge} Approved</span>
 					</div>
 				{/each}

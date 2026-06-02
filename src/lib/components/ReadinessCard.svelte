@@ -90,8 +90,8 @@
 		<div class="text-[10px]" style="color:var(--text-muted);">Keep it up!</div>
 	</div>
 
-	<div class="absolute -bottom-4 -left-3 hidden rounded-2xl border border-amber-500/20 bg-black/70 px-4 py-2 shadow-xl backdrop-blur-xl sm:block">
-		<div class="text-xs font-black text-white">⏱️ Mock Ready</div>
-		<div class="text-[10px] text-white/40">90s/question</div>
+	<div class="absolute -bottom-4 -left-3 hidden rounded-2xl px-4 py-2 shadow-xl backdrop-blur-xl sm:block" style="background:var(--bg-alt);border:1px solid rgba(245,158,11,0.2);">
+		<div class="text-xs font-black" style="color:var(--text);">⏱️ Mock Ready</div>
+		<div class="text-[10px]" style="color:var(--text-muted);">90s/question</div>
 	</div>
 </aside>

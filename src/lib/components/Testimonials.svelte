@@ -16,12 +16,12 @@
 	<div class="page-container relative z-10">
 		<div class="text-center mb-16 px-4">
 			<div class="section-tag">💬 Student Success Stories</div>
-			<h2 id="test-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 text-white leading-tight">
+			<h2 id="test-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl mb-6 leading-tight" style="color:var(--text);">
 				Real Students.
 				<br />
-				<span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Real Results.</span>
+				<span style="background:linear-gradient(135deg,var(--violet),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;"> Real Results.</span>
 			</h2>
-			<p class="text-white/55 max-w-2xl mx-auto text-lg leading-relaxed font-semibold">
+			<p class="max-w-2xl mx-auto text-lg leading-relaxed font-semibold" style="color:var(--text-muted);">
 				Nigerian undergraduates across universities and polytechnics sharing their CollegeCBT experience and target grade results.
 			</p>
 		</div>
@@ -32,7 +32,7 @@
 					<!-- Quote icon -->
 					<div class="absolute top-6 right-8 font-display text-8xl text-violet-DEFAULT/5 group-hover:text-violet-DEFAULT/10 leading-none transition-colors select-none pointer-events-none">"</div>
 					
-					<p class="text-white/80 text-base sm:text-lg italic leading-relaxed mb-10 flex-1 relative z-10 font-medium">
+					<p class="text-base sm:text-lg italic leading-relaxed mb-10 flex-1 relative z-10 font-medium" style="color:var(--text);">
 						"{t.quote}"
 					</p>
 					
@@ -41,8 +41,8 @@
 							{t.emoji}
 						</div>
 						<div class="flex-1 overflow-hidden">
-							<div class="font-display font-bold text-lg text-white mb-1 tracking-tight truncate">{t.name}</div>
-							<div class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white/40 mb-2 truncate">{t.meta}</div>
+							<div class="font-display font-bold text-lg mb-1 tracking-tight truncate" style="color:var(--text);">{t.name}</div>
+							<div class="text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 truncate" style="color:var(--text-muted);">{t.meta}</div>
 							<div class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-tighter text-lime-500 py-1 px-3 rounded-full bg-lime-500/10 border border-lime-500/20 group-hover:scale-105 transition-transform origin-left">
 								{t.grade}
 							</div>

@@ -132,10 +132,10 @@
 		<!-- ── Page Header ── -->
 		<div class="text-center mb-12">
 			<div class="section-tag">📚 Study Resources</div>
-			<h1 class="font-display text-4xl sm:text-5xl mb-4">
-				Exam Tips & <span style="background:linear-gradient(135deg,#a78bfa,#84cc16);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Study Guides</span>
+			<h1 class="font-display text-4xl sm:text-5xl mb-4" style="color:var(--text);">
+				Exam Tips & <span style="background:linear-gradient(135deg,var(--violet),var(--lime));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Study Guides</span>
 			</h1>
-			<p class="text-white/50 max-w-xl mx-auto text-lg">
+			<p class="max-w-xl mx-auto text-lg" style="color:var(--text-muted);">
 				Evidence-based strategies and subject deep-dives to boost your AI Readiness Score and score A1 in your exams.
 			</p>
 		</div>
@@ -145,8 +145,8 @@
 			{#each quickGuides as g}
 				<div class="glass-card p-5">
 					<div class="text-3xl mb-3">{g.icon}</div>
-					<div class="font-bold text-sm mb-2">{g.title}</div>
-					<p class="text-xs text-white/50 leading-relaxed">{g.tip}</p>
+					<div class="font-bold text-sm mb-2" style="color:var(--text);">{g.title}</div>
+					<p class="text-xs leading-relaxed" style="color:var(--text-muted);">{g.tip}</p>
 				</div>
 			{/each}
 		</div>
@@ -188,27 +188,27 @@
 									{article.category}
 								</span>
 							</div>
-							<span class="text-xs text-white/35 flex-shrink-0">{article.readTime}</span>
+							<span class="flex-shrink-0" style="color:var(--text-muted);">{article.readTime}</span>
 						</div>
 
 						<!-- Title -->
-						<h2 class="font-bold text-lg mb-3 group-hover:text-lime-DEFAULT transition-colors leading-snug">{article.title}</h2>
+						<h2 class="font-bold text-lg mb-3 transition-colors leading-snug" style="color:var(--text);">{article.title}</h2>
 
 						<!-- Excerpt -->
-						<p class="text-sm text-white/55 mb-6 flex-1 leading-relaxed">{article.excerpt}</p>
+						<p class="text-sm mb-6 flex-1 leading-relaxed" style="color:var(--text-muted);">{article.excerpt}</p>
 
 						<!-- Footer -->
-						<div class="flex justify-between items-center text-xs pt-4 border-t border-white/6">
-							<span class="text-white/35">{article.date}</span>
-							<span class="font-semibold transition-colors text-violet-light group-hover:text-white">Read Article →</span>
+						<div class="flex justify-between items-center text-xs pt-4 border-t" style="border-color:var(--glass-border);">
+							<span style="color:var(--text-muted);">{article.date}</span>
+							<span class="font-semibold transition-colors" style="color:var(--violet);">Read Article →</span>
 						</div>
 					</div>
 				{/each}
 			</div>
 		{:else}
-			<div class="text-center py-16 text-white/40">
+			<div class="text-center py-16" style="color:var(--text-muted);">
 				<div class="text-5xl mb-4">🔍</div>
-				<p class="text-lg font-semibold mb-2">No articles found</p>
+				<p class="text-lg font-semibold mb-2" style="color:var(--text);">No articles found</p>
 				<p class="text-sm">Try adjusting your search or selecting a different category.</p>
 			</div>
 		{/if}
@@ -216,10 +216,10 @@
 		<!-- ── Bottom CTA ── -->
 		<div class="glass-card p-8 md:p-12 text-center" style="background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(132,204,22,0.06));border-color:rgba(124,58,237,0.25);">
 			<div class="text-5xl mb-5">🤖</div>
-			<h2 class="font-display text-3xl sm:text-4xl mb-4">
-				Reading is Good. <span style="color:#84cc16;">Practising is Better.</span>
+			<h2 class="font-display text-3xl sm:text-4xl mb-4" style="color:var(--text);">
+				Reading is Good. <span style="color:var(--lime);">Practising is Better.</span>
 			</h2>
-			<p class="text-white/55 max-w-lg mx-auto mb-8 leading-relaxed">
+			<p class="max-w-lg mx-auto mb-8 leading-relaxed" style="color:var(--text-muted);">
 				Apply these strategies immediately in the CollegeCBT Exam Lab — unlimited AI-generated questions for every Nigerian higher education course.
 			</p>
 			<div class="flex flex-wrap gap-4 justify-center">
@@ -237,17 +237,17 @@
 
 <style>
 	.category-active {
-		background: #7c3aed;
+		background: var(--violet);
 		color: #fff;
 		box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
 	}
 	.category-off {
-		background: rgba(255, 255, 255, 0.05);
-		color: #94a3b8;
-		border: 1px solid rgba(255, 255, 255, 0.08);
+		background: var(--glass);
+		color: var(--text-muted);
+		border: 1px solid var(--glass-border);
 	}
 	.category-off:hover {
 		background: rgba(124, 58, 237, 0.12);
-		color: #fff;
+		color: var(--text);
 	}
 </style>
