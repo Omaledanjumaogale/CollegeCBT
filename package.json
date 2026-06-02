@@ -10,12 +10,15 @@
     "deploy": "npm run build && wrangler pages deploy .svelte-kit/cloudflare",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "test": "npm run check",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:e2e": "playwright test",
     "lint": "npm run check",
     "sync": "svelte-kit sync"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "4.20260404.1",
+    "@playwright/test": "1.60.0",
     "@sveltejs/adapter-cloudflare": "4.9.0",
     "@sveltejs/kit": "2.56.1",
     "@sveltejs/vite-plugin-svelte": "4.0.4",
@@ -26,6 +29,7 @@
     "tailwindcss": "3.4.19",
     "typescript": "5.9.3",
     "vite": "5.4.21",
+    "vitest": "4.1.7",
     "wrangler": "3.114.17"
   },
   "dependencies": {

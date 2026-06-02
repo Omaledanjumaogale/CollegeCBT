@@ -1,5 +1,4 @@
 import { getRuntimeEnv, type RuntimeEnv } from './auth';
-import { api, convex } from '$lib/services/convexClient';
 
 export type PaymentGateway = 'flutterwave' | 'korapay' | 'paystack' | 'seerbit';
 export type PaymentPlan = 'free' | 'pro';
@@ -76,6 +75,7 @@ function isProcessPaymentResult(value: unknown): value is ProcessPaymentResult {
 }
 
 export async function processSubscriptionPayment(input: ProcessPaymentInput): Promise<ProcessPaymentResult> {
+	const { api, convex } = await import('$lib/services/convexClient');
 	const result: unknown = await convex.mutation(api.users.processPayment, {
 		email: input.email,
 		plan: input.plan ?? 'pro',

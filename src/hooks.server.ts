@@ -55,7 +55,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 	response.headers.set(
 		'Content-Security-Policy',
-		"default-src 'self'; script-src 'self' 'unsafe-inline' https://checkout.flutterwave.com https://js.paystack.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.convex.cloud https://*.convex.site https://*.firebaseio.com https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://api.anthropic.com https://api.flutterwave.com https://api.paystack.co https://api.korapay.com https://api.seerbitapi.com https://api.seerbitapigateway.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+		"default-src 'self'; script-src 'self' 'unsafe-inline' https://checkout.flutterwave.com https://js.paystack.co; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.convex.cloud https://*.convex.site wss://*.convex.cloud wss://*.convex.site https://*.firebaseio.com https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://api.anthropic.com https://api.flutterwave.com https://api.paystack.co https://api.korapay.com https://api.seerbitapi.com https://api.seerbitapigateway.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 	);
 
 	// Set X-Robots-Tag to prevent indexers from storing private pages
